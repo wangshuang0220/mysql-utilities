@@ -18,11 +18,12 @@
 """
 import_parameters test.
 """
+from __future__ import absolute_import
 
 import os
 import sys
 
-import import_basic
+from . import import_basic
 
 from mysql.utilities.command.dbcompare import database_compare
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError

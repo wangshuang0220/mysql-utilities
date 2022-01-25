@@ -18,6 +18,7 @@
 """
 This file contains the utilities console mechanism.
 """
+from __future__ import print_function
 
 import os
 import tempfile
@@ -240,7 +241,7 @@ class UtilitiesConsole(Console):
         print_dictionary_list(['Option', 'Description'],
                               ['long_name', 'description'],
                               options, self.width, False)
-        print
+        print()
 
     def is_valid_custom_command(self, command_text):  # pylint: disable=W0221
         """Validate the custom command
@@ -297,7 +298,7 @@ class UtilitiesConsole(Console):
                 else:
                     proc = subprocess.Popen(cmd, shell=False,
                                             stderr=subprocess.PIPE)
-                    print
+                    print()
 
                 # check the output for errors
                 _, stderr_temp = proc.communicate()
@@ -356,7 +357,7 @@ class UtilitiesConsole(Console):
 
         # Build a new list that normalizes the options as a dictionary
         dictionary_list = []
-        for key in self.options.keys():
+        for key in list(self.options.keys()):
             # Skip variables list and messages
             if key not in ['variables', 'welcome', 'goodbye']:
                 value = self.options.get(key, '')
@@ -366,8 +367,8 @@ class UtilitiesConsole(Console):
                 }
                 dictionary_list.append(item)
 
-        print
-        print
+        print()
+        print()
         print_dictionary_list(['Option', 'Value'], ['name', 'value'],
                               dictionary_list, self.width)
-        print
+        print()

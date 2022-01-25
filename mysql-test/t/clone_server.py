@@ -19,6 +19,7 @@
 clone_server test.
 """
 
+from builtins import str
 import os
 import time
 

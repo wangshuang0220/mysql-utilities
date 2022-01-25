@@ -18,11 +18,17 @@
 """
 This module contains a test framework for testing MySQL Utilities.
 """
+from __future__ import print_function
 
 # TODO: Make it possible to stop and delete a specific server from the Server
 #       class.
 
-import commands
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+import subprocess
 import difflib
 import itertools
 import os
@@ -43,6 +49,7 @@ from mysql.utilities.common.tools import get_tool_path, check_port_in_use
 from mysql.utilities.command.serverclone import clone_server
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
+from future.utils import with_metaclass
 
 # Constants
 MAX_SERVER_POOL = 10
@@ -139,7 +146,7 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
         run_cmd = cmd
     with open(file_out, 'w+') as f_out:
         if debug:
-            print
+            print()
             print("exec_util command={0}".format(run_cmd))
             proc = subprocess.Popen(run_cmd, shell=shell, stdin=stdin)
         else:
@@ -155,7 +162,7 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
 
         ret_val = proc.wait()
         if debug:
-            print "ret_val=", ret_val
+            print("ret_val=", ret_val)
     return ret_val
 
 
@@ -543,13 +550,13 @@ class ServerList(object):
         for server in self.server_list:
             if server[1] and server[0] is not None and server[0].is_alive():
                 try:
-                    print("  Shutting down server "
-                          "{0}...".format(server[0].role)),
+                    print(("  Shutting down server "
+                          "{0}...".format(server[0].role)), end=' ')
                     if self.stop_server(server[0]):
                         print("success.")
                     elif server[2] is not None and server[2] > 1:
-                        print("WARN - attempting SIGTERM - pid = "
-                              "{0}".format(server[2])),
+                        print(("WARN - attempting SIGTERM - pid = "
+                              "{0}".format(server[2])), end=' ')
                         # try signal termination
                         retval = 0
                         if os.name == "posix":
@@ -567,7 +574,7 @@ class ServerList(object):
                     else:
                         print("ERROR")
                 except MUTLibError as err:
-                    print "ERROR"
+                    print("ERROR")
                     print("    Unable to shutdown server "
                           "{0}.".format(server[0].role))
 
@@ -707,7 +714,7 @@ class ServerList(object):
         Returns (int) process id or -1 if not found
         """
         if os.name == "posix":
-            output = commands.getoutput("ps -f|grep mysqld")
+            output = subprocess.getoutput("ps -f|grep mysqld")
             lines = output.splitlines()
             for line in lines:
                 proginfo = string.split(line)
@@ -734,7 +741,7 @@ class ServerList(object):
                     pass
 
 
-class System_test(object):
+class System_test(with_metaclass(ABCMeta, object)):
     """The System_test class is used by the MySQL Utilities Test (MUT) facility
     to perform system tests against MySQL utilities This class is the base
     class from which all tests are derived.
@@ -758,7 +765,6 @@ class System_test(object):
     Note: Place test case comments in the class documentation section. This
           will be printed by the --verbose option.
     """
-    __metaclass__ = ABCMeta   # Register abstract base class
 
     def __init__(self, servers, res_dir, utildir, verbose=False, debug=False):
         """Constructor
@@ -1067,7 +1073,7 @@ class System_test(object):
         Returns True if result matches expected result
         """
         if self.debug or debug:
-            print "\n{0}".format(comments)
+            print("\n{0}".format(comments))
         res = self.exec_util(command, self.res_fname)
         if comments:
             self.results.append("{0}\n".format(comments))
@@ -1087,7 +1093,7 @@ class System_test(object):
         Returns int - actual result
         """
         if self.debug or debug:
-            print "\n{0}".format(comments)
+            print("\n{0}".format(comments))
         res = self.exec_util(command, self.res_fname)
         if comments:
             self.results.append("{0}\n".format(comments))
@@ -1140,7 +1146,7 @@ class System_test(object):
                 # Line matched one of the given lines.
                 match_all = True
                 # Check if next lines also match.
-                for i in xrange(1, len(lines_tuple)):
+                for i in range(1, len(lines_tuple)):
                     # Note: same line can be repeatedly matched, i.e. it does
                     # not guarantee that distinct line are matched.
                     if not self.results[line_num + i].startswith(lines_tuple):
@@ -1477,7 +1483,7 @@ class System_test(object):
         rej_list = []
         try:
             while 1:
-                str_ = diff.next()
+                str_ = next(diff)
                 if str_[0] in ['-', '+', '?']:
                     rej_list.append(str_)
                 rej_file.write(str_)
@@ -1544,7 +1550,7 @@ class System_test(object):
         if index >= 0:
             server = self.servers.get_server(index)
             if self.debug:
-                print "# Killing server {0}.".format(server.role)
+                print("# Killing server {0}.".format(server.role))
             try:
                 self.servers.stop_server(server)
             except:
@@ -1562,7 +1568,7 @@ class System_test(object):
             return True
         else:
             if self.debug:
-                print "# Kill failed! Server '{0}' was not found.".format(name)
+                print("# Kill failed! Server '{0}' was not found.".format(name))
             return False
 
     def kill_server_list(self, servers):

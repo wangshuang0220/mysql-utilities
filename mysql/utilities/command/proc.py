@@ -18,7 +18,11 @@
 """
 This file contains grep processing.
 """
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
+from builtins import object
 import re
 import sys
 
@@ -31,7 +35,7 @@ from mysql.utilities.common.options import obj2sql
 from mysql.utilities.common.server import set_ssl_opts_in_connection_info
 
 
-KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = range(3)
+KILL_QUERY, KILL_CONNECTION, PRINT_PROCESS = list(range(3))
 
 ID = "ID"
 USER = "USER"
@@ -248,7 +252,7 @@ class ProcessGrep(object):
                 if PRINT_PROCESS in self.__actions:
                     entries.append(tuple([_spec(info)] + list(row)))
             if print_rows:
-                print "# The following KILL commands were executed:"
+                print("# The following KILL commands were executed:")
                 print_list(output, fmt, cols, print_rows)
 
         # If output is None, nothing is printed

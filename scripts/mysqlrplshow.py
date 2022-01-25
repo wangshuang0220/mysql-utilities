@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -21,6 +21,7 @@ This file contains the show replication topology utility. It is used to
 find the slaves for a given master and can traverse the list of slaves
 checking for additional master/slave connections.
 """
+from __future__ import print_function
 
 import os.path
 import sys

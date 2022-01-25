@@ -18,7 +18,10 @@
 """
 connect_servers test.
 """
+from __future__ import print_function
 
+from builtins import zip
+from builtins import range
 import mutlib
 
 from mysql.utilities.exception import UtilError, FormatError
@@ -86,7 +89,7 @@ class test(mutlib.System_test):
                 self.results.append((test_case[0], False, None))
 
         if self.debug:
-            print "\nTest Results (test case, actual result, expected result):"
+            print("\nTest Results (test case, actual result, expected result):")
             for i in range(0, len(self.test_cases)):
                 # pylint: disable=W0631
                 print("{0}, {1}, {2}".format(

@@ -18,10 +18,12 @@
 """
 show_rpl_socket test.
 """
+from __future__ import absolute_import
 
+from builtins import range
 import os
 
-import show_rpl
+from . import show_rpl
 
 from mysql.utilities.exception import UtilError, MUTLibError
 

@@ -18,11 +18,14 @@
 """
 replicate_ms_privileges test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
 import os
 import time
 
-import replicate_ms
+from . import replicate_ms
 
 from mysql.utilities.exception import MUTLibError, UtilError
 
@@ -42,7 +45,7 @@ class test(replicate_ms.test):
     Note: Test extend the replicate_ms test and it has the same prerequisites.
     """
 
-    log_range = range(1, 3)
+    log_range = list(range(1, 3))
 
     def setup(self):
         res = super(test, self).setup()

@@ -18,8 +18,9 @@
 """
 show_rpl_skip_grants test.
 """
+from __future__ import absolute_import
 
-import show_rpl
+from . import show_rpl
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

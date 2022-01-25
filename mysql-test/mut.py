@@ -19,7 +19,9 @@
 This file contains the MySQL Utilities Test facility for running system
 tests on the MySQL Utilities.
 """
+from __future__ import print_function
 
+from builtins import range
 import sys
 import traceback
 

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 #
 # Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
 #
@@ -17,7 +18,7 @@
 
 import unittest
 
-import test_options
+from . import test_options
 
 def test_all():
     suite = unittest.TestSuite()

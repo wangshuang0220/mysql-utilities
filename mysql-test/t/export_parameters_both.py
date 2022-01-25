@@ -18,8 +18,9 @@
 """
 export_parameters_both test.
 """
+from __future__ import absolute_import
 
-import export_parameters_def
+from . import export_parameters_def
 
 from mysql.utilities.exception import MUTLibError
 

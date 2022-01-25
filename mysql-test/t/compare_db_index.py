@@ -18,10 +18,12 @@
 """
 compare_db_index test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 
-import compare_db
+from . import compare_db
 
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError

@@ -18,11 +18,14 @@
 """
 Test the main features of the mysqlbinlogmove utility.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
 import os
 import shutil
 
-import rpl_admin
+from . import rpl_admin
 from mysql.connector import OperationalError
 
 from mysql.utilities.common.tools import delete_directory

@@ -19,6 +19,7 @@
 rpl_admin test.
 """
 
+from builtins import str
 import os
 import time
 

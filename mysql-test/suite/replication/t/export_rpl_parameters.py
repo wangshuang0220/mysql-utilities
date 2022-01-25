@@ -18,10 +18,11 @@
 """
 export_rpl_parameters test.
 """
+from __future__ import absolute_import
 
 import os
 
-import replicate
+from . import replicate
 import mutlib
 
 from mysql.utilities.exception import MUTLibError

@@ -18,7 +18,9 @@
 This file contains commands methods methods for working with binary log files.
 For example: to relocate binary log files to a new location.
 """
+from __future__ import print_function
 
+from builtins import object
 import logging
 import os.path
 import shutil

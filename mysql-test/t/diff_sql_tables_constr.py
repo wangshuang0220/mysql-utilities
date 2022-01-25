@@ -18,8 +18,9 @@
 """
 diff_sql_tables_constr test.
 """
+from __future__ import absolute_import
 
-import test_sql_template
+from . import test_sql_template
 
 
 _PARENT_TABLE = ("CREATE TABLE diff_table.t2 (a_i INT NOT NULL PRIMARY KEY) "

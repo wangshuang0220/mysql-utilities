@@ -18,6 +18,7 @@
 """
 clone_db_apostrophe test.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -72,7 +73,7 @@ class test(mutlib.System_test):
 
         # dump if debug run
         if self.debug:
-            print "\n# Dump of data to be cloned:"
+            print("\n# Dump of data to be cloned:")
             rows = self.server1.exec_query("SELECT * FROM apostrophe.t1")
             format_tabular_list(sys.stdout, ['char_field', 'blob_field'], rows)
 
@@ -87,7 +88,7 @@ class test(mutlib.System_test):
 
         # dump if debug run
         if self.debug:
-            print "\n# Dump of data cloned:"
+            print("\n# Dump of data cloned:")
             rows = self.server1.exec_query("SELECT * FROM apostrophe_clone.t1")
             format_tabular_list(sys.stdout, ['char_field', 'blob_field'], rows)
 

@@ -18,6 +18,7 @@
 """
 locking test.
 """
+from __future__ import print_function
 
 import os
 
@@ -120,12 +121,12 @@ class test(mutlib.System_test):
             self.results.append(res_entry)
             if self.debug:
                 print(comment_str)
-                print("    expected to fail:", res_entry['lock_fail'],
-                      res_entry['unlock_fail'])
-                print("    locking step:", res_entry['lock_res'][0],
-                      res_entry['lock_res'][1])
-                print ("  unlocking step:", res_entry['unlock_res'][0],
-                       res_entry['unlock_res'][1])
+                print(("    expected to fail:", res_entry['lock_fail'],
+                      res_entry['unlock_fail']))
+                print(("    locking step:", res_entry['lock_res'][0],
+                      res_entry['lock_res'][1]))
+                print(("  unlocking step:", res_entry['unlock_res'][0],
+                       res_entry['unlock_res'][1]))
             test_num += 1
 
         return True
@@ -135,10 +136,10 @@ class test(mutlib.System_test):
 
             if self.debug:
                 print(result['test_case'])
-                print("  expected results for locking step:",
-                      result['lock_res'][0], result['lock_res'][1])
-                print("  expected results for unlocking step:",
-                      result['unlock_res'][0], result['unlock_res'][1])
+                print(("  expected results for locking step:",
+                      result['lock_res'][0], result['lock_res'][1]))
+                print(("  expected results for unlocking step:",
+                      result['unlock_res'][0], result['unlock_res'][1]))
 
             if not isinstance(result, dict):
                 return False, "Invalid test result: '{0}'.\n".format(result)

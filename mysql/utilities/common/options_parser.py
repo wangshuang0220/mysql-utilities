@@ -24,11 +24,14 @@ C/py v2.0.0 is released and in the meanwhile will be used from here.
 
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import codecs
 import io
 import os
 import re
-from ConfigParser import SafeConfigParser, MissingSectionHeaderError
+from configparser import SafeConfigParser, MissingSectionHeaderError
 from mysql.utilities.common.tools import check_python_version
 
 DEFAULT_OPTION_FILES = {
@@ -181,12 +184,12 @@ class MySQLOptionsParser(SafeConfigParser):
                 continue
             try:
                 self._read(out_file, filename)
-                for group in self._sections.keys():
+                for group in list(self._sections.keys()):
                     try:
                         self._options_dict[group]
                     except KeyError:
                         self._options_dict[group] = {}
-                    for option, value in self._sections[group].items():
+                    for option, value in list(self._sections[group].items()):
                         if py26:
                             self._options_dict[group][option] = (str(value),
                                                                  priority)
@@ -215,18 +218,18 @@ class MySQLOptionsParser(SafeConfigParser):
         Returns a dictionary
         """
         if len(args) == 0:
-            args = self._options_dict.keys()
+            args = list(self._options_dict.keys())
 
         options = {}
         for group in args:
             try:
-                for option, value in self._options_dict[group].items():
+                for option, value in list(self._options_dict[group].items()):
                     if option not in options or options[option][1] <= value[1]:
                         options[option] = value
             except KeyError:
                 pass
 
-        for key in options.keys():
+        for key in list(options.keys()):
             if key == '__name__' or key.startswith('!'):
                 del options[key]
             else:
@@ -251,7 +254,7 @@ class MySQLOptionsParser(SafeConfigParser):
         Returns an dictionary of dictionaries
         """
         if len(args) == 0:
-            args = self._options_dict.keys()
+            args = list(self._options_dict.keys())
 
         options = dict()
         for group in args:
@@ -260,8 +263,8 @@ class MySQLOptionsParser(SafeConfigParser):
             except KeyError:
                 pass
 
-        for group in options.keys():
-            for key in options[group].keys():
+        for group in list(options.keys()):
+            for key in list(options[group].keys()):
                 if key == '__name__' or key.startswith('!'):
                     del options[group][key]
         return options
@@ -280,7 +283,7 @@ class MySQLOptionsParser(SafeConfigParser):
         Returns an dictionary of dictionaries
         """
         if len(args) == 0:
-            args = self._options_dict.keys()
+            args = list(self._options_dict.keys())
 
         options = dict()
         for group in args:
@@ -289,8 +292,8 @@ class MySQLOptionsParser(SafeConfigParser):
             except KeyError:
                 pass
 
-        for group in options.keys():
-            for key in options[group].keys():
+        for group in list(options.keys()):
+            for key in list(options[group].keys()):
                 if key == '__name__' or key.startswith('!'):
                     del options[group][key]
                 else:

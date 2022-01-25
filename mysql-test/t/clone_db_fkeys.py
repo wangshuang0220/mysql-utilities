@@ -19,6 +19,7 @@
 clone_db_fkeys test.
 """
 
+from builtins import range
 import os
 from collections import namedtuple
 import mutlib

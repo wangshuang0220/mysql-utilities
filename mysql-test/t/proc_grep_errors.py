@@ -18,8 +18,9 @@
 """
 proc_grep_errors test.
 """
+from __future__ import absolute_import
 
-import proc_grep
+from . import proc_grep
 
 from mysql.utilities.exception import MUTLibError
 

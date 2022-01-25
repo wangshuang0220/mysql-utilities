@@ -18,8 +18,9 @@
 """
 rpl_admin_basic_ssl_opt_gtid test.
 """
+from __future__ import absolute_import
 
-import rpl_admin_basic_ssl_gtid
+from . import rpl_admin_basic_ssl_gtid
 
 from mutlib.ssl_certs import ssl_c_ca
 

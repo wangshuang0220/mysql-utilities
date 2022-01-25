@@ -18,11 +18,13 @@
 """
 failover_daemon test with ssl.
 """
+from __future__ import absolute_import
 
+from builtins import range
 import os
 
-import failover_daemon
-import rpl_admin
+from . import failover_daemon
+from . import rpl_admin
 from mutlib.ssl_certs import (ssl_pass, ssl_user, ssl_util_opts, ssl_c_ca,
                               ssl_c_cert, ssl_c_key, SSL_OPTS)
 
@@ -68,7 +70,7 @@ class test(failover_daemon.test):
     It uses the rpl_admin_gtid test for setup and teardown methods.
     """
 
-    log_range = range(1, 6)
+    log_range = list(range(1, 6))
 
     def setup(self):
         self.res_fname = "result.txt"

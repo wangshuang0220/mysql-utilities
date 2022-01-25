@@ -18,8 +18,11 @@
 """
 config_parser test.
 """
+from __future__ import absolute_import
 
-import ConfigParser
+from future import standard_library
+standard_library.install_aliases()
+import configparser
 import os
 
 from mysql.utilities.exception import MUTLibError, UtilError
@@ -28,7 +31,7 @@ from mysql.utilities.common.user import grant_proxy_ssl_privileges
 from mutlib.ssl_certs import (ssl_pass, ssl_user, ssl_server_opts,
                               ssl_c_ca, ssl_c_cert, ssl_c_key)
 
-import server_info
+from . import server_info
 
 
 class test(server_info.test):
@@ -91,7 +94,7 @@ class test(server_info.test):
         if not res[0][1]:
             raise MUTLibError('Cannot setup SSL server for test')
 
-        config_p = ConfigParser.ConfigParser()
+        config_p = configparser.ConfigParser()
         with open(self.config_file_path, 'w') as config_f:
 
             config_p.add_section('client')

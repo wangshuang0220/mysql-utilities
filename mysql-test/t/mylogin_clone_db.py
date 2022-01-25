@@ -19,6 +19,7 @@
 mylogin_clone_db test.
 """
 
+from builtins import str
 import os
 
 import mutlib

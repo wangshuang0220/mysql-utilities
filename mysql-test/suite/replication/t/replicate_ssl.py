@@ -19,7 +19,9 @@
 replicate ssl test.
 """
 
-import ConfigParser
+from future import standard_library
+standard_library.install_aliases()
+import configparser
 import os
 
 import mutlib
@@ -102,7 +104,7 @@ class test(mutlib.System_test):
             raise MUTLibError("Cannot spawn a SSL server2.")
 
         # setup config_path
-        config_p = ConfigParser.ConfigParser()
+        config_p = configparser.ConfigParser()
         self.test_server_names = []
         servers_ = [self.server1, self.server2]
         with open(self.config_file_path, 'w') as config_f:

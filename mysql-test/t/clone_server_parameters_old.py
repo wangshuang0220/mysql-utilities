@@ -18,8 +18,9 @@
 """
 clone_server_parameters_old test.
 """
+from __future__ import absolute_import
 
-import clone_server_parameters
+from . import clone_server_parameters
 from mysql.utilities.exception import MUTLibError
 
 

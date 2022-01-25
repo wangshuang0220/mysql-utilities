@@ -18,11 +18,14 @@
 """
 Test options for the mysqlbinlogmove utility.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
 import os
 import time
 
-import binlogmove
+from . import binlogmove
 
 from mysql.utilities.exception import MUTLibError
 

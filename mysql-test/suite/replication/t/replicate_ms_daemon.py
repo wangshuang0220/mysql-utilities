@@ -18,13 +18,17 @@
 """
 replicate_ms_daemon test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import oct
+from builtins import range
 import os
 import re
 import stat
 import time
 
-import replicate_ms
+from . import replicate_ms
 
 from mysql.utilities.exception import MUTLibError
 
@@ -48,7 +52,7 @@ class test(replicate_ms.test):
     Note: this test requires GTID enabled servers.
     """
 
-    log_range = range(1, 3)
+    log_range = list(range(1, 3))
     total_masters = 2
 
     def check_prerequisites(self):

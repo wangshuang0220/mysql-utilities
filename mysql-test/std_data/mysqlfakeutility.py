@@ -18,6 +18,7 @@
 """
 This file contains methods to test mysqluc.
 """
+from __future__ import print_function
 
 import logging
 import optparse

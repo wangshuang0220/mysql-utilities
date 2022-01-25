@@ -18,6 +18,7 @@
 """
 grants_show test.
 """
+from builtins import str
 import os
 
 import mutlib

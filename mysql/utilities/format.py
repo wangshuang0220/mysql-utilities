@@ -34,6 +34,7 @@ import codecs
 import csv
 import os
 import textwrap
+import pprint
 
 try:
     import io as StringIO
@@ -121,11 +122,12 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
             f_out.write("| ")
         val = row[i].encode("utf-8") if isinstance(row[i], str) \
             else row[i]
+
         if isinstance(val, str):
             val = u"{0:<{1}}".format(val.decode("utf-8"), col_widths[i] + 1)
             f_out.write(val.encode("utf-8"))
         else:
-            f_out.write("{0:<{1}} ".format("%s" % val, col_widths[i]))
+            f_out.write("{0:<{1}} ".format("%s" % str(val,'utf-8'), col_widths[i]))
 
     if not quiet:
         f_out.write("|")
@@ -141,7 +143,7 @@ def get_col_widths(columns, rows):
     # Calculate column width for each column
     col_widths = []
     for col in columns:
-        size = len(col.decode("utf-8") if isinstance(col, str) else col)
+        size = len(col if isinstance(col, str) else col)
         col_widths.append(size + 1)
 
     stop = len(columns)
@@ -304,6 +306,7 @@ def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False,
     col_widths[in]    col widths to use instead of actual col
     """
 
+    
     if not col_widths:
         col_widths = []
     if sort:

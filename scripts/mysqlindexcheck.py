@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -22,6 +22,7 @@ duplicate or redundant indexes for a list of database (operates on
 all tables in each database), a list of tables in the for db.table,
 or all tables in all databases except internal databases.
 """
+from __future__ import print_function
 
 import os.path
 import sys

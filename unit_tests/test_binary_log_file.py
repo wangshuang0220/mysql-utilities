@@ -18,6 +18,7 @@
 This files contains unit tests for mysql.utilities.common.binary_log module.
 """
 
+from builtins import range
 import os
 import shutil
 import tempfile

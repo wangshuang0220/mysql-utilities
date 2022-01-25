@@ -18,10 +18,13 @@
 """
 rpl_sync_privileges test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import str
 import os
 
-import rpl_sync
+from . import rpl_sync
 
 from mysql.utilities.common.user import change_user_privileges
 from mysql.utilities.exception import MUTLibError

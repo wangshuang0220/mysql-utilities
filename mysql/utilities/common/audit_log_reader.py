@@ -19,6 +19,7 @@
 This file contains the methods for reading the audit log.
 """
 
+from builtins import object
 import os
 import xml.etree.ElementTree as xml
 

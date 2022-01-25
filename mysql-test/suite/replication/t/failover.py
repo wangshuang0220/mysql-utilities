@@ -18,13 +18,16 @@
 """
 failover test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
 import os
 import subprocess
 import tempfile
 import time
 
-import rpl_admin_gtid
+from . import rpl_admin_gtid
 
 from mysql.utilities.common.server import get_local_servers
 from mysql.utilities.common.tools import delete_directory
@@ -48,7 +51,7 @@ class test(rpl_admin_gtid.test):
     It uses the rpl_admin_gtid test for setup and teardown methods.
     """
 
-    log_range = range(1, 5)
+    log_range = list(range(1, 5))
 
     # TODO: Perform analysis as to whether any of these methods need to be
     #       generalized and placed in the mutlib for all tests to access.
@@ -345,7 +348,7 @@ class test(rpl_admin_gtid.test):
         num_phrases = len(key_phrase)
         found_count = 0
         if self.debug:
-            print("# Phrases: ", num_phrases, phrases)
+            print(("# Phrases: ", num_phrases, phrases))
         for phrase in phrases:
             if self.debug:
                 print("# Looking in log for: {0}".format(phrase))
@@ -499,7 +502,7 @@ class test(rpl_admin_gtid.test):
         #       timeout, the test case has failed and the log will contain
         #       the error.
         if self.debug:
-            print comment
+            print(comment)
 
         failover_cmd = ("python ../scripts/mysqlfailover.py --interval=10 "
                         " --discover-slaves-login=root:root --force "
@@ -507,14 +510,14 @@ class test(rpl_admin_gtid.test):
                             slave3_conn, FAILOVER_LOG.format('4')))
 
         if self.debug:
-            print failover_cmd
+            print(failover_cmd)
 
         # Launch the console in stealth mode
         proc, f_out = self.start_process(failover_cmd)
 
         # Wait for console to load
         if self.debug:
-            print "# Waiting for console to start."
+            print("# Waiting for console to start.")
         i = 1
         time.sleep(1)
         while proc.poll() is not None:
@@ -522,7 +525,7 @@ class test(rpl_admin_gtid.test):
             i += 1
             if i > _TIMEOUT:
                 if self.debug:
-                    print "# Timeout console to start."
+                    print("# Timeout console to start.")
                 raise MUTLibError("{0}: failed - timeout waiting for "
                                   "console to start.".format(comment))
 
@@ -530,14 +533,14 @@ class test(rpl_admin_gtid.test):
         self.stop_process(proc, f_out, True)
         # Wait for console to end
         if self.debug:
-            print "# Waiting for console to end."
+            print("# Waiting for console to end.")
         i = 0
         while proc.poll() is None:
             time.sleep(1)
             i += 1
             if i > _TIMEOUT:
                 if self.debug:
-                    print "# Timeout console to end."
+                    print("# Timeout console to end.")
                 raise MUTLibError("{0}: failed - timeout waiting for "
                                   "console to end.".format(comment))
 
@@ -565,7 +568,7 @@ class test(rpl_admin_gtid.test):
                 file_.seek(0)
                 for row in file_:
                     if len(row.strip()):
-                        print row,
+                        print(row, end=' ')
 
         # Kill all remaining servers (to avoid problems for other tests).
         self.kill_server('rep_slave3_gtid')

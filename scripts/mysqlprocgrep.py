@@ -20,6 +20,7 @@
 This file contains the procgrep utility which allows users to search process
 information.
 """
+from __future__ import print_function
 
 import os.path
 import sys

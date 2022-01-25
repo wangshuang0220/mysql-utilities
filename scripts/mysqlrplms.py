@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2014, 2016 Oracle and/or its affiliates. All rights reserved.
 #
@@ -20,7 +20,9 @@
 This file contains the replicate utility. It is used to establish a
 multi-source replication topology.
 """
+from __future__ import print_function
 
+from builtins import str
 import os.path
 import sys
 import logging

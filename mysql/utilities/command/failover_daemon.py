@@ -19,7 +19,9 @@
 This file contains the automatic failover daemon. It contains the daemon
 mechanism for the automatic failover feature for replication.
 """
+from __future__ import print_function
 
+from builtins import zip
 import os
 import sys
 import time
@@ -122,7 +124,7 @@ class FailoverDaemon(Daemon):
         """
         # Only do something if warnings exist.
         if self.warnings_dic:
-            for msg in self.warnings_dic.itervalues():
+            for msg in self.warnings_dic.values():
                 print("# WARNING: {0}".format(msg))
 
     def _format_health_data(self):

@@ -21,6 +21,9 @@ topology (i.e., between the master and its slaves, or only slaves), providing
 synchronization features to perform the check over the (supposed) same data of
 a system with replication active (running).
 """
+from __future__ import print_function
+from builtins import str
+from builtins import object
 import re
 import sys
 
@@ -522,7 +525,7 @@ class RPLSynchronizer(object):
                 )
         # Skip slaves without GTID enabled and warn user.
         reset_base_srv = False
-        for slave_key, slave_dict in self._slaves.items():
+        for slave_key, slave_dict in list(self._slaves.items()):
             slave = slave_dict['instance']
             support_gtid = slave.supports_gtid().upper()
             if support_gtid != 'ON':
@@ -680,7 +683,7 @@ class RPLSynchronizer(object):
                         gtid_sets_by_uuid[uuid] = union_set
 
             # Return union of all know executed GTID.
-            return ",".join(gtid_sets_by_uuid.itervalues())
+            return ",".join(iter(gtid_sets_by_uuid.values()))
 
     def _sync_slaves(self, slaves, gtid):
         """Set synchronization point (specified GTID set) for the given slaves.

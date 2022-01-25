@@ -18,10 +18,11 @@
 """
 export_basic test.
 """
+from __future__ import absolute_import
 
 import os
 
-import copy_db_parameters
+from . import copy_db_parameters
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

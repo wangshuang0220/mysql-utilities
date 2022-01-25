@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -20,6 +20,7 @@
 This file contains the replicate utility. It is used to establish a
 master/slave replication topology among two servers.
 """
+from __future__ import print_function
 
 import os.path
 import sys

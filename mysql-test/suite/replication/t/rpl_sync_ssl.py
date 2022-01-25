@@ -18,11 +18,13 @@
 """
 rpl_sync test using ssl.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import threading
 import time
 
-import rpl_sync
+from . import rpl_sync
 from mutlib.ssl_certs import (ssl_pass, ssl_user, ssl_util_opts, ssl_c_ca,
                               ssl_c_cert, ssl_c_key, SSL_OPTS)
 

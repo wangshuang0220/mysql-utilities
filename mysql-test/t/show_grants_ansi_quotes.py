@@ -18,9 +18,11 @@
 """
 grants_show test.
 """
+from __future__ import absolute_import
+from builtins import str
 import os
 
-import show_grants
+from . import show_grants
 
 from mysql.utilities.exception import MUTLibError
 

@@ -18,11 +18,13 @@
 """
 rpl_admin_parameters test.
 """
+from __future__ import absolute_import
 
+from builtins import str
 import os
 
 import mutlib
-import rpl_admin
+from . import rpl_admin
 
 from mysql.utilities.exception import MUTLibError
 

@@ -19,11 +19,13 @@
 This tests the export and import of a databases with composite keys in multiple
 output formats.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import sys
 
-import import_basic
+from . import import_basic
 
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError

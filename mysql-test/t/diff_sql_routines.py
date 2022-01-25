@@ -18,8 +18,9 @@
 """
 diff_sql_routines test.
 """
+from __future__ import absolute_import
 
-import test_sql_template
+from . import test_sql_template
 
 
 _PROC_TABLE = "CREATE TABLE `diff_routine`.`t1` (b char(30))"

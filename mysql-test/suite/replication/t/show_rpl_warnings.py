@@ -18,9 +18,11 @@
 """
 show_rpl_warnings test.
 """
+from __future__ import absolute_import
 
+from builtins import str
 import mutlib
-import rpl_admin
+from . import rpl_admin
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

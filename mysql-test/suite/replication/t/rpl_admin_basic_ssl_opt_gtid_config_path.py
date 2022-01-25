@@ -19,11 +19,14 @@
 rpl_admin_basic_ssl_opt_gtid_config_path test with ssl option using
 config-path.
 """
+from __future__ import absolute_import
 
-import ConfigParser
+from future import standard_library
+standard_library.install_aliases()
+import configparser
 
-import rpl_admin_basic_ssl_gtid_config_path
-from rpl_admin_basic_ssl_gtid_config_path import (_DEFAULT_MYSQL_OPTS,
+from . import rpl_admin_basic_ssl_gtid_config_path
+from .rpl_admin_basic_ssl_gtid_config_path import (_DEFAULT_MYSQL_OPTS,
                                                   _DEFAULT_MYSQL_OPTS_DIFF_SSL)
 
 from mysql.utilities.exception import MUTLibError, UtilError
@@ -132,7 +135,7 @@ class test(rpl_admin_basic_ssl_gtid_config_path.test):
                              self.server3, self.server4]
 
         # setup config_path
-        config_p = ConfigParser.ConfigParser()
+        config_p = configparser.ConfigParser()
         self.test_server_names = []
 
         with open(self.config_file_path, 'w') as config_f:

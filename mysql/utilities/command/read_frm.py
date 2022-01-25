@@ -19,7 +19,9 @@
 This file contains the command to read a frm file. It requires a .frm filename,
 and general options (verbosity, etc.).
 """
+from __future__ import print_function
 
+from builtins import str
 import os
 import re
 import shutil
@@ -137,13 +139,13 @@ def _spawn_server(options):
         temp_datadir = tempfile.mkdtemp()
 
     if verbosity > 1 and not quiet:
-        print "# Creating a temporary datadir =", temp_datadir
+        print("# Creating a temporary datadir =", temp_datadir)
 
     # 2) spawn a server pointed to temp
     if not quiet:
         if user:
             print("# Spawning server with --user={0}.".format(user))
-        print "# Starting the spawned server on port %s ..." % new_port,
+        print("# Starting the spawned server on port %s ..." % new_port, end=' ')
         sys.stdout.flush()
 
     bootstrap_options = {
@@ -160,7 +162,7 @@ def _spawn_server(options):
         'start_timeout': start_timeout,
     }
     if verbosity > 1 and not quiet:
-        print
+        print()
 
     try:
         serverclone.clone_server(None, bootstrap_options)
@@ -186,7 +188,7 @@ def _spawn_server(options):
             raise
 
     if verbosity > 1 and not quiet:
-        print "# Connecting to spawned server"
+        print("# Connecting to spawned server")
     conn = {
         "user": "root",
         "passwd": "root",
@@ -204,7 +206,7 @@ def _spawn_server(options):
         raise UtilError(_SPAWN_SERVER_ERROR.format(""))
 
     if not quiet:
-        print "done."
+        print("done.")
 
     return (server, temp_datadir)
 
@@ -241,7 +243,7 @@ def _get_create_statement(server, temp_datadir,
     user = options.get('user', 'root')
 
     if not quiet:
-        print "#\n# Reading the %s.frm file." % frm_file[1]
+        print("#\n# Reading the %s.frm file." % frm_file[1])
     try:
         # 1) copy the file
         db = frm_file[0]
@@ -362,9 +364,9 @@ def _get_create_statement(server, temp_datadir,
                                                 frm_file[0])
 
         # Now we must replace the string for storage engine!
-        print "#\n# CREATE statement for %s:\n#\n" % frm_file[2]
-        print create_str
-        print
+        print("#\n# CREATE statement for %s:\n#\n" % frm_file[2])
+        print(create_str)
+        print()
         if frm_type == "TABLE" and options.get("show_stats", False):
             frm.show_statistics()
 
@@ -426,13 +428,13 @@ def read_frm_files(file_names, options):
 
     # 1) for each .frm, determine its type and db, table name
     if verbosity > 1 and not quiet:
-        print "# Checking read access to .frm files "
+        print("# Checking read access to .frm files ")
     frm_files = []
     for file_name in file_names:
         db, table, frm_path = _get_frm_path(file_name, datadir)
         if not os.access(frm_path, os.R_OK):
-            print "ERROR: Unable to read the file %s." % frm_path + \
-                  "You must have read access to the .frm file."
+            print("ERROR: Unable to read the file %s." % frm_path + \
+                  "You must have read access to the .frm file.")
         frm_files.append((db, table, frm_path))
 
     # 2) Spawn the server
@@ -449,7 +451,7 @@ def read_frm_files(file_names, options):
         version = None
     failed_reads = []
     if not quiet:
-        print "# Reading .frm files"
+        print("# Reading .frm files")
     try:
         for frm_file in frm_files:
             # 3) For each .frm file, get the CREATE statement
@@ -464,8 +466,8 @@ def read_frm_files(file_names, options):
     finally:
         # 4) shutdown the spawned server
         if verbosity > 1 and not quiet:
-            print "# Shutting down spawned server"
-            print "# Removing the temporary datadir"
+            print("# Shutting down spawned server")
+            print("# Removing the temporary datadir")
         if user_change_as_root(options):
             try:
                 os.unlink(temp_datadir)

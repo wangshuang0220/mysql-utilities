@@ -18,9 +18,10 @@
 """
 binlog_purge test.
 """
+from __future__ import absolute_import
 
 import mutlib
-from binlog_rotate import binlog_file_exists
+from .binlog_rotate import binlog_file_exists
 
 from mysql.utilities.exception import MUTLibError
 

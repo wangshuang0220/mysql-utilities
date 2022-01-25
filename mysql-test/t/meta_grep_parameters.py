@@ -18,8 +18,9 @@
 """
 meta_grep_parameters test.
 """
+from __future__ import absolute_import
 
-import meta_grep
+from . import meta_grep
 
 from mysql.utilities.exception import MUTLibError
 

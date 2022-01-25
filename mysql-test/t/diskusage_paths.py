@@ -18,10 +18,11 @@
 """
 diskusage_paths test.
 """
+from __future__ import absolute_import
 
 import os
 
-import diskusage_basic
+from . import diskusage_basic
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

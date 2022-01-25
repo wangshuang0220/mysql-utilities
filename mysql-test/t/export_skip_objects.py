@@ -18,8 +18,9 @@
 """
 export_skip_objects test.
 """
+from __future__ import absolute_import
 
-import export_basic
+from . import export_basic
 
 from mysql.utilities.exception import MUTLibError
 

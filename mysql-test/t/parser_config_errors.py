@@ -18,9 +18,12 @@
 """
 config_parser errors test.
 """
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
 import os
-import ConfigParser
+import configparser
 import mutlib
 
 from mysql.utilities.exception import UtilError
@@ -61,7 +64,7 @@ class test(mutlib.System_test):
         self.test_group_names = []
         self.server1 = self.servers.get_server(0)
 
-        config_p = ConfigParser.ConfigParser()
+        config_p = configparser.ConfigParser()
         with open(self.config_file_path, 'w') as config_f:
 
             config_p.add_section('client')
@@ -78,7 +81,7 @@ class test(mutlib.System_test):
 
             config_p.write(config_f)
 
-        config_p = ConfigParser.ConfigParser()
+        config_p = configparser.ConfigParser()
         with open(self.config_file_path_2, 'w') as config_f:
             config_p.add_section('missing_values')
             config_p.set('missing_values', 'user', 'my_user')
@@ -122,7 +125,7 @@ class test(mutlib.System_test):
             except UtilError as err:
                 self.results.append("{0}\n".format(err.errmsg))
             else:
-                self.results.append("{0}\n".format(sorted(conn.iteritems())))
+                self.results.append("{0}\n".format(sorted(conn.items())))
 
         # Replacements
         self.replace_substring_portion("port or ", "socket", "port")

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -20,6 +20,7 @@
 This file contains the object diff utility which allows users to compare the
 definitions of two objects and return the difference (like diff).
 """
+from __future__ import print_function
 
 import os
 import re

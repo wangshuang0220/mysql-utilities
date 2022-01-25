@@ -19,7 +19,9 @@
 This module contains abstractions of a MySQL Database object used by
 multiple utilities.
 """
+from __future__ import print_function
 
+from builtins import object
 import multiprocessing
 import os
 import re
@@ -582,8 +584,8 @@ class Database(object):
         """
 
         if self.verbose:
-            print "# Dropping new object %s %s.%s" % \
-                  (obj_type, self.new_db, name)
+            print("# Dropping new object %s %s.%s" % \
+                  (obj_type, self.new_db, name))
         drop_str = "DROP %s %s.%s" % \
                    (obj_type, self.q_new_db, name)
         # Suppress the error on drop
@@ -666,10 +668,10 @@ class Database(object):
         if not quiet:
             if obj_type == _GRANT:
                 if show_grant_msg:
-                    print "%s GRANTS from %s" % (string, self.db_name)
+                    print("%s GRANTS from %s" % (string, self.db_name))
             else:
-                print "%s %s %s.%s" % \
-                      (string, obj_type, self.db_name, obj[0])
+                print("%s %s %s.%s" % \
+                      (string, obj_type, self.db_name, obj[0]))
             if self.verbose:
                 print("; ".join(create_list))
 

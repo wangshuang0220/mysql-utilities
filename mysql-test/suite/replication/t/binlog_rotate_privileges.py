@@ -18,9 +18,11 @@
 """
 binlog_rotate_privileges test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import mutlib
-from binlog_rotate import binlog_file_exists
+from .binlog_rotate import binlog_file_exists
 
 from mysql.utilities.common.user import change_user_privileges
 from mysql.utilities.exception import MUTLibError

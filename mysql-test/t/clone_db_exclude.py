@@ -18,8 +18,9 @@
 """
 clone_db_exclude test.
 """
+from __future__ import absolute_import
 
-import clone_db
+from . import clone_db
 
 from mysql.utilities.exception import MUTLibError
 

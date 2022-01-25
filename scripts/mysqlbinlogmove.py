@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -20,6 +20,7 @@
 This file contains the binlog relocate utility. It is used to move binlog
 files to a different location, updating the binlog index files accordingly.
 """
+from __future__ import print_function
 
 import os
 import sys

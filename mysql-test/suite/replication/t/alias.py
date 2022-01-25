@@ -18,7 +18,9 @@
 """
 alias test.
 """
+from __future__ import print_function
 
+from builtins import str
 import socket
 import os
 
@@ -124,7 +126,7 @@ class test(mutlib.System_test):
         conn_str = master_str + slave_str
 
         if self.debug:
-            print comment
+            print(comment)
 
         # Stop and reset the slave
         try:

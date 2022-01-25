@@ -19,6 +19,7 @@
 get_tool_windows test.
 """
 
+from builtins import range
 import os
 
 import mutlib

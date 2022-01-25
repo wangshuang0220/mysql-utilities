@@ -24,6 +24,7 @@ Requirements:
   pep8>=1.4.6
 """
 
+from builtins import str
 import os
 import sys
 import csv
@@ -99,7 +100,7 @@ class ParseableTextReporter(TextReporter):
     def on_set_current_module(self, module, filepath):
         """Sets the template for the current module.
         """
-        self._template = unicode(self.line_format)
+        self._template = str(self.line_format)
 
 
 class CsvReporter(BaseReporter):

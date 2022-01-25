@@ -18,8 +18,9 @@
 """
 check_rpl test.
 """
+from __future__ import absolute_import
 
-import replicate
+from . import replicate
 import mutlib
 
 from mysql.utilities.exception import MUTLibError

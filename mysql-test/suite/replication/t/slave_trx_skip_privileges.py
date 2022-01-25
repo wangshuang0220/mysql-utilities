@@ -18,8 +18,11 @@
 """
 Test privileges to run the mysqlslavetrx utility.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
-import slave_trx_skip
+from builtins import str
+from . import slave_trx_skip
 
 from mysql.utilities.common.gtid import gtid_set_union
 from mysql.utilities.common.user import change_user_privileges

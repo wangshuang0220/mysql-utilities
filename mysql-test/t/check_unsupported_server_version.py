@@ -19,6 +19,7 @@
 check_unsupported_server_version test.
 """
 
+from builtins import range
 import os
 
 import mutlib

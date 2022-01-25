@@ -18,8 +18,9 @@
 """
 server_info_errors test.
 """
+from __future__ import absolute_import
 
-import server_info
+from . import server_info
 
 from mysql.utilities.exception import MUTLibError
 

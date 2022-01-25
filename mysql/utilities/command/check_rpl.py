@@ -19,7 +19,9 @@
 This file contains the check replication functionality to verify a replication
 setup.
 """
+from __future__ import print_function
 
+from builtins import object
 from mysql.utilities.exception import UtilRplError, UtilRplWarn
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.replication import Replication, MasterInfo
@@ -93,10 +95,10 @@ def check_replication(master_vals, slave_vals, options):
     rpl = Replication(servers[0], servers[1], rpl_options)
 
     if not quiet:
-        print "Test Description",
-        print ' ' * (width - 24),
-        print "Status"
-        print '-' * width
+        print("Test Description", end=' ')
+        print(' ' * (width - 24), end=' ')
+        print("Status")
+        print('-' * width)
 
     for test in _get_replication_tests(rpl, options):
         if not test.exec_test():
@@ -104,13 +106,13 @@ def check_replication(master_vals, slave_vals, options):
 
     if slave_status and not quiet:
         try:
-            print "\n#\n# Slave status: \n#"
+            print("\n#\n# Slave status: \n#")
             rpl.slave.show_status()
-        except UtilRplError, e:
-            print "ERROR:", e.errmsg
+        except UtilRplError as e:
+            print("ERROR:", e.errmsg)
 
     if not quiet:
-        print "# ...done."
+        print("# ...done.")
 
     return test_errors
 
@@ -147,8 +149,8 @@ class _BaseTestReplication(object):
         """
         self.description = description
         if not self.quiet:
-            print self.description[0:self.width - 9],
-            print ' ' * (self.width - len(self.description) - 8),
+            print(self.description[0:self.width - 9], end=' ')
+            print(' ' * (self.width - len(self.description) - 8), end=' ')
 
     def report_status(self, state, errors):
         """Print the results of a test.
@@ -159,18 +161,18 @@ class _BaseTestReplication(object):
         Returns bool - True if errors detected during epilog reporting.
         """
         if not self.quiet:
-            print "[%s]" % state
+            print("[%s]" % state)
         if isinstance(errors, list) and len(errors) > 0:
-            print
+            print()
             for error in errors:
-                print error
-            print
+                print(error)
+            print()
         res = False
         if state == "pass":  # Only execute epilog if test passes.
             try:
                 self.report_epilog()
-            except UtilRplError, e:
-                print "ERROR:", e.errmsg
+            except UtilRplError as e:
+                print("ERROR:", e.errmsg)
                 res = True
 
         return res
@@ -214,20 +216,20 @@ class _BaseTestReplication(object):
         try:
             res = self.rpl_test()
         # Any errors raised is a failed test.
-        except UtilRplError, e:
+        except UtilRplError as e:
             if not self.quiet:
                 self.report_status("FAIL", [e.errmsg])
             else:
-                print "Test: %s failed. Error: %s" % (self.description,
-                                                      e.errmsg)
+                print("Test: %s failed. Error: %s" % (self.description,
+                                                      e.errmsg))
             return False
         # Check for warnings
-        except UtilRplWarn, e:
+        except UtilRplWarn as e:
             if not self.quiet:
                 self.report_status("WARN", [e.errmsg])
             else:
-                print "Test: %s had warnings. %s" % (self.description,
-                                                     e.errmsg)
+                print("Test: %s had warnings. %s" % (self.description,
+                                                     e.errmsg))
             return False
 
         # Check to see if test passed or if there were errors returned.
@@ -240,9 +242,9 @@ class _BaseTestReplication(object):
                     if not self.quiet:
                         self.report_status("WARN", res)
                     else:
-                        print "WARNING:", self.description
+                        print("WARNING:", self.description)
                         for error in res:
-                            print error
+                            print(error)
                 elif not self.quiet:
                     self.report_status("WARN", res)
             else:
@@ -309,8 +311,8 @@ class _TestServerIds(_BaseTestReplication):
         if self.verbosity > 0 and not self.quiet:
             master_id = self.rpl.master.get_server_id()
             slave_id = self.rpl.slave.get_server_id()
-            print "\n master id = %s" % master_id
-            print "  slave id = %s\n" % slave_id
+            print("\n master id = %s" % master_id)
+            print("  slave id = %s\n" % slave_id)
 
 
 class _TestUUIDs(_BaseTestReplication):
@@ -330,11 +332,11 @@ class _TestUUIDs(_BaseTestReplication):
         if self.verbosity > 0 and not self.quiet:
             master_uuid = self.rpl.master.get_server_uuid()
             slave_uuid = self.rpl.slave.get_server_uuid()
-            print "\n master uuid = %s" % \
+            print("\n master uuid = %s" % \
                   (master_uuid if master_uuid is not None else "Not "
-                   "supported.")
-            print "  slave uuid = %s\n" % \
-                  (slave_uuid if slave_uuid is not None else "Not supported.")
+                   "supported."))
+            print("  slave uuid = %s\n" % \
+                  (slave_uuid if slave_uuid is not None else "Not supported."))
 
 
 class _TestSlaveConnection(_BaseTestReplication):
@@ -368,9 +370,9 @@ class _TestMasterInfo(_BaseTestReplication):
         """
         if self.verbosity > 0 and not self.quiet:
             m_info = MasterInfo(self.rpl.slave, self.options)
-            print "\n#\n# Master information file: \n#"
+            print("\n#\n# Master information file: \n#")
             m_info.show_master_info()
-            print
+            print()
 
 
 class _TestInnoDB(_BaseTestReplication):
@@ -416,8 +418,8 @@ class _TestLCTN(_BaseTestReplication):
         if self.verbosity > 0 and not self.quiet:
             slave_lctn = self.rpl.slave.get_lctn()
             master_lctn = self.rpl.master.get_lctn()
-            print "\n  Master lower_case_table_names: %s" % master_lctn
-            print "   Slave lower_case_table_names: %s\n" % slave_lctn
+            print("\n  Master lower_case_table_names: %s" % master_lctn)
+            print("   Slave lower_case_table_names: %s\n" % slave_lctn)
 
 
 class _TestSlaveBehindMaster(_BaseTestReplication):

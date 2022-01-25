@@ -19,6 +19,7 @@
 This file contains the diff commands for finding the difference among
 the definitions of two databases.
 """
+from __future__ import print_function
 
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.common.pattern_matching import parse_object_name

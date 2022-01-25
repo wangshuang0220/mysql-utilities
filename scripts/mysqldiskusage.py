@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -20,6 +20,7 @@
 This file contains the disk usage utility for showing the estimated disk
 storage of the databases and system files.
 """
+from __future__ import print_function
 
 import os
 import sys

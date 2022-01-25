@@ -18,10 +18,12 @@
 """
 frm_reader_diagnostic test for YEAR data type changes from 5.7.4 to 5.7.5.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 
-import frm_reader_base
+from . import frm_reader_base
 
 from mysql.utilities.exception import MUTLibError
 
@@ -41,7 +43,7 @@ class test(frm_reader_base.test):
         self.res_fname = "result.txt"
 
         if self.debug:
-            print
+            print()
         test_num = 1
 
         self.cmd = "mysqlfrm.py --server={0} --diagnostic ".format(

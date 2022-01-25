@@ -18,11 +18,15 @@
 """
 Test privileges to run the mysqlbinlogmove utility.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import str
+from builtins import range
 import os
 import time
 
-import binlogmove
+from . import binlogmove
 
 from mysql.utilities.common.user import change_user_privileges
 from mysql.utilities.exception import MUTLibError

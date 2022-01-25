@@ -18,8 +18,9 @@
 """
 diff_sql_events test.
 """
+from __future__ import absolute_import
 
-import test_sql_template
+from . import test_sql_template
 
 
 _DIFF_TABLE = "CREATE TABLE `diff_event`.`t1` (a char(30)) ENGINE=InnoDB"

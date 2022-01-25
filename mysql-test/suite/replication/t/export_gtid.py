@@ -18,6 +18,7 @@
 """
 export_gtid test.
 """
+from __future__ import print_function
 
 import os
 
@@ -154,19 +155,19 @@ class test(mutlib.System_test):
             # in order to help determine the issue.
             print("Test output (results):")
             for row in self.results:
-                print row,
+                print(row, end=' ')
             print("Command failing: {0}".format(cmd_str))
             print("Export file {0}:".format(self.export_file))
             with open(self.export_file.strip()) as f:
                 for row in f:
-                    print row,
+                    print(row, end=' ')
             raise MUTLibError("{0}: failed".format(comment))
 
         # Display the export file if in debug mode
         if self.debug:
             with open(self.export_file.strip()) as f:
                 for row in f:
-                    print row,
+                    print(row, end=' ')
 
         comment = "Test case {0} (import phase) {1}".format(test_num,
                                                             test_case)
@@ -179,12 +180,12 @@ class test(mutlib.System_test):
             # in order to help determine the issue.
             print("Test output (results):")
             for row in self.results:
-                print row,
+                print(row, end=' ')
             print("Command failing: {0}".format(cmd_str))
             print("Export file {0}:".format(self.export_file))
             with open(self.export_file.strip()) as f:
                 for row in f:
-                    print row,
+                    print(row, end=' ')
             raise MUTLibError("{0}: failed".format(comment))
         self.drop_all()
 

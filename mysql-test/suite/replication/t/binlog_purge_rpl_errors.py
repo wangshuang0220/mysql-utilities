@@ -18,9 +18,12 @@
 """
 binlog_purge_rpl_errors test.
 """
+from __future__ import absolute_import
 
-import rpl_admin
-from binlog_rotate import binlog_file_exists
+from builtins import str
+from builtins import range
+from . import rpl_admin
+from .binlog_rotate import binlog_file_exists
 
 from mysql.utilities.exception import MUTLibError
 

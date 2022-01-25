@@ -18,10 +18,12 @@
 """
 diff test with sql_mode=ANSI_QUOTES and different sql_mode.
 """
+from __future__ import absolute_import
 
+from builtins import range
 import os
 
-import diff
+from . import diff
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

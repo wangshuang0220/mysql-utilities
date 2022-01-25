@@ -19,7 +19,15 @@
 This file contains a module to read .frm files and attempt to create a
 facsimile of the CREATE TABLE command.
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import zip
+from builtins import str
+from builtins import chr
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import bisect
 import os
 import stat
@@ -247,14 +255,14 @@ _HA_SPATIAL = 1024             # For spatial search
 
 # Row type definitions
 _ROW_TYPE_DEFAULT, _ROW_TYPE_FIXED, _ROW_TYPE_DYNAMIC, _ROW_TYPE_COMPRESSED, \
-    _ROW_TYPE_REDUNDANT, _ROW_TYPE_COMPACT, _ROW_TYPE_PAGE = range(0, 7)
+    _ROW_TYPE_REDUNDANT, _ROW_TYPE_COMPACT, _ROW_TYPE_PAGE = list(range(0, 7))
 
 # enum utypes from field.h
 _NONE, _DATE, _SHIELD, _NOEMPTY, _CASEUP, _PNR, _BGNR, _PGNR, _YES, _NO, \
     _REL, _CHECK, _EMPTY, _UNKNOWN_FIELD, _CASEDN, _NEXT_NUMBER, \
     _INTERVAL_FIELD, _BIT_FIELD, _TIMESTAMP_OLD_FIELD, _CAPITALIZE, \
     _BLOB_FIELD, _TIMESTAMP_DN_FIELD, _TIMESTAMP_UN_FIELD, \
-    _TIMESTAMP_DNUN_FIELD = range(0, 24)
+    _TIMESTAMP_DNUN_FIELD = list(range(0, 24))
 
 # Array of field data types that can be unsigned
 _UNSIGNED_FIELDS = ['TINYINT', 'SMALLINT', 'MEDIUMINT', 'INT', 'INTEGER',
@@ -325,7 +333,7 @@ def _is_geometry(flags):
     """Check for geometry field types
     Returns bool - True if geometry type.
     """
-    print "flags: %0x" % flags
+    print("flags: %0x" % flags)
     return (flags & _FIELDFLAG_GEOM) == _FIELDFLAG_GEOM
 
 
@@ -345,26 +353,26 @@ def _print_default_values(values):
     values[in]         Array of default values
     """
     num_bytes = len(values)
-    print "# Default values raw data:"
+    print("# Default values raw data:")
     i = 0
     while (i < num_bytes):
         def_str = ""
         j = 0
-        print "#",
+        print("#", end=' ')
         while (j < 8) and (i < num_bytes):
-            print "%02x" % ord(values[i]),
+            print("%02x" % ord(values[i]), end=' ')
             def_str += values[i]
             i += 1
             j += 1
-        print "",
+        print("", end=' ')
         j = 0
         while (j < 8) and (i < num_bytes):
-            print "%02x" % ord(values[i]),
+            print("%02x" % ord(values[i]), end=' ')
             def_str += values[i]
             i += 1
             j += 1
-        print " |",
-        print def_str
+        print(" |", end=' ')
+        print(def_str)
 
 
 def _get_pack_length(col):
@@ -381,7 +389,7 @@ def _get_pack_length(col):
         return (1 if int(col_len) < 256 else 2), col_len
     if size == -2:
         col_len = col['bytes_in_col']
-        return col_len / 8, col_len
+        return old_div(col_len, 8), col_len
     if size is None:
         return size, col['bytes_in_col']  # It's a string of some sort
     return 0, size
@@ -524,12 +532,12 @@ class FrmReader(object):
         try:
             # Skip to header position
             if self.verbosity > 1:
-                print "# Skipping to header at : %0000x" % 2
+                print("# Skipping to header at : %0000x" % 2)
             self.frm_file.seek(2, 0)
             data = self.frm_file.read(_HEADER_LEN)
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot read header.")
 
         # Read header
@@ -575,11 +583,11 @@ class FrmReader(object):
         try:
             # Skip ahead to key section
             if self.verbosity > 1:
-                print "# Skipping to key data at : %0000x" % int(offset)
+                print("# Skipping to key data at : %0000x" % int(offset))
             self.frm_file.seek(offset, 0)
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot locate keys.")
 
         # Decipher key parts
@@ -614,7 +622,7 @@ class FrmReader(object):
             }
             for j in range(0, key_info['num_parts']):
                 if self.verbosity > 1:
-                    print "# Reading key part %s." % j
+                    print("# Reading key part %s." % j)
                 key_part_info = {
                     'field_num': struct.unpack(
                         "<H", self.frm_file.read(2))[0] & _FIELD_NR_MASK,
@@ -660,16 +668,16 @@ class FrmReader(object):
         io_size = self.general_data['IO_SIZE']
         record_offset = io_size + self.general_data['tmp_key_length'] + \
             self.general_data['rec_length']
-        offset = (((record_offset / io_size) + 1) * io_size) + 46
+        offset = (((old_div(record_offset, io_size)) + 1) * io_size) + 46
         try:
             # Skip to column position
             if self.verbosity > 1:
-                print "# Skipping to table comments at : %0000x" % int(offset)
+                print("# Skipping to table comments at : %0000x" % int(offset))
             self.frm_file.seek(offset, 0)
             data = self.frm_file.read(1)
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot read table comment.")
 
         comment_len = struct.unpack("<B", data)[0]
@@ -686,12 +694,12 @@ class FrmReader(object):
         try:
             # Skip ahead to key section
             if self.verbosity > 1:
-                print "# Skipping to default data at : %0000x" % \
-                    int(offset + 1)
+                print("# Skipping to default data at : %0000x" % \
+                    int(offset + 1))
             self.frm_file.seek(offset + 1, 0)
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot find default data.")
 
         num_bytes = self.general_data['rec_length']
@@ -711,11 +719,11 @@ class FrmReader(object):
         try:
             # Skip ahead to key section
             if self.verbosity > 1:
-                print "# Skipping to keys at : %0000x" % int(offset + 2)
+                print("# Skipping to keys at : %0000x" % int(offset + 2))
             self.frm_file.seek(offset + 2, 0)
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot find engine data.")
 
         engine_len = struct.unpack("<H", self.frm_file.read(2))[0]
@@ -798,8 +806,8 @@ class FrmReader(object):
         #       frac0*sizeof(dec1)+dig2bytes[frac0x];
 
         intg = length - decimals
-        intg0 = intg / _DIG_PER_DEC1
-        frac0 = decimals / _DIG_PER_DEC1
+        intg0 = old_div(intg, _DIG_PER_DEC1)
+        frac0 = old_div(decimals, _DIG_PER_DEC1)
         intg0x = intg - (intg0 * _DIG_PER_DEC1)
         frac0x = decimals - (frac0 * _DIG_PER_DEC1)
         int_len = (intg0 * 4 + _DIG2BYTES[intg0x]) - 1  # len of integer part
@@ -845,7 +853,7 @@ class FrmReader(object):
                     maxlen = self.csi.get_maxlen(field_cs_num)
                 else:
                     maxlen = 1
-                size = size / maxlen
+                size = old_div(size, maxlen)
             if len_pos is None:
                 value = self.default_values[recpos:recpos + size]
             else:
@@ -891,7 +899,7 @@ class FrmReader(object):
         try:
             for i in range(0, self.num_cols):
                 if self.verbosity > 1:
-                    print "# Reading column metadata #%s" % i
+                    print("# Reading column metadata #%s" % i)
                 data = struct.unpack(_COL_DATA, self.frm_file.read(17))
                 data_type = _col_types[bisect.bisect_left(_col_keys,
                                                           data[13])]
@@ -915,9 +923,9 @@ class FrmReader(object):
                     'default': None,
                 }
                 column_data.append(col_def)
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot locate column data")
         return column_data
 
@@ -932,17 +940,17 @@ class FrmReader(object):
         io_size = self.general_data['IO_SIZE']
         record_offset = io_size + self.general_data['tmp_key_length'] + \
             self.general_data['rec_length']
-        offset = ((((record_offset + self.general_data['key_info_length']) /
-                    io_size) + 1) * io_size) + 258
+        offset = (((old_div((record_offset + self.general_data['key_info_length']),
+                    io_size)) + 1) * io_size) + 258
         try:
             # Skip to column position
             if self.verbosity > 1:
-                print "# Skipping to column data at : %0000x" % int(offset)
+                print("# Skipping to column data at : %0000x" % int(offset))
             self.frm_file.seek(offset, 0)
             data = struct.unpack("<HHHHHHHHHHHHH", self.frm_file.read(26))
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot read column header.")
         self.num_cols = data[0]
         self.col_metadata = {
@@ -964,14 +972,14 @@ class FrmReader(object):
             self.frm_file.read(7)
             fields_per_screen = struct.unpack("<B", self.frm_file.read(1))[0]
             if self.verbosity > 1:
-                print "# Fields per screen =", fields_per_screen
+                print("# Fields per screen =", fields_per_screen)
             self.frm_file.read(46)
             col_names = self._read_column_names(fields_per_screen)[1]
             self.frm_file.read(1)  # skip 1 byte
             self.column_data = self._read_column_metadata()
-        except Exception, error:
+        except Exception as error:
             if self.verbosity > 1:
-                print "EXCEPTION:", error
+                print("EXCEPTION:", error)
             raise UtilError("Cannot read column data.")
 
         # TODO: Add ability to read defaults by modifying _get_field_defaults
@@ -1015,13 +1023,13 @@ class FrmReader(object):
         # Now read column comments
         for i in range(0, len(col_names)):
             if self.verbosity > 1:
-                print "# Column comment:", \
-                    self.column_data[i]['comment_length']
+                print("# Column comment:", \
+                    self.column_data[i]['comment_length'])
             if self.column_data[i]['comment_length'] > 0:
                 col_str = ''
                 for j in range(0, self.column_data[i]['comment_length']):
                     if self.verbosity > 3:
-                        print "# Reading column data %s." % j
+                        print("# Reading column data %s." % j)
                     char_found = struct.unpack("B", self.frm_file.read(1))[0]
                     col_str += chr(char_found)
                 self.column_data[i]['comment'] = col_str
@@ -1052,8 +1060,8 @@ class FrmReader(object):
 
         elif (field_cs_name is None or table_cs_name is None) and \
                 not self.quiet:
-            print "C",
-            print "# WARNING: Cannot get character set name for id =", id
+            print("C", end=' ')
+            print("# WARNING: Cannot get character set name for id =", id)
             parts.append(" CHARACTER SET <UNKNOWN>")
         else:
             parts.append("")
@@ -1065,9 +1073,9 @@ class FrmReader(object):
            def_field_col[1] != field_col:
             parts.append(" COLLATE `%s`" % field_col)
         elif def_field_col is None and not self.quiet:
-            print "# WARNING: Cannot get default collation for id =", id
+            print("# WARNING: Cannot get default collation for id =", id)
         elif field_col is None and not self.quiet:
-            print "# WARNING: Cannot get collation for id =", id
+            print("# WARNING: Cannot get collation for id =", id)
         else:
             parts.append("")
 
@@ -1116,7 +1124,7 @@ class FrmReader(object):
                 maxlen = 1
             # Only convert the length for character type fields
             if _is_cs_enabled(col):
-                length = length / maxlen
+                length = old_div(length, maxlen)
             decimals = int((col_flags >> _FIELDFLAG_DEC_SHIFT) &
                            _FIELDFLAG_MAX_DEC)
             col_parts = []
@@ -1242,7 +1250,7 @@ class FrmReader(object):
         elif field_len != key_len and \
                 not int(flags) & _HA_FULLTEXT and not int(flags) & _HA_SPATIAL:
             if self.csi:
-                size_info = "(%d)" % (key_len / maxlen)
+                size_info = "(%d)" % (old_div(key_len, maxlen))
             else:
                 size_info = "(UNKNOWN)"
         return size_info
@@ -1256,7 +1264,7 @@ class FrmReader(object):
         Returns list of strings - key column definitions
         """
         keys = []
-        key_info = zip(self.key_data['key_names'], self.key_data['keys'])
+        key_info = list(zip(self.key_data['key_names'], self.key_data['keys']))
         num_keys = len(key_info)
         i = 0
         for key, info in key_info:
@@ -1320,7 +1328,7 @@ class FrmReader(object):
                 if cs_name is not None:
                     options.append("DEFAULT CHARSET=%s" % cs_name)
                 elif not self.quiet:
-                    print "# WARNING: Cannot find character set by id =", c_id
+                    print("# WARNING: Cannot find character set by id =", c_id)
 
                 # collation
                 def_col = self.csi.get_default_collation(c_id)
@@ -1328,11 +1336,11 @@ class FrmReader(object):
                 if def_col is not None and col is not None and def_col != col:
                     options.append("COLLATE=`%s`" % col)
                 elif def_col is None and not self.quiet:
-                    print "# WARNING: Cannot find default collation " + \
-                          "for table using id =", c_id
+                    print("# WARNING: Cannot find default collation " + \
+                          "for table using id =", c_id)
                 elif col is None and not self.quiet:
-                    print "# WARNING: Cannot find collation for table " + \
-                        "using id =", c_id
+                    print("# WARNING: Cannot find collation for table " + \
+                        "using id =", c_id)
 
         row_format = ""
         row_type = int(gen['row_type'])
@@ -1395,7 +1403,7 @@ class FrmReader(object):
         # Fail if we cannot read the file
         try:
             self.frm_file = open(self.frm_path, "rb")
-        except Exception, error:
+        except Exception as error:
             raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
@@ -1417,7 +1425,7 @@ class FrmReader(object):
         """Show general file and table statistics
         """
 
-        print "# File Statistics:"
+        print("# File Statistics:")
         file_stats = os.stat(self.frm_path)
         file_info = {
             'Size': file_stats[stat.ST_SIZE],
@@ -1426,14 +1434,14 @@ class FrmReader(object):
             'Creation Time': time.ctime(file_stats[stat.ST_CTIME]),
             'Mode': file_stats[stat.ST_MODE],
         }
-        for value, data in file_info.iteritems():
-            print "#%22s : %s" % (value, data)
-        print
+        for value, data in file_info.items():
+            print("#%22s : %s" % (value, data))
+        print()
 
         # Fail if we cannot read the file
         try:
             self.frm_file = open(self.frm_path, "rb")
-        except Exception, error:
+        except Exception as error:
             raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
@@ -1458,7 +1466,7 @@ class FrmReader(object):
             def_part_eng = _engine_types[bisect.bisect_left(
                 _engine_keys,
                 self.general_data['default_part_eng'])]['text']
-        print "# Table Statistics:"
+        print("# Table Statistics:")
         table_info = {
             'MySQL Version': ver_str,
             'frm Version': self.general_data['frm_version'],
@@ -1467,9 +1475,9 @@ class FrmReader(object):
             'frm File_Version': self.general_data['frm_file_ver'],
             'Def Partition Engine': def_part_eng,
         }
-        for value, data in table_info.iteritems():
-            print "#%22s : %s" % (value, data)
-        print
+        for value, data in table_info.items():
+            print("#%22s : %s" % (value, data))
+        print()
 
     def show_create_table_statement(self):
         """Show the CREATE TABLE statement
@@ -1480,12 +1488,12 @@ class FrmReader(object):
         contained in the file.
         """
         if not self.quiet:
-            print "# Reading .frm file for %s:" % self.frm_path
+            print("# Reading .frm file for %s:" % self.frm_path)
 
         # Fail if we cannot read the file
         try:
             self.frm_file = open(self.frm_path, "rb")
-        except Exception, error:
+        except Exception as error:
             raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
@@ -1495,18 +1503,18 @@ class FrmReader(object):
         # Take action based on file type
         if file_type == _TABLE_TYPE:
             if not self.quiet:
-                print "# The .frm file is a TABLE."
+                print("# The .frm file is a TABLE.")
 
             # Read general information
             self._read_header()
             if self.verbosity > 1:
-                print "# General Data from .frm file:"
+                print("# General Data from .frm file:")
                 pprint(self.general_data)
 
             # Read key information
             self._read_keys()
             if self.verbosity > 1:
-                print "# Index (key) Data from .frm file:"
+                print("# Index (key) Data from .frm file:")
                 pprint(self.key_data)
 
             # Read default field values information
@@ -1515,31 +1523,31 @@ class FrmReader(object):
             # Read partition information
             self._read_engine_data()
             if self.verbosity > 1:
-                print "# Engine string:", self.engine_str
-                print "# Partition string:", self.partition_str
+                print("# Engine string:", self.engine_str)
+                print("# Partition string:", self.partition_str)
 
             # Read column information
             self._read_column_data()
             if self.verbosity > 1:
-                print "# Column Data from .frm file:"
+                print("# Column Data from .frm file:")
                 pprint(self.column_data)
-                print "# Number of columns:", self.num_cols
+                print("# Number of columns:", self.num_cols)
                 pprint(self.column_data[1:])
 
             # Read comment
             self._read_comment()
             if self.verbosity > 1:
-                print "# Comment:", self.comment_str
+                print("# Comment:", self.comment_str)
 
             if self.csi is not None and self.verbosity > 2:
-                print "# Character sets read from server:"
+                print("# Character sets read from server:")
                 self.csi.print_charsets()
 
             create_table_statement = self._build_create_statement()
             if not self.quiet:
-                print "# CREATE TABLE Statement:\n"
-            print create_table_statement
-            print
+                print("# CREATE TABLE Statement:\n")
+            print(create_table_statement)
+            print()
 
         elif file_type == _VIEW_TYPE:
             # Skip heading
@@ -1551,9 +1559,9 @@ class FrmReader(object):
             if self.verbosity > 1:
                 pprint(view_data)
             if not self.quiet:
-                print "# CREATE VIEW Statement:\n"
-            print view_data['query']
-            print
+                print("# CREATE VIEW Statement:\n")
+            print(view_data['query'])
+            print()
         else:
             raise UtilError("Invalid file type. Magic bytes = %02x" %
                             file_type)
@@ -1575,12 +1583,12 @@ class FrmReader(object):
         # Here we must change the code in position 0x03 to the engine code
         # and the engine string in body of the file (Calculated location)
         if self.verbosity > 1 and not self.quiet:
-            print "# Changing engine for .frm file %s:" % self.frm_path
+            print("# Changing engine for .frm file %s:" % self.frm_path)
 
         # Fail if we cannot read the file
         try:
             self.frm_file = open(self.frm_path, "r+b")
-        except Exception, error:
+        except Exception as error:
             raise UtilError("The file %s cannot be read.\n%s" %
                             (self.frm_path, error))
 
@@ -1603,7 +1611,7 @@ class FrmReader(object):
         # Read general information
         self._read_header()
         if self.verbosity > 1:
-            print "# General Data from .frm file:"
+            print("# General Data from .frm file:")
             pprint(self.general_data)
 
         engine_str = ""
@@ -1619,7 +1627,7 @@ class FrmReader(object):
         engine_str = "".join(struct.unpack("c" * engine_len,
                                            self.frm_file.read(engine_len)))
         if self.verbosity > 1:
-            print "# Engine string:", engine_str
+            print("# Engine string:", engine_str)
 
         # If this is a CSV storage engine, don't change the engine type
         # and instead create an empty .CSV file

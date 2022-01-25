@@ -18,11 +18,13 @@
 """
 copy_db_gtid test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 
 import mutlib
-import export_gtid
+from . import export_gtid
 
 from mysql.utilities.exception import UtilError, MUTLibError
 
@@ -79,7 +81,7 @@ class test(export_gtid.test):
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if res != ret_val:
             for row in self.results:
-                print row,
+                print(row, end=' ')
             raise MUTLibError("{0}: failed".format(comment))
 
         self.drop_all()

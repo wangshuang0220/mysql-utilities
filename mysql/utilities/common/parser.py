@@ -17,6 +17,8 @@
 """Module with parsers for General and Slow Query Log.
 """
 
+from builtins import str
+from builtins import object
 import re
 import decimal
 import datetime
@@ -241,7 +243,7 @@ class LogParserBase(object):
         """
         return self
 
-    def next(self):
+    def __next__(self):
         """Returns the next log entry
 
         Raises StopIteration when no more entries are available.
@@ -492,7 +494,7 @@ class GeneralQueryLog(LogParserBase):
             # Generic command
             entry['argument'] = argument
 
-        for key in entry.keys():
+        for key in list(entry.keys()):
             if key in session:
                 entry[key] = session[key]
 

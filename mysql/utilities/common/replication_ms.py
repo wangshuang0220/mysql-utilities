@@ -20,7 +20,11 @@
 This file contains the multi-source replication utility. It is used to setup
 replication among a slave and multiple masters.
 """
+from __future__ import print_function
 
+from builtins import zip
+from builtins import str
+from builtins import range
 import os
 import sys
 import time

@@ -19,6 +19,7 @@
 diff test.
 """
 
+from builtins import range
 import os
 
 import mutlib

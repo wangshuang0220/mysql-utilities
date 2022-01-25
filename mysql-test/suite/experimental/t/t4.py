@@ -18,8 +18,9 @@
 """
 t4 test.
 """
+from __future__ import absolute_import
 
-import t2
+from . import t2
 
 
 class test(t2.test):

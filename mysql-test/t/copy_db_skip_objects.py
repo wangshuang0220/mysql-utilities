@@ -18,8 +18,9 @@
 """
 copy_db_skips_objects test.
 """
+from __future__ import absolute_import
 
-import copy_db
+from . import copy_db
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

@@ -18,6 +18,7 @@
 """
 This file contains the show replication topology functionality.
 """
+from __future__ import print_function
 
 import sys
 
@@ -61,13 +62,13 @@ def show_topology(master_vals, options=None):
     topo.generate_topology_map(options.get('max_depth', None))
 
     if not options.get("quiet", False) and topo.depth():
-        print "\n# Replication Topology Graph"
+        print("\n# Replication Topology Graph")
 
     if not topo.slaves_found():
-        print "No slaves found."
+        print("No slaves found.")
 
     topo.print_graph()
-    print
+    print()
 
     if options.get("show_list", False):
         from mysql.utilities.common.format import print_list

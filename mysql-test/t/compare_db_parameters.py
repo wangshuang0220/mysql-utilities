@@ -18,8 +18,9 @@
 """
 compare_db_parameters test.
 """
+from __future__ import absolute_import
 
-import compare_db
+from . import compare_db
 
 from mysql.utilities.exception import MUTLibError
 

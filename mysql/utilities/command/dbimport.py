@@ -19,7 +19,9 @@
 This file contains the import operations that will import object metadata or
 table data.
 """
+from __future__ import print_function
 
+from builtins import range
 import csv
 import re
 import sys
@@ -1489,7 +1491,7 @@ def import_file(dest_val, file_name, options):
             if not supports_gtid:
                 # only display warning once
                 if not skip_gtid_warning_printed:
-                    print _GTID_SKIP_WARNING
+                    print(_GTID_SKIP_WARNING)
                     skip_gtid_warning_printed = True
             elif not skip_gtid:
                 if not gtid_version_checked:

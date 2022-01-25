@@ -20,6 +20,8 @@ This module contains function to manipulate GTIDs.
 """
 
 
+from builtins import str
+from builtins import range
 def get_last_server_gtid(gtid_set, server_uuid):
     """Get the last GTID of the specified GTID set for the given server UUID.
 
@@ -183,7 +185,7 @@ def gtid_set_itemize(gtid_set):
         for interval in uuid_set_elements[1:]:
             try:
                 start_val, end_val = interval.split('-')
-                trx_num_list.extend(range(int(start_val), int(end_val) + 1))
+                trx_num_list.extend(list(range(int(start_val), int(end_val) + 1)))
             except ValueError:
                 # Error raised for single values (not an interval).
                 trx_num_list.append(int(interval))

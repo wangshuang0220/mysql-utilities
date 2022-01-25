@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -21,6 +21,7 @@ This file contains the audit log file search utility which allows user to
 retrieve log entries according to the specified search criteria (i.e.,
 from specific users, search patterns, date ranges, or query types).
 """
+from __future__ import print_function
 
 import os.path
 import sys

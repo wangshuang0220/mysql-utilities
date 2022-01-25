@@ -18,10 +18,11 @@
 """
 check_rpl_errors test.
 """
+from __future__ import absolute_import
 
 import socket
 
-import check_rpl
+from . import check_rpl
 import mutlib
 
 from mysql.utilities.exception import MUTLibError

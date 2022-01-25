@@ -18,6 +18,7 @@
 """
 utilities_console_startup_errors test.
 """
+from __future__ import print_function
 
 import os
 import sys

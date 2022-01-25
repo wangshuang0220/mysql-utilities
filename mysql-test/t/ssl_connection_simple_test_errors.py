@@ -18,12 +18,13 @@
 """
 check ssl connection support test.
 """
+from __future__ import absolute_import
 
 from mysql.utilities.exception import MUTLibError
 
 from mutlib.ssl_certs import ssl_c_ca_b
 
-import ssl_connection_simple_test
+from . import ssl_connection_simple_test
 
 
 class test(ssl_connection_simple_test.test):

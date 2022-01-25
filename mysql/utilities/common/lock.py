@@ -19,7 +19,9 @@
 """
 This file contains the methods for checking consistency among two databases.
 """
+from __future__ import print_function
 
+from builtins import object
 from mysql.utilities.exception import UtilError, UtilDBError
 
 
@@ -94,7 +96,7 @@ class Lock(object):
             lock_str += ', '.join(table_locks)
 
             if self.verbosity >= 3 and not self.silent:
-                print '# LOCK STRING:', lock_str
+                print('# LOCK STRING:', lock_str)
 
             # Execute the lock
             self.server.exec_query(lock_str, self.query_opts)
@@ -108,7 +110,7 @@ class Lock(object):
         # Execute a FLUSH TABLES WITH READ LOCK for replication uses only
         elif self.locking == 'flush' and options.get("rpl_mode", None):
             if self.verbosity >= 3 and not self.silent:
-                print "# LOCK STRING: %s" % _FLUSH_TABLES_READ_LOCK
+                print("# LOCK STRING: %s" % _FLUSH_TABLES_READ_LOCK)
             self.server.exec_query(_FLUSH_TABLES_READ_LOCK, self.query_opts)
             self.locked = True
         else:
@@ -132,11 +134,11 @@ class Lock(object):
 
         if self.verbosity >= 3 and not self.silent and \
            self.locking != 'no-locks':
-            print "# UNLOCK STRING:",
+            print("# UNLOCK STRING:", end=' ')
         # Call unlock:
         if self.locking in ['lock-all', 'flush']:
             if self.verbosity >= 3 and not self.silent:
-                print "UNLOCK TABLES"
+                print("UNLOCK TABLES")
             self.server.exec_query("UNLOCK TABLES", self.query_opts)
             self.locked = False
 
@@ -144,9 +146,9 @@ class Lock(object):
         elif self.locking == 'snapshot':
             if not abort:
                 if self.verbosity >= 3 and not self.silent:
-                    print "COMMIT"
+                    print("COMMIT")
                 self.server.exec_query("COMMIT", self.query_opts)
             else:
                 self.server.exec_queery("ROLLBACK", self.query_opts)
                 if self.verbosity >= 3 and not self.silent:
-                    print "ROLLBACK"
+                    print("ROLLBACK")

@@ -20,7 +20,10 @@ This module contains classes and functions used to determine what MySQL
 utilities are installed, their options, and usage. This module can be
 used to allow a client to provide auto type and option completion.
 """
+from __future__ import print_function
 
+from builtins import str
+from builtins import object
 import glob
 import os
 import sys
@@ -173,7 +176,7 @@ class Utilities(object):
         else:
             self.posible_utilities.update(self.extra_utilities)
         self.available_utilities = self.posible_utilities
-        for util_name, ver_compatibility in self.posible_utilities.iteritems():
+        for util_name, ver_compatibility in self.posible_utilities.items():
             name_utility = "{0} utility".format(util_name)
             if ver_compatibility:
                 min_v, max_v = ver_compatibility
@@ -464,15 +467,15 @@ class Utilities(object):
             list_of_utilities = self.util_list
         else:
             list_of_utilities = print_list
-        print
+        print()
         if len(list_of_utilities) > 0:
             print_dictionary_list(['Utility', 'Description'],
                                   ['name', 'description'],
                                   list_of_utilities, self.width)
         else:
-            print
-            print "No utilities match the search term."
-        print
+            print()
+            print("No utilities match the search term.")
+        print()
 
     def get_options_dictionary(self, utility_options):
         """Retrieve the options dictionary.
@@ -520,12 +523,12 @@ class Utilities(object):
         """
         if len(options) > 0:
             dictionary_list = self.get_options_dictionary(options)
-            print
-            print
+            print()
+            print()
             print_dictionary_list(['Option', 'Description'],
                                   ['long_name', 'description'],
                                   dictionary_list, self.width)
-            print
+            print()
 
     @staticmethod
     def get_usage(util_info):

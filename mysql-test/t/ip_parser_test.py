@@ -19,6 +19,7 @@
 ip_parser_test test.
 """
 
+from builtins import str
 import os
 import re
 

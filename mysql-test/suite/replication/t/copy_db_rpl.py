@@ -18,11 +18,14 @@
 """
 copy_db_rpl test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import range
 import os
 import time
 
-import replicate
+from . import replicate
 
 from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.replication import Master, Slave
@@ -153,7 +156,7 @@ class test(replicate.test):
         i = 0
         while i < attempts:
             if self.debug:
-                print ".",
+                print(".", end=' ')
             res = slave.exec_query("SHOW SLAVE STATUS")
             if res and res[0][0] == 'Waiting for master to send event':
                 break
@@ -252,13 +255,13 @@ class test(replicate.test):
         # Wait for slave to connect to master
         if not skip_wait:
             if self.debug:
-                print "# Waiting for slave to connect to master",
+                print("# Waiting for slave to connect to master", end=' ')
             try:
                 self.wait_for_slave_connection(destination, _MAX_ATTEMPTS)
             except MUTLibError:
                 raise
             if self.debug:
-                print "done."
+                print("done.")
 
         # Check databases on slave and save results for 'AFTER' check
         results.append(self._check_result(destination, "SHOW DATABASES "
@@ -275,7 +278,7 @@ class test(replicate.test):
         # Wait for slave to catch up
         if not skip_wait:
             if self.debug:
-                print "# Waiting for slave to sync",
+                print("# Waiting for slave to sync", end=' ')
 
             bin_info = master.get_binlog_info()
             if bin_info is None:  # server is no longer acting as a master
@@ -292,7 +295,7 @@ class test(replicate.test):
             if not synced:
                 raise MUTLibError("Slave did not catch up with master")
             if self.debug:
-                print "done."
+                print("done.")
 
         # ROLLBACK to close any active transaction leading to wrong values for
         # the next SELECT COUNT(*) with 5.5 servers (versions > 5.5.0).
@@ -302,9 +305,9 @@ class test(replicate.test):
                                                        "FROM master_db1.t1"))
 
         if self.debug:
-            print comment
-            print "Expected Results:", expected_results[test_num - 1]
-            print "  Actual Results:", results[1:]
+            print(comment)
+            print("Expected Results:", expected_results[test_num - 1])
+            print("  Actual Results:", results[1:])
 
         self.results.append(results)
 
@@ -397,9 +400,9 @@ class test(replicate.test):
         # Here we check the result from execution of each test case.
         for i in range(0, len(_TEST_CASE_RESULTS)):
             if self.debug:
-                print self.results[i][0]
-                print "  Actual results:", self.results[i][1:]
-                print "Expected results:", _TEST_CASE_RESULTS[i]
+                print(self.results[i][0])
+                print("  Actual results:", self.results[i][1:])
+                print("Expected results:", _TEST_CASE_RESULTS[i])
             if self.results[i][1:] != _TEST_CASE_RESULTS[i]:
                 msg = ("\n{0}\nExpected result = {1}\n  Actual result = "
                        "{2}\n".format(self.results[i][0], self.results[i][1:],

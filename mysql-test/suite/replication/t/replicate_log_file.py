@@ -18,8 +18,10 @@
 """
 replicate_log_file test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
-import replicate
+from . import replicate
 
 from mysql.utilities.exception import MUTLibError, UtilError
 
@@ -233,12 +235,12 @@ class test(replicate.test):
 
         if self.debug:
             i = 0
-            print "\n", len(self.results), self.results
-            print "\nTest Results: (test_case_num, result)"
+            print("\n", len(self.results), self.results)
+            print("\nTest Results: (test_case_num, result)")
             for result in _EXPECTED_RESULTS:
-                print "Expected:", result
+                print("Expected:", result)
                 if i + 2 > len(self.results):
-                    print "Not enough actual results for this test case."
+                    print("Not enough actual results for this test case.")
                 else:
                     i += 1
                     post_rpl = self.results[i]
@@ -264,7 +266,7 @@ class test(replicate.test):
                 return (False, "{0}: Result mismatch."
                                "\n{1}".format(test_case, result_msg))
             if self.debug:
-                print "{0}:\n{1}".format(test_case, result_msg)
+                print("{0}:\n{1}".format(test_case, result_msg))
         return True, None
 
     def record(self):

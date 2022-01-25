@@ -19,7 +19,9 @@
 This module contains classes and functions used to manage a user-defined
 variables.
 """
+from __future__ import print_function
 
+from builtins import str
 import re
 
 from mysql.utilities.common.format import print_dictionary_list
@@ -74,7 +76,7 @@ class Variables(dict):
         Returns list - matches or [] for no matches
         """
         result = []
-        for key, value in self.iteritems():
+        for key, value in self.items():
             if key.startswith(prefix):
                 result.append({key: value})
         return result
@@ -91,16 +93,16 @@ class Variables(dict):
             return
 
         var_list = [{'name': key, 'value': value}
-                    for key, value in self.iteritems()]
+                    for key, value in self.items()]
 
-        print "\n"
+        print("\n")
         if not self:
-            print "There are no variables defined.\n"
+            print("There are no variables defined.\n")
             return
 
         print_dictionary_list(['Variable', 'Value'], ['name', 'value'],
                               var_list, self.width)
-        print
+        print()
 
     def replace_variables(self, cmd_string):
         """Replace all instances of variables with their values.
@@ -131,6 +133,6 @@ class Variables(dict):
         """
         regex = re.compile(pattern)
 
-        for key, value in self.iteritems():
+        for key, value in self.items():
             if regex.match(key):
                 yield key, value

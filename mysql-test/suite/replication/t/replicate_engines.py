@@ -18,10 +18,11 @@
 """
 replicate_engines test.
 """
+from __future__ import absolute_import
 
 import os
 
-import replicate
+from . import replicate
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

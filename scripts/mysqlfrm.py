@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -20,6 +20,7 @@
 This file contains the .frm file utility for reading .frm files to construct
 CREATE TABLE commands and display diagnostic information.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -408,7 +409,7 @@ if __name__ == '__main__':
             frm_files_found.append(arg)
 
         if not frm_files_found:
-            print "# NOTE: No .frm files found in folder %s." % arg
+            print("# NOTE: No .frm files found in folder %s." % arg)
             continue
         all_frm_files.extend(frm_files_found)
 
@@ -424,13 +425,13 @@ if __name__ == '__main__':
                        "You can try the --diagnostic mode to read these "
                        "files.\n#")
                 for frm_file in failed:
-                    print "#", frm_file
-                print "#"
+                    print("#", frm_file)
+                print("#")
     except UtilError as error:
-        print "ERROR: {0}".format(error.errmsg)
+        print("ERROR: {0}".format(error.errmsg))
         sys.exit(1)
 
     if not opt.quiet:
-        print "#...done."
+        print("#...done.")
 
     sys.exit()

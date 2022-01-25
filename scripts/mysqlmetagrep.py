@@ -19,6 +19,7 @@
 """
 This file contains the metagrep utility which allows users to search metadata.
 """
+from __future__ import print_function
 
 import os.path
 import re

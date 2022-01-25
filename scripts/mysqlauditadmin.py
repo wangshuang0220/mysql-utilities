@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -21,6 +21,7 @@ This file contains the audit log administration utility which allows users to
 manage the audit log (i.e., view/edit control variables; perform on-demand
 log file rotation, and copy log files to other locations).
 """
+from __future__ import print_function
 
 import os.path
 import sys

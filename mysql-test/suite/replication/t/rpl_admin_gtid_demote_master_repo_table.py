@@ -18,8 +18,9 @@
 """
 rpl_admin_gtid_demote_master_repo_table test.
 """
+from __future__ import absolute_import
 
-import rpl_admin
+from . import rpl_admin
 
 from mysql.utilities.exception import MUTLibError
 

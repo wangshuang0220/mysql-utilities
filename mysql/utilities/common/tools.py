@@ -18,7 +18,12 @@
 """
 This module contains methods for working with mysql server tools.
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import chr
+from builtins import str
+from past.utils import old_div
 import inspect
 import os
 import re
@@ -170,10 +175,10 @@ def estimate_free_space(path, unit_multiple=2):
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(path),
                                                    None, None,
                                                    ctypes.pointer(free_bytes))
-        return free_bytes.value / unit_size
+        return old_div(free_bytes.value, unit_size)
     else:
         st = os.statvfs(path)  # pylint: disable=E1101
-        return st.f_bavail * st.f_frsize / unit_size
+        return old_div(st.f_bavail * st.f_frsize, unit_size)
 
 
 def execute_script(run_cmd, filename=None, options=None, verbosity=False):

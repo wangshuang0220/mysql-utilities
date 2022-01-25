@@ -18,10 +18,11 @@
 """
 utilities_console_pipe test.
 """
+from __future__ import absolute_import
 
 import os
 
-import utilities_console_base
+from . import utilities_console_base
 
 from mysql.utilities.exception import MUTLibError
 

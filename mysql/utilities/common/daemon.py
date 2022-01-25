@@ -19,6 +19,8 @@
 This file contains a base class that implements a POSIX daemon.
 """
 
+from builtins import str
+from builtins import object
 import os
 import sys
 import time

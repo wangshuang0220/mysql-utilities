@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -21,6 +21,7 @@ This file contains the clone user utility. It is used to clone an existing
 MySQL user to one or more new user accounts copying all grant statements
 to the new users.
 """
+from __future__ import print_function
 
 import os.path
 import sys

@@ -18,10 +18,11 @@
 """
 check_index_errors test.
 """
+from __future__ import absolute_import
 
 import os
 
-import check_index
+from . import check_index
 
 from mysql.utilities.exception import MUTLibError
 

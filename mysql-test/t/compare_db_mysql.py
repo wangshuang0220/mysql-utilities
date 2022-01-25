@@ -18,6 +18,7 @@
 """
 compare_db_mysql test.
 """
+from __future__ import print_function
 
 import os
 
@@ -194,12 +195,12 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
             # Append output difference for server1 to result file.
         if self.debug:
-            print "\nContents of SQL file:"
+            print("\nContents of SQL file:")
         sql_file = open(_INPUT_SQL_FILE, 'r')
         for line in sql_file:
             self.results.append(line)
             if self.debug:
-                print line,
+                print(line, end=' ')
         sql_file.close()
         # Execute diff from mysqldbcompare on server1
         res = self.exec_mysql_client_cmd(self.server1, _INPUT_SQL_FILE)
@@ -261,12 +262,12 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
             # Append output difference for server1 to result file.
         if self.debug:
-            print "\nContents of SQL file:"
+            print("\nContents of SQL file:")
         sql_file = open(_INPUT_SQL_FILE, 'r')
         for line in sql_file:
             self.results.append(line)
             if self.debug:
-                print line,
+                print(line, end=' ')
         sql_file.close()
         # Execute diff from mysqldbcompare on server1
         res = self.exec_mysql_client_cmd(self.server1, _INPUT_SQL_FILE)

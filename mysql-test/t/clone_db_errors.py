@@ -18,10 +18,11 @@
 """
 clone_db_errors test.
 """
+from __future__ import absolute_import
 
 import os
 
-import clone_db
+from . import clone_db
 
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 

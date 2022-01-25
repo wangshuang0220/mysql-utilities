@@ -18,10 +18,11 @@
 """
 audit_log_grep_errors test.
 """
+from __future__ import absolute_import
 
 import os
 
-import audit_log_grep
+from . import audit_log_grep
 
 from mysql.utilities.exception import MUTLibError
 

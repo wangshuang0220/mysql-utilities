@@ -18,11 +18,12 @@
 """
 import_errors test.
 """
+from __future__ import absolute_import
 
 import os
 import subprocess
 
-import import_basic
+from . import import_basic
 
 from mysql.utilities.exception import MUTLibError, UtilError
 
@@ -297,7 +298,7 @@ class test(import_basic.test):
         with open(self.perms_test_file, "w"):
             pass
         if os.name == "posix":
-            os.chmod(self.perms_test_file, 0200)
+            os.chmod(self.perms_test_file, 0o200)
         else:
             proc = subprocess.Popen(["icacls", self.perms_test_file, "/deny",
                                      "everyone:(R)"], stdout=subprocess.PIPE)

@@ -18,7 +18,8 @@
 """
 grant_show_privileges test.
 """
-import show_grants
+from __future__ import absolute_import
+from . import show_grants
 from mysql.utilities.exception import MUTLibError, UtilError
 
 

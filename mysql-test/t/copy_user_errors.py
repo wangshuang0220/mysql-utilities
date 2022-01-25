@@ -18,8 +18,9 @@
 """
 copy_user_errors test.
 """
+from __future__ import absolute_import
 
-import copy_user
+from . import copy_user
 
 from mysql.utilities.exception import MUTLibError
 

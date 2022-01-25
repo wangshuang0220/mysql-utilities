@@ -59,7 +59,7 @@ class test(mutlib.System_test):
             con_dic = parse_connection(test_, options={"charset": "utf8"})
             # Sort the keys to fix the issue where the keys are printed in
             # different order on linux and windows.
-            self.results.append(sorted(con_dic.iteritems()))
+            self.results.append(sorted(con_dic.items()))
 
         # Test parse_user_password with login-paths
         user_pass_tests = ["test_user", "test_mylogin", "test_user:",

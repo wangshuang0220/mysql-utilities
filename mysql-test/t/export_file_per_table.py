@@ -18,10 +18,12 @@
 """
 export_file_per_table test.
 """
+from __future__ import absolute_import
 
+from builtins import range
 import os
 
-import export_parameters_def
+from . import export_parameters_def
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

@@ -1,3 +1,19 @@
+#    ****** CEL STUFF ********
+# upgrade to python3 stuff
+**/*.bak
+**/*.bak.*
+
+# scripts copied for install
+scripts/mysql*
+!scripts/*.py
+scripts/*.bak.py
+
+# editor backups
+*~
+
+#  ************************
+
+
 # Tmp files
 ~*
 

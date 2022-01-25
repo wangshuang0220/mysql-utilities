@@ -18,8 +18,10 @@
 """
 copy_db_rpl_errors test.
 """
+from __future__ import absolute_import
 
-import export_rpl_errors
+from builtins import str
+from . import export_rpl_errors
 import mutlib
 
 from mysql.utilities.exception import MUTLibError

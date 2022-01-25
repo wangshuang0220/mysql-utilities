@@ -19,6 +19,8 @@ This files contains unit tests for the MySQL General and Slow Query Log
 parsers.
 """
 
+from builtins import str
+from builtins import zip
 import sys
 import os.path
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -327,15 +329,15 @@ class BaseParserTestCase(unittest.TestCase):
     """
     def checkArguments(self, function, supported_arguments):
         argspec = inspect.getargspec(function)
-        function_arguments = dict(zip(argspec[0][1:],argspec[3]))
-        for argument, default in function_arguments.items():
+        function_arguments = dict(list(zip(argspec[0][1:],argspec[3])))
+        for argument, default in list(function_arguments.items()):
             try:
                 self.assertEqual(supported_arguments[argument],
                     default, msg ="Argument '%s' has wrong default" % argument)
             except KeyError:
                 self.fail("Found unsupported or new argument '%s'" % argument)
-        for argument, default in supported_arguments.items():
-            if not function_arguments.has_key(argument):
+        for argument, default in list(supported_arguments.items()):
+            if argument not in function_arguments:
                 self.fail("Supported argument '%s' fails" % argument)
     
     def _fakelog_writelines(self, lines, empty=True, rewind=True):
@@ -363,7 +365,7 @@ class BaseParserTestCase(unittest.TestCase):
             objdict = obj
         else:
             objdict = obj.__dict__
-        for key,value in expected.items():
+        for key,value in list(expected.items()):
             self.assertTrue(key in objdict,
                 msg="No attribute '%s' for instance of class %s" % (
                     key,obj.__class__.__name__))
@@ -621,19 +623,19 @@ class TestGeneralQueryLog(BaseParserTestCase):
 
         log_iterator = self.log.__iter__()
         for i,exp in enumerate(GENERAL_LOG_ENTRIES_EXP['Query']):
-            entry = log_iterator.next()
+            entry = next(log_iterator)
             self.assertTrue(isinstance(entry, GeneralQueryLogEntry))
             self.assertEqual(exp,entry,msg="Failed parsing entry #%d" % i)
 
     def test_next(self):
         """Iterate through the log, reading entries (.next()-method)"""
-        self.assertRaises(StopIteration,self.log.next)
+        self.assertRaises(StopIteration,self.log.__next__)
 
         data = GENERAL_LOG_ENTRIES['Query'][0]
         exp = GENERAL_LOG_ENTRIES_EXP['Query'][0]
         self._fakelog_writelines([data],empty=True,rewind=True)
-        self.assertEqual(exp,self.log.next())
-        self.assertRaises(StopIteration,self.log.next)
+        self.assertEqual(exp,next(self.log))
+        self.assertRaises(StopIteration,self.log.__next__)
 
 class TestSlowQueryLog(BaseParserTestCase):
     """Test SlowQueryLog class"""
@@ -836,19 +838,19 @@ class TestSlowQueryLog(BaseParserTestCase):
 
         log_iterator = self.log.__iter__()
         for i,exp in enumerate(SLOW_LOG_ENTRIES_EXP):
-            entry = log_iterator.next()
+            entry = next(log_iterator)
             self.assertTrue(isinstance(entry, SlowQueryLogEntry))
             self.assertEqual(exp,entry,msg="Failed parsing entry #%d" % i)
     
     def test_next(self):
         """Iterate through the log, reading entries (.next()-method)"""
-        self.assertRaises(StopIteration,self.log.next)
+        self.assertRaises(StopIteration,self.log.__next__)
 
         data = SLOW_LOG_ENTRIES[0]
         exp = SLOW_LOG_ENTRIES_EXP[0]
         self._fakelog_writelines(data,empty=True,rewind=True)
-        self.assertEqual(exp,self.log.next())
-        self.assertRaises(StopIteration,self.log.next)
+        self.assertEqual(exp,next(self.log))
+        self.assertRaises(StopIteration,self.log.__next__)
 
 class TestLogEntryBase(BaseParserTestCase):
     entry_init_attributes =  {

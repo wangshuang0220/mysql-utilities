@@ -18,6 +18,8 @@
 """
 This file contains grep for objects.
 """
+from builtins import str
+from builtins import object
 import sys
 
 import mysql.connector
@@ -213,7 +215,7 @@ VIEW = 'view'
 USER = 'user'
 COLUMN = 'column'
 
-OBJECT_TYPES = _OBJMAP.keys()
+OBJECT_TYPES = list(_OBJMAP.keys())
 
 
 class ObjectGrep(object):

@@ -18,7 +18,12 @@
 """
 This file contains the methods for checking consistency among two databases.
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 import re
 import tempfile
 import difflib
@@ -188,7 +193,7 @@ def get_create_object(server, object_name, options, object_type):
         else:
             print("\n# Definition for object {0}:"
                   "".format(remove_backtick_quoting(db_name, sql_mode)))
-        print create_stmt
+        print(create_stmt)
 
     return create_stmt
 
@@ -207,9 +212,9 @@ def print_missing_list(item_list, first, second):
     """
     if len(item_list) == 0:
         return False
-    print "# WARNING: Objects in {0} but not in {1}:".format(first, second)
+    print("# WARNING: Objects in {0} but not in {1}:".format(first, second))
     for item in item_list:
-        print "# {0:>12}: {1}".format(item[0], item[1][0])
+        print("# {0:>12}: {1}".format(item[0], item[1][0]))
     return True
 
 
@@ -619,9 +624,9 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
 
     if not quiet:
         msg = "# Comparing {0} to {1} ".format(object1, object2)
-        print msg,
+        print(msg, end=' ')
         linelen = width - (len(msg) + 10)
-        print ' ' * linelen,
+        print(' ' * linelen, end=' ')
 
     object1_create_list = object1_create.split('\n')
     object2_create_list = object2_create.split('\n')
@@ -705,10 +710,10 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
         # warning to the user.
 
         if not quiet:
-            print "[FAIL]"
+            print("[FAIL]")
 
         for line in diff_list:
-            print line
+            print(line)
 
         print("# WARNING: Could not generate SQL statements for differences "
               "between {0} and {1}. No changes required or not supported "
@@ -718,12 +723,12 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
 
     if len(diff_list) > 0:
         if not quiet:
-            print "[FAIL]"
+            print("[FAIL]")
 
         if not quiet or \
            (not options.get("suppress_sql", False) and difftype == 'sql'):
             for line in diff_list:
-                print line
+                print(line)
 
             # Full ALTER TABLE for partition difference cannot be generated
             # (not supported). Notify the user.
@@ -814,7 +819,7 @@ def _get_compare_objects(index_cols, table1,
         table = _COMPARE_TABLE.format(db=table1.q_db_name,
                                       compare_tbl=q_tbl_name,
                                       pkdef=index_defn,
-                                      span_key_size=span_key_size / 2)
+                                      span_key_size=old_div(span_key_size, 2))
 
     return (table, index_str)
 

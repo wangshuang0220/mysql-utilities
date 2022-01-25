@@ -441,7 +441,7 @@ def connect_servers(src_val, dest_val, options=None):
     src_name = options.get("src_name", "Source")
     dest_name = options.get("dest_name", "Destination")
     version = options.get("version", None)
-    charset = options.get("charset", None)
+    charset = options.get("charset", "utf8")
     verbose = options.get('verbose', False)
 
     ssl_dict = {}
@@ -1232,14 +1232,18 @@ class Server(object):
         Returns bool True if server version is GE (>=) version specified,
                      False if server version is LT (<) version specified
         """
-        version_str = self.get_version()
+        version_str = str(self.get_version())
         if version_str is not None:
+            match = re.match(r"^bytearray\(b\'(.*)\'\)$",version_str)
+            if match:
+                version_str = match.group(1)
             match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', version_str.strip())
             if match:
                 version = [int(x) for x in match.group(1).split('.')]
                 version = (version + [0])[:3]  # Ensure a 3 elements list
                 return version >= [int(t_major), int(t_minor), int(t_rel)]
             else:
+                print("no match")
                 return False
         return True
 

@@ -18,9 +18,11 @@
 """
 binlog_purge_privileges test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
-import binlog_purge_rpl
-from binlog_rotate import binlog_file_exists
+from . import binlog_purge_rpl
+from .binlog_rotate import binlog_file_exists
 
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common.user import change_user_privileges

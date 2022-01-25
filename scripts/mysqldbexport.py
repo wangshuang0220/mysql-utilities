@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -20,6 +20,7 @@
 This file contains the export database utility which allows users to export
 metadata for objects in a database and data for tables.
 """
+from __future__ import print_function
 
 import multiprocessing
 import os
@@ -254,6 +255,8 @@ if __name__ == '__main__':
         output_filename = None
 
     # Set options for database operations.
+    opt.verbosity = int( opt.verbosity or 0)
+    
     options = {
         "skip_tables": "tables" in skips,
         "skip_views": "views" in skips,

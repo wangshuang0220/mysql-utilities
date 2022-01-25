@@ -18,12 +18,16 @@
 """
 replicate_ms test with SSL.
 """
+from __future__ import absolute_import
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 import os
 
-import ConfigParser
+import configparser
 
-import replicate_ms
+from . import replicate_ms
 
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.user import grant_proxy_ssl_privileges
@@ -48,7 +52,7 @@ class test(replicate_ms.test):
     This test exercises the mysqlrplms utility using SSL.
     """
 
-    log_range = range(1, 2)
+    log_range = list(range(1, 2))
     total_masters = 2
     server0 = None
     server1 = None
@@ -114,7 +118,7 @@ class test(replicate_ms.test):
         self.cleanup_logs()
 
         # setup config_path
-        config_p = ConfigParser.ConfigParser()
+        config_p = configparser.ConfigParser()
         self.test_server_names = []
         servers_ = [self.server1, self.server2, self.server3]
         with open(self.config_file_path, 'w') as config_f:

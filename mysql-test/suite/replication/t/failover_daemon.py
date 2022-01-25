@@ -18,13 +18,17 @@
 """
 failover_daemon test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import oct
+from builtins import range
 import os
 import re
 import stat
 import time
 
-import failover
+from . import failover
 
 from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.command.rpl_admin import WARNING_SLEEP_TIME
@@ -48,7 +52,7 @@ class test(failover.test):
     It uses the rpl_admin_gtid test for setup and teardown methods.
     """
 
-    log_range = range(1, 6)
+    log_range = list(range(1, 6))
 
     def check_prerequisites(self):
         if os.name != "posix":

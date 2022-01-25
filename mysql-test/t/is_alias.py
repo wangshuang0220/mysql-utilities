@@ -18,6 +18,7 @@
 """
 is_alias test.
 """
+from __future__ import print_function
 
 import socket
 

@@ -18,14 +18,18 @@
 """
 rpl_sync test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import str
+from builtins import range
 import os
 import random
 import string
 import threading
 import time
 
-import rpl_admin
+from . import rpl_admin
 
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import MUTLibError
@@ -50,7 +54,7 @@ def create_test_db(server, db_num=1):
     server[in]      Target server to create the test databases and tables.
     db_num[in]      Number of databases to create (by default: 1).
     """
-    for db_index in xrange(db_num):
+    for db_index in range(db_num):
         db_name = '`test_rplsync_db{0}`'.format(
             '' if db_num == 1 else db_index
         )
@@ -59,7 +63,7 @@ def create_test_db(server, db_num=1):
         # correctly with statement based replication.
         server.exec_query("USE {0}".format(db_name))
         columns = []
-        for table_index in xrange(TEST_DB_NUM_TABLES):
+        for table_index in range(TEST_DB_NUM_TABLES):
             columns.append('rnd_txt{0} VARCHAR(20)'.format(table_index))
             create_tbl_query = (
                 'CREATE TABLE {0}.`t{1}` '
@@ -78,7 +82,7 @@ def drop_test_db(server, db_num=1):
                     It is assumed that a matching number of test databases
                     have been previously created.
     """
-    for db_index in xrange(db_num):
+    for db_index in range(db_num):
         db_name = '`test_rplsync_db{0}`'.format(
             '' if db_num == 1 else db_index
         )
@@ -103,19 +107,19 @@ def load_test_data(server, db_num=1):
     srv = Server({'conn_info': server})
     srv.connect()
 
-    for db_index in xrange(db_num):
+    for db_index in range(db_num):
         db_name = '`test_rplsync_db{0}`'.format(
             '' if db_num == 1 else db_index
         )
         # Insert random data on all tables.
         random_values = string.letters + string.digits
-        for _ in xrange(TEST_DB_NUM_ROWS):
+        for _ in range(TEST_DB_NUM_ROWS):
             columns = []
             values = []
-            for table_index in xrange(TEST_DB_NUM_TABLES):
+            for table_index in range(TEST_DB_NUM_TABLES):
                 columns.append('rnd_txt{0}'.format(table_index))
                 rnd_text = "".join(
-                    [random.choice(random_values) for _ in xrange(20)]
+                    [random.choice(random_values) for _ in range(20)]
                 )
                 values.append("'{0}'".format(rnd_text))
                 insert = ("INSERT INTO {0}.`t{1}` ({2}) VALUES ({3})"

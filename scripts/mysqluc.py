@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -19,7 +19,9 @@
 """
 This file contains the mysql utilities client.
 """
+from __future__ import print_function
 
+from builtins import range
 import os
 import sys
 

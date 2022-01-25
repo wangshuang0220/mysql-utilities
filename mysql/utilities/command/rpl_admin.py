@@ -19,7 +19,10 @@
 This file contains the replication administration tools for managine a
 simple master-to-slaves topology.
 """
+from __future__ import print_function
 
+from builtins import str
+from builtins import object
 import logging
 import os
 import sys
@@ -113,7 +116,7 @@ def purge_log(filename, age):
     Returns bool - True = success, Fail = error reading/writing log file
     """
     if not os.path.exists(filename):
-        print "NOTE: Log file '%s' does not exist. Will be created." % filename
+        print("NOTE: Log file '%s' does not exist. Will be created." % filename)
         return True
 
     # Read a row, check age. If > today + age, delete row.
@@ -322,7 +325,7 @@ class RplCommands(object):
         """
         # First, print the message.
         if print_msg and not self.quiet:
-            print message
+            print(message)
         # Now log message if logging turned on
         if self.logging:
             logging.log(int(level), message.strip("#").strip(' '))
@@ -364,8 +367,8 @@ class RplCommands(object):
         cols, rows = self.topology.get_health()
 
         if not quiet:
-            print "#"
-            print "# Replication Topology Health:"
+            print("#")
+            print("# Replication Topology Health:")
 
         # Print health report
         print_list(sys.stdout, fmt, cols, rows)
@@ -389,24 +392,24 @@ class RplCommands(object):
         # Get UUIDs
         uuids = self.topology.get_server_uuids()
         if len(uuids):
-            print "#"
-            print "# UUIDS for all servers:"
+            print("#")
+            print("# UUIDS for all servers:")
             print_list(sys.stdout, fmt, ['host', 'port', 'role', 'uuid'],
                        uuids)
 
         # Get GTID lists
         executed, purged, owned = self.topology.get_gtid_data()
         if len(executed):
-            print "#"
-            print "# Transactions executed on the server:"
+            print("#")
+            print("# Transactions executed on the server:")
             print_list(sys.stdout, fmt, _GTID_COLS, executed)
         if len(purged):
-            print "#"
-            print "# Transactions purged from the server:"
+            print("#")
+            print("# Transactions purged from the server:")
             print_list(sys.stdout, fmt, _GTID_COLS, purged)
         if len(owned):
-            print "#"
-            print "# Transactions owned by another server:"
+            print("#")
+            print("# Transactions owned by another server:")
             print_list(sys.stdout, fmt, _GTID_COLS, owned)
 
     def _check_host_references(self):
@@ -735,9 +738,9 @@ class RplCommands(object):
                          "master %s:%s." % (self.topology.master.host,
                                             self.topology.master.port),
                          logging.WARN)
-            print "If this is an error, restart the console with --force. "
-            print "Failover mode changed to 'FAIL' for this instance. "
-            print "Console will start in 10 seconds.",
+            print("If this is an error, restart the console with --force. ")
+            print("Failover mode changed to 'FAIL' for this instance. ")
+            print("Console will start in 10 seconds.", end=' ')
             sys.stdout.flush()
             i = 0
             while i < 9:
@@ -745,7 +748,7 @@ class RplCommands(object):
                 sys.stdout.write('.')
                 sys.stdout.flush()
                 i += 1
-            print "starting Console."
+            print("starting Console.")
             time.sleep(1)
 
         try:
@@ -1003,7 +1006,7 @@ class RplCommands(object):
                 self.topology.remove_discovered_slaves()
                 self.topology.discover_slaves()
                 console.list_data = None
-                print "\nFailover console will restart in 5 seconds."
+                print("\nFailover console will restart in 5 seconds.")
                 time.sleep(5)
                 console.clear()
                 failover = False

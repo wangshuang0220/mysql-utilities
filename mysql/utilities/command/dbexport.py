@@ -18,6 +18,7 @@
 This file contains the export operations that will export object metadata or
 table data.
 """
+from __future__ import print_function
 
 import multiprocessing
 import os

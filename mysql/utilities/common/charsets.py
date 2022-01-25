@@ -19,13 +19,16 @@
 This module contains the charset_info class designed to read character set
 and collation information from /share/charsets/index.xml.
 """
+from __future__ import print_function
 
+from builtins import range
+from builtins import object
 import sys
 
 from mysql.utilities.common.format import print_list
 
 _CHARSET_INDEXES = ID, CHARACTER_SET_NAME, COLLATION_NAME, MAXLEN, IS_DEFAULT \
-    = range(0, 5)
+    = list(range(0, 5))
 
 _CHARSET_QUERY = """
 SELECT CL.ID,CL.CHARACTER_SET_NAME,CL.COLLATION_NAME,CS.MAXLEN, CL.IS_DEFAULT
@@ -68,7 +71,7 @@ class CharsetInfo(object):
                    ["id", "character_set_name", "collation_name",
                     "maxlen", "is_default"],
                    self.charset_map)
-        print len(self.charset_map), "rows in set."
+        print(len(self.charset_map), "rows in set.")
 
     def get_name(self, chr_id):
         """Get the character set name for the given id

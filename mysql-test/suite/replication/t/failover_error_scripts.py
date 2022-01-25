@@ -18,10 +18,12 @@
 """
 failover_error_scripts test.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 
-import failover
+from . import failover
 
 from mysql.utilities.exception import MUTLibError
 

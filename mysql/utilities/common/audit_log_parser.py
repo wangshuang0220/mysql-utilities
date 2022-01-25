@@ -199,7 +199,7 @@ class AuditLogParser(AuditLogReader):
 
         record[in] audit log record to check;
         """
-        for val in record.values():
+        for val in list(record.values()):
             if val and self.regexp_pattern.match(val):
                 return True
         return False

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
@@ -19,6 +19,7 @@
 """
 This file contains the server information utility.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -130,6 +131,8 @@ if __name__ == '__main__':
             opt.ports = "3306:3333"
 
     # Set options for database operations.
+    opt.verbosity = ( opt.verbosity or 0)
+    
     options = {
         "format": opt.format,
         "no_headers": opt.no_headers,

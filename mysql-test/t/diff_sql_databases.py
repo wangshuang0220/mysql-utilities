@@ -18,8 +18,9 @@
 """
 diff_sql_databases test.
 """
+from __future__ import absolute_import
 
-import test_sql_template
+from . import test_sql_template
 
 
 # (comment, def1, def2, expected result)
