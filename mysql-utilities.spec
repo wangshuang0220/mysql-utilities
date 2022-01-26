@@ -9,13 +9,14 @@ Release:       11%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
 URL:           https://github.com/celane/mysql-utilities
-#Source0:       mysql-utilities-%{version}.zip
+#Source0:       mysql-utilities-#{version}.zip
 BuildArch:     noarch
 BuildRequires: python3-devel > 3.0
 ### mysql-connector-python3 should be in /usr/lib64
 ## and sometimes bad builds put it in the wrong place, this checks
 Requires:      mysql-connector-python3 >= 3.0.0
 Requires:      %{python3_sitearch}/mysql/connector/__init__.py
+BuildRequires: git
 #
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
@@ -34,14 +35,16 @@ rm -rf %{NVdir}
 git clone %{url}.git %{NVdir}
 ###
 
-%setup -q
+# #setup -q
 
 %build
+cd %{NVdir}
 %{__python} setup.py build
 
 %install
 rm -rf %{buildroot}
 
+cd %{NVdir}
 %{__python} setup.py install --skip-build \
        --root %{buildroot}  \
      --install-lib %{python3_sitearch}
@@ -62,7 +65,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc CHANGES.txt LICENSE.txt README.txt
+%doc %{NVdir}/CHANGES.txt  %{NVdir}/LICENSE.txt  %{NVdir}/README.txt
 %{_bindir}/mysqlbinlogpurge
 %{_bindir}/mysqlbinlogrotate
 %{_bindir}/mysqlslavetrx
