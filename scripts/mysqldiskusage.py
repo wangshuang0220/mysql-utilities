@@ -34,6 +34,7 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import (add_verbosity, add_format_option,
                                             add_no_headers_option,
+                                            add_config_path_option,
                                             setup_common_options,
                                             check_password_security)
 
@@ -67,7 +68,8 @@ if __name__ == '__main__':
                                   DESCRIPTION, USAGE, add_ssl=True)
 
     # Setup utility-specific options:
-
+    add_config_path_option(parser)
+    
     # Output format
     add_format_option(parser, "display the output in either grid (default), "
                       "tab, csv, or vertical format", "grid")
@@ -156,7 +158,7 @@ if __name__ == '__main__':
     options = {
         "format": opt.format,
         "no_headers": opt.no_headers,
-        "verbosity": opt.verbosity,
+        "verbosity": opt.verbosity = 0,
         "debug": opt.verbosity >= 3,
         "have_read": have_read,
         "is_remote": is_remote,
