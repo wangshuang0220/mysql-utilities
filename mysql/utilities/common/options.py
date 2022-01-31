@@ -49,7 +49,6 @@ from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
 
-
 _PERMITTED_FORMATS = ["grid", "tab", "csv", "vertical"]
 _PERMITTED_DIFFS = ["unified", "context", "differ"]
 _PERMITTED_RPL_DUMP = ["master", "slave"]
@@ -151,8 +150,20 @@ def add_config_path_option(parser):
     parser[in]        the parser instance
     """
     # --config-path option: config_path
+
+    if os.name == "nt":
+        default_config = 'C:\\my.ini'
+    else:
+        default_config = os.getenv("HOME") + '/.my.cnf'
+    
+    if (not os.path.exists(default_config)) and \
+       (not os.path.isfile(default_config)) :
+        default_config = None
+        
+        
     parser.add_option("--config-path", action="callback",
                       callback=path_callback,
+                      default=default_config,
                       type="string", help="The path to a MySQL option file "
                                           "with the login options")
 

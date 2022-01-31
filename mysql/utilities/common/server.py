@@ -441,7 +441,7 @@ def connect_servers(src_val, dest_val, options=None):
     src_name = options.get("src_name", "Source")
     dest_name = options.get("dest_name", "Destination")
     version = options.get("version", None)
-    charset = options.get("charset", None)
+    charset = options.get("charset", "utf8")
     verbose = options.get('verbose', False)
 
     ssl_dict = {}
