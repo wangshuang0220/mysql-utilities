@@ -125,7 +125,7 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
             val = u"{0:<{1}}".format(val.decode("utf-8"), col_widths[i] + 1)
             f_out.write(val.encode("utf-8"))
         else:
-            f_out.write("{0:<{1}} ".format("%s" % val, col_widths[i]))
+            f_out.write("{0:<{1}} ".format("%s" % str(val,'utf-8'), col_widths[i]))
 
     if not quiet:
         f_out.write("|")
@@ -141,7 +141,7 @@ def get_col_widths(columns, rows):
     # Calculate column width for each column
     col_widths = []
     for col in columns:
-        size = len(col.decode("utf-8") if isinstance(col, str) else col)
+        size = len(col if isinstance(col, str) else col)
         col_widths.append(size + 1)
 
     stop = len(columns)

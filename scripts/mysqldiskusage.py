@@ -158,8 +158,8 @@ if __name__ == '__main__':
     options = {
         "format": opt.format,
         "no_headers": opt.no_headers,
-        "verbosity": opt.verbosity = 0,
-        "debug": opt.verbosity >= 3,
+        "verbosity": opt.verbosity,
+        "debug": opt.verbosity,
         "have_read": have_read,
         "is_remote": is_remote,
         "do_empty": opt.do_empty,

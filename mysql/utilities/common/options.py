@@ -25,6 +25,7 @@ Methods:
 from __future__ import print_function
 from __future__ import absolute_import
 
+import sys
 import copy
 import optparse
 from optparse import Option as CustomOption, OptionValueError
@@ -255,6 +256,8 @@ def setup_common_options(program_name, desc_str, usage_str,
                       callback=license_callback,
                       help="display program's license and exit")
 
+#    sys.tracebacklimit = 0
+    
     if server:
         # Connection information for the first server
         if append:
@@ -404,6 +407,7 @@ def add_verbosity(parser, quiet=True):
 
     """
     parser.add_option("-v", "--verbose", action="count", dest="verbosity",
+                      default = 0,
                       help="control how much information is displayed. "
                       "e.g., -v = verbose, -vv = more verbose, -vvv = debug")
     if quiet:
@@ -416,6 +420,7 @@ def check_verbosity(options):
     """Check to see if both verbosity and quiet are being used.
     """
     # Warn if quiet and verbosity are both specified
+        
     if options.quiet is not None and options.quiet and \
        options.verbosity is not None and options.verbosity > 0:
         print("WARNING: --verbosity is ignored when --quiet is specified.")

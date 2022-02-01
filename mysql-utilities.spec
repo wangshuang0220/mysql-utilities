@@ -5,7 +5,7 @@
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities
 Version:       %{version}
-Release:       13%{?dist}
+Release:       14%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
 URL:           https://github.com/celane/mysql-utilities

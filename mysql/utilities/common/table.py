@@ -384,7 +384,7 @@ class Table(object):
         else:
             self.max_packet_size = _MAXPACKET_SIZE
         # Watch for invalid values
-        if self.max_packet_size > _MAXPACKET_SIZE:
+        if int(self.max_packet_size) > _MAXPACKET_SIZE:
             self.max_packet_size = _MAXPACKET_SIZE
 
         self._insert = "INSERT INTO %s.%s VALUES "

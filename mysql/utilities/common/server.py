@@ -61,7 +61,7 @@ def tostr(value):
 
     Returns value as str instance or None.
     """
-    return None if value is None else str(value)
+    return None if value is None else str(value,'utf-8')
 
 
 class MySQLUtilsCursorRaw(mysql.connector.cursor.MySQLCursorRaw):
