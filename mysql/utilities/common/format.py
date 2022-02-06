@@ -34,11 +34,11 @@ import codecs
 import csv
 import os
 import textwrap
-
-try:
-    import io as StringIO
-except ImportError:
-    import io
+import io
+#try:
+#    import io as StringIO
+#except ImportError:
+#    import io
 
 from mysql.utilities.common.sql_transform import to_sql
 
@@ -70,11 +70,11 @@ class UnicodeWriter(object):
 
         row[in]     sequence of strings or numbers
         """
-        self.writer.writerow([val.encode("utf-8") if isinstance(val, str)
-                              else val for val in row])
+        self.writer.writerow([val if isinstance(val, str)
+                              else str(val) for val in row])
         data = self.queue.getvalue()
-        data = data.decode("utf-8")  # pylint: disable=R0204
-        data = self.encoder.encode(data)
+#        data = data.decode("utf-8")  # pylint: disable=R0204
+#        data = self.encoder.encode(data)
         self.stream.write(data)
         self.queue.truncate(0)
 
@@ -119,11 +119,11 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
     for i, _ in enumerate(columns):
         if not quiet:
             f_out.write("| ")
-        val = row[i].encode("utf-8") if isinstance(row[i], str) \
-            else row[i]
+        val = row[i] if isinstance(row[i], str) \
+            else str(row[i])
         if isinstance(val, str):
-            val = u"{0:<{1}}".format(val.decode("utf-8"), col_widths[i] + 1)
-            f_out.write(val.encode("utf-8"))
+            val = u"{0:<{1}}".format(val, col_widths[i] + 1)
+            f_out.write(val)
         else:
             f_out.write("{0:<{1}} ".format("%s" % str(val,'utf-8'), col_widths[i]))
 
@@ -146,18 +146,18 @@ def get_col_widths(columns, rows):
 
     stop = len(columns)
     for row in rows:
-        row = [val.encode("utf-8") if isinstance(val, str)
-               else val for val in row]
+        row = [val if isinstance(val, str)
+               else str(val) for val in row]
         # if there is one column, just use row.
         if stop == 1:
-            col_size = len(row[0].decode("utf-8")
+            col_size = len(row[0]
                            if isinstance(row[0], str) else str(row[0]))
             col_size += 1
             if col_size > col_widths[0]:
                 col_widths[0] = col_size
         else:
             for i in range(0, stop):
-                col_size = len(row[i].decode("utf-8")
+                col_size = len(row[i]
                                if isinstance(row[i], str) else str(row[i]))
                 col_size += 1
                 if col_size > col_widths[i]:
@@ -203,8 +203,8 @@ def format_tabular_list(f_out, columns, rows, options=None):
         if print_header:
             csv_writer.writerow(columns)
         for row in rows:
-            row = [val.encode("utf-8") if isinstance(val, str)
-                   else val for val in row]
+            row = [val if isinstance(val, str)
+                   else str(val) for val in row]
             if convert_to_sql:
                 # Convert value to SQL (i.e. add quotes if needed).
                 row = ['NULL' if col is None else to_sql(col) for col in row]
@@ -275,12 +275,12 @@ def format_vertical_list(f_out, columns, rows, options=None):
             # Convert None values to 'NULL'
             row = ['NULL' if not val else val for val in row]
         for i in range(0, stop):
-            col = columns[i].decode("utf-8") \
+            col = columns[i] \
                 if isinstance(columns[i], str) else columns[i]
-            val = row[i].decode("utf-8") \
+            val = row[i] \
                 if isinstance(row[i], str) else row[i]
             out = u"{0:>{1}}: {2}\n".format(col, max_colwidth, val)
-            f_out.write(out.encode("utf-8"))
+            f_out.write(out)
 
     if row_num > 0:
         row_str = 'rows' if row_num > 1 else 'row'
