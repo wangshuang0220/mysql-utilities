@@ -145,6 +145,20 @@ def ssl_callback(option, opt, value, parser):
     setattr(parser.values, option.dest, value)
 
 
+def verbosity_callback(option, opt, value, parser):
+    """increment verbosity, set debug if verbosity >=3, and
+    enable traceback if debug
+    """
+
+    parser.values.verbosity += 1
+    if parser.values.verbosity >= 3 :
+        parser.values.debug = True
+        sys.tracebacklimit = 1000
+    else:
+        parser.values.debug = False
+        sys.tracebacklimit = 0
+        
+    
 def add_config_path_option(parser):
     """Add the config_path option.
 
@@ -406,8 +420,12 @@ def add_verbosity(parser, quiet=True):
                       (default is True)
 
     """
-    parser.add_option("-v", "--verbose", action="count", dest="verbosity",
-                      default = 0,
+
+    parser.set_defaults(verbosity=0, debug=False)
+
+    
+    parser.add_option("-v", "--verbose", action="callback",
+                      callback=verbosity_callback,
                       help="control how much information is displayed. "
                       "e.g., -v = verbose, -vv = more verbose, -vvv = debug")
     if quiet:
