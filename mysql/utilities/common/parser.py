@@ -92,6 +92,8 @@ class LogParserBase(object):
         except AttributeError:
             raise LogParserError("Need a file type")
 
+        if line is not None and not isinstance(line,str):
+            line = str(line,'utf-8')
         # Not every log file starts with a header
         if line is not None and line.endswith('started with:'):
             self._parse_header(line)
@@ -109,6 +111,8 @@ class LogParserBase(object):
         line = self._stream.readline()
         if not line:
             return None
+        if not isinstance(line,str):
+            line = str(line,'utf-8')
         return line.rstrip('\r\n')
 
     def _parse_header(self, line):
@@ -132,10 +136,12 @@ class LogParserBase(object):
         """
         if line is None:
             return
+        if not isinstance(line, str):
+            line = str(line,'utf-8')
         # Header line containing executable and version, example:
         # /raid0/mysql/mysql/bin/mysqld,
         # Version: 5.5.17-log (Source distribution). started with:
-        info = _HEADER_VERSION_CRE.match(line)
+        info = _HEADER_VERSION_CRE.match(str(line))
         if not info:
             raise LogParserError("Could not read executable and version from "
                                  "header")
@@ -144,9 +150,9 @@ class LogParserBase(object):
         # Header line with server information, example:
         # Tcp port: 3306  Unix socket: /tmp/mysql.sock
         line = self._get_next_line()
-        info = _HEADER_SERVER_CRE.match(line)
+        info = _HEADER_SERVER_CRE.match(str(line))
         if not info:
-            raise LogParserError("Malformed server header line: %s" % line)
+            raise LogParserError("Malformed server header line: %s" % str(line))
         tcp_port, unix_socket = info.groups()
 
         # Throw away column header line, example:
@@ -407,6 +413,8 @@ class GeneralQueryLog(LogParserBase):
         # Next line is None if the end of the file is reached.
         # Note: empty lines can appear and should be read (i.e., line == '').
         while line is not None:
+            if not isinstance(line, str):
+                line = str(line, 'utf-8')
             # Stop if it is a header.
             if line.endswith('started with:'):
                 self._cached_logentry = line
@@ -414,7 +422,8 @@ class GeneralQueryLog(LogParserBase):
             # Stop if a new log entry is found.
             info = _GENERAL_ENTRY_CRE.match(line)
             if info is not None:
-                self._cached_logentry = info.groups()
+#                self._cached_logentry = info.groups()
+                self._cached_logentry = line
                 break
             # Otherwise, append line and read next.
             argument_parts.append(line)
@@ -457,21 +466,24 @@ class GeneralQueryLog(LogParserBase):
             return None
         if isinstance(logentry, tuple):
             dt, session_id, command, argument = logentry
-        elif logentry.endswith('started with:'):
-            while logentry.endswith('started with:'):
-                # We got a header
-                self._parse_header(logentry)
-                logentry = self._get_next_line()
-                if logentry is None:
-                    return None
-            return self._parse_command(logentry, entry)
         else:
-            info = _GENERAL_ENTRY_CRE.match(logentry)
-            if info is None:
-                raise LogParserError("Failed parsing command line: %s"
-                                     % logentry)
-            dt, session_id, command, argument = info.groups()
-        self._cached_logentry = None
+            if not isinstance(logentry, str):
+                logentry = str(logentry, 'utf-8')
+            if logentry.endswith('started with:'):
+                while logentry.endswith('started with:'):
+                    # We got a header
+                    self._parse_header(logentry)
+                    logentry = self._get_next_line()
+                    if logentry is None:
+                        return None
+                    return self._parse_command(logentry, entry)
+            else:
+                info = _GENERAL_ENTRY_CRE.match(str(logentry))
+                if info is None:
+                    raise LogParserError("Failed parsing command line: %s"
+                                         % str(logentry))
+                dt, session_id, command, argument = info.groups()
+                self._cached_logentry = None
 
         session_id = int(session_id)
         entry['session_id'] = session_id
@@ -566,10 +578,10 @@ class SlowQueryLog(LogParserBase):
 
         Returns a tuple.
         """
-        info = regex.match(line)
+        info = regex.match(str(line))
         if info is None:
             raise LogParserError('Failed parsing Slow Query line: %s' %
-                                 line[:30])
+                                 str(line[:30]))
         return info.groups()
 
     def _parse_connection_info(self, line, entry):
@@ -659,6 +671,8 @@ class SlowQueryLog(LogParserBase):
         while True:
             if line is None:
                 break
+            if not isinstance(line, str):
+                line = str(line,'utf-8')
             if line.startswith('use'):
                 entry['database'] = self._current_database = line.split(' ')[1]
             elif line.startswith('SET timestamp='):
@@ -704,27 +718,37 @@ class SlowQueryLog(LogParserBase):
             line = self._get_next_line()
         if line is None:
             return None
-
+        if not isinstance(line,str):
+            line = str(line,'utf-8')
         while line.endswith('started with:'):
             # We got a header
             self._parse_header(line)
             line = self._get_next_line()
             if line is None:
                 return None
+            if not isinstance(line,str):
+                line = str(line,'utf-8')
 
         entry = SlowQueryLogEntry()
 
         if line.startswith('# Time:'):
             self._parse_timestamp(line, entry)
             line = self._get_next_line()
+            if not isinstance(line,str):
+                line = str(line,'utf-8')
+
 
         if line.startswith('# User@Host:'):
             self._parse_connection_info(line, entry)
             line = self._get_next_line()
+            if not isinstance(line,str):
+                line = str(line,'utf-8')
 
         if line.startswith('# Query_time:'):
             self._parse_statistics(line, entry)
             line = self._get_next_line()
+            if not isinstance(line,str):
+                line = str(line,'utf-8')
 
         self._parse_query(line, entry)
 

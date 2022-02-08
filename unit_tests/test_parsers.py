@@ -354,7 +354,7 @@ class BaseParserTestCase(unittest.TestCase):
             if empty is True:
                 self.fakelog.seek(0)
                 self.fakelog.truncate()
-            self.fakelog.write('\n'.join(lines)+'\n')
+            self.fakelog.write(bytes('\n'.join(lines)+'\n',"utf-8"))
             if rewind is True:
                 self.fakelog.seek(0)
         except AttributeError:
@@ -551,7 +551,7 @@ class TestGeneralQueryLog(BaseParserTestCase):
         self._fakelog_writelines(lines)
 
         i = 0
-        logentry = self.fakelog. readline().strip()
+        logentry =  str(self.fakelog. readline().strip(),'utf-8')
         while logentry:
             exp = GENERAL_LOG_ENTRIES_EXP['Connect'][i]
             entry = GeneralQueryLogEntry()
@@ -575,7 +575,7 @@ class TestGeneralQueryLog(BaseParserTestCase):
         self._fakelog_writelines(lines)
 
         i = 0
-        logentry = self.fakelog.readline().strip()
+        logentry = str(self.fakelog.readline().strip(),'utf-8')
         while logentry:
             exp = GENERAL_LOG_ENTRIES_EXP[command][i]
             entry = GeneralQueryLogEntry()
@@ -584,7 +584,7 @@ class TestGeneralQueryLog(BaseParserTestCase):
             if self.log._cached_logentry is not None:
                 logentry = self.log._cached_logentry
             else:
-                logentry = self.fakelog.readline().strip()
+                logentry = str(self.fakelog.readline().strip(),'utf-8')
             i += 1
     
     def test_handle_multi_line(self):
