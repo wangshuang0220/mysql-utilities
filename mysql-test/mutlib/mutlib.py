@@ -717,7 +717,7 @@ class ServerList(object):
             output = subprocess.getoutput("ps -f|grep mysqld")
             lines = output.splitlines()
             for line in lines:
-                proginfo = string.split(line)
+                proginfo = str.split(line)
                 for arg in proginfo[8:]:
                     if arg.find(datadir) >= 0:
                         return proginfo[1]

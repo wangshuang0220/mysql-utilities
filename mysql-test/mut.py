@@ -562,6 +562,7 @@ if __name__ == "__main__":
             server_options = {
                 'conn_info': conn_val,
                 'role': "server{0}".format(i),
+                'charset': 'utf8',   # CEL: for mariadb
             }
             conn = Server(server_options)
             try:
@@ -870,7 +871,7 @@ if __name__ == "__main__":
                 print("\nShutting down spawned servers ")
                 server_list.shutdown_spawned_servers()
 
-            if server_list.cleanup_list > 0:
+            if len(server_list.cleanup_list) > 0:
                 sys.stdout.write("\nDeleting temporary files...")
                 server_list.remove_files()
                 print("success.")

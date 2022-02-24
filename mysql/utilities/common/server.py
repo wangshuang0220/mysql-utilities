@@ -253,7 +253,7 @@ def get_local_servers(all_proc=False, start=3306, end=3333,
             datadir = False
             grep = False
             datadir_arg = ""
-            proginfo = string.split(line)
+            proginfo = str.split(str(line,'utf8'))
             for arg in proginfo:
                 if "datadir" in arg:
                     datadir = True
@@ -282,7 +282,7 @@ def get_local_servers(all_proc=False, start=3306, end=3333,
         execute_script("netstat -anop tcp", "portlist")
         f_out = open("portlist", 'r')
         for line in f_out.readlines():
-            proginfo = string.split(line)
+            proginfo = str.split(line)
             if proginfo:
                 # Look for port on either local or foreign address
                 port = proginfo[1][proginfo[1].find(":") + 1:]
