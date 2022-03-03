@@ -554,7 +554,7 @@ class ServerList(object):
                           "{0}...".format(server[0].role)), end=' ')
                     if self.stop_server(server[0]):
                         print("success.")
-                    elif server[2] is not None and server[2] > 1:
+                    elif server[2] is not None and int(server[2]) > 1:
                         print(("WARN - attempting SIGTERM - pid = "
                               "{0}".format(server[2])), end=' ')
                         # try signal termination

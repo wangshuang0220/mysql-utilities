@@ -285,7 +285,7 @@ def _server_info(server_val, get_defaults=False, options=None):
             # Get defaults data from temp output file.
             defaults.append("\nDefaults for server {0}".format(server_id))
             for line in out_file.readlines():
-                defaults.append(line.rstrip())
+                defaults.append(str(line.rstrip(),'utf8'))
         else:
             # Remote server; Cannot get the defaults data.
             defaults.append("\nWARNING: The utility can not get defaults from "

@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from builtins import str
 import os
 
-from . import compare_db
+import compare_db
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import os
 
-from . import audit_log_grep
+import audit_log_grep
 
 from mysql.utilities.exception import MUTLibError
 

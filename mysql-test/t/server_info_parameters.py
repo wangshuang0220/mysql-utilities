@@ -21,7 +21,7 @@ server_info_parameters test.
 from __future__ import absolute_import
 import os
 
-from . import server_info
+import server_info
 
 from mysql.utilities.exception import MUTLibError
 

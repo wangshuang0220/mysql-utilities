@@ -340,10 +340,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
         #    login_path on step 4.
         # 3. If connection data is retrieved on step 2, then try login_path on
         #    next step to overwrite values from the new configuration.
-        # 4. If login_path matches, check is .my.cnf exists, if it doesn't
+        # 4. If login_path matches, check is .mylogin.cnf exists, if it doesn't
         #    and data configuration was found verify it  for missing values and
         #    continue if they are not any missing.
-        # 5. If .my.cnf exists and data configuration is found, overwrite
+        # 5. If .mylogin.cnf exists and data configuration is found, overwrite
         #    any previews value from config_path if there is any.
         # 6. If login_path matches a secondary value but the configuration data
         #    could not be retrieved, do not continue and raise any error.
@@ -380,10 +380,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
             # No '@' then handle has in the format: login-path[:port][:socket]
             login_path, port, socket = _match(_CONN_LOGINPATH, conn_format[0])
 
-            # Check if the login configuration file (.my.cnf) exists
+            # Check if the login configuration file (.mylogin.cnf) exists
             if login_path and not my_login_config_exists():
                 if not config_path_data:
-                    util_err_msg = (".my.cnf was not found at is default "
+                    util_err_msg = (".mylogin.cnf was not found at is default "
                                     "location: {0}. Please configure your "
                                     "login-path data before using it (use the "
                                     "mysql_config_editor tool)."

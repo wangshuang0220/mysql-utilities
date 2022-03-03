@@ -20,7 +20,7 @@ diff_sql_triggers test.
 """
 from __future__ import absolute_import
 
-from . import test_sql_template
+import test_sql_template
 
 
 _TRIG_TABLE = "CREATE TABLE `diff_trig`.`t1` (a int)"

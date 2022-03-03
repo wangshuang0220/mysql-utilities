@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import os
 
-from . import export_basic
+import export_basic
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

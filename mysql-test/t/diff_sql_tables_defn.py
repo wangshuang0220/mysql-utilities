@@ -20,7 +20,7 @@ diff_sql_tables_defn test.
 """
 from __future__ import absolute_import
 
-from . import test_sql_template
+import test_sql_template
 
 
 # (comment, def1, def2, expected result, error_codes)

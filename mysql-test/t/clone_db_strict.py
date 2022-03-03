@@ -20,7 +20,7 @@ clone_db_strict test.
 """
 from __future__ import absolute_import
 
-from . import clone_db
+import clone_db
 
 
 class test(clone_db.test):

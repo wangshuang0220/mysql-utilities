@@ -710,7 +710,7 @@ class User(object):
             GRANT\s(.+)?\sON\s # grant or list of grants
             (?:(?:PROCEDURE\s)|(?:FUNCTION\s))? # optional for routines only
             (?:(?:(\*|`?[^']+`?)\.(\*|`?[^']+`?)) # object where grant applies
-            | ('[^']*'@'[^']*')) # For proxy grants user/host
+            | (`[^`]*`@`[^`]*`)) # For proxy grants user/host
             \sTO\s([^@]+@[\S]+) # grantee
             (?:\sIDENTIFIED\sBY\sPASSWORD
              (?:(?:\s<secret>)|(?:\s\'[^\']+\')?))? # optional pwd
@@ -732,7 +732,7 @@ class User(object):
                 obj = match.group(3)
                 if not is_quoted_with_backticks(obj, sql_mode) and obj != '*':
                     obj = quote_with_backticks(obj, sql_mode)
-            else:  # if it is not a proxy grant
+            else:  # if it is a proxy grant
                 db = obj = None
             grants = grant_tpl_factory(
                 # privileges

@@ -20,7 +20,7 @@ clone_user_parameters test.
 """
 from __future__ import absolute_import
 
-from . import clone_user
+import clone_user
 
 from mysql.utilities.exception import MUTLibError
 

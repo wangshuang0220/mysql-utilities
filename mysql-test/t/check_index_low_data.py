@@ -20,7 +20,7 @@ check_index_low_data test.
 """
 from __future__ import absolute_import
 
-from . import check_index_parameters
+import check_index_parameters
 
 from mysql.utilities.exception import MUTLibError
 

@@ -23,7 +23,7 @@ from __future__ import absolute_import
 import os
 import sys
 
-from . import import_basic
+import import_basic
 
 from mysql.utilities.command.dbcompare import database_compare
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError

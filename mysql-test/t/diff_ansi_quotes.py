@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from builtins import range
 import os
 
-from . import diff
+import diff
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

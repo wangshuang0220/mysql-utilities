@@ -32,11 +32,11 @@ from mysql.utilities.exception import UtilError
 
 
 _MY_PRINT_DEFAULTS_TOOL = "my_print_defaults"
-MYLOGIN_FILE = ".my.cnf"
+MYLOGIN_FILE = ".mylogin.cnf"
 
 
 def my_login_config_path():
-    """Return the default path of the my file (.my.cnf).
+    """Return the default path of the mylogin file (.mylogin.cnf).
     """
     if os.name == 'posix':
         # File located in $HOME for non-Windows systems
@@ -47,7 +47,7 @@ def my_login_config_path():
 
 
 def my_login_config_exists():
-    """Check if file (.my.cnf) exists.
+    """Check if the mylogin file (.mylogin.cnf) exists.
     """
 
     my_login_fullpath = os.path.normpath(os.path.join(my_login_config_path(),
@@ -114,7 +114,7 @@ class MyDefaultsReader(object):
             search_paths = []
 
         # Set the default search paths (i.e., default location of the
-        # .my.cnf file).
+        # .mylogin.cnf file).
         default_paths = [my_login_config_path()]
 
         # Extend the list of path to search with the ones specified.

@@ -165,20 +165,8 @@ def add_config_path_option(parser):
     parser[in]        the parser instance
     """
     # --config-path option: config_path
-
-    if os.name == "nt":
-        default_config = 'C:\\my.ini'
-    else:
-        default_config = os.getenv("HOME") + '/.my.cnf'
-    
-    if (not os.path.exists(default_config)) and \
-       (not os.path.isfile(default_config)) :
-        default_config = None
-        
-        
     parser.add_option("--config-path", action="callback",
                       callback=path_callback,
-                      default=default_config,
                       type="string", help="The path to a MySQL option file "
                                           "with the login options")
 
@@ -270,8 +258,6 @@ def setup_common_options(program_name, desc_str, usage_str,
                       callback=license_callback,
                       help="display program's license and exit")
 
-#    sys.tracebacklimit = 0
-    
     if server:
         # Connection information for the first server
         if append:
@@ -927,7 +913,7 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
         # and password, in case of success overwrite the values previously set
         # and in case of failure return these ones instead.
 
-        # Check if the login configuration file (.my.cnf) exists
+        # Check if the login configuration file (.mylogin.cnf) exists
         if login_values[0] and not my_login_config_exists():
             return user, passwd
 
@@ -947,7 +933,7 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
                 return user, passwd
 
         # Check if the my_print_default tool is able to read a login-path from
-        # the my configuration file
+        # the mylogin configuration file
         if not my_defaults_reader.check_login_path_support():
             return user, passwd
 

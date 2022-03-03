@@ -25,7 +25,7 @@ from __future__ import absolute_import
 import os
 import sys
 
-from . import import_basic
+import import_basic
 
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError

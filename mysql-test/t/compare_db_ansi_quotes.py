@@ -21,7 +21,7 @@ compare_db test.
 from __future__ import absolute_import
 
 import os
-from . import compare_db
+import compare_db
 
 from mysql.utilities.exception import MUTLibError
 

@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import os
 
-from . import utilities_console_base
+import utilities_console_base
 
 from mysql.utilities.exception import MUTLibError
 

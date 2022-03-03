@@ -56,19 +56,37 @@ _OBJTYPE_QUERY = """
         WHERE TRIGGER_SCHEMA = '%(db_name)s' AND
           TRIGGER_NAME = '%(obj_name)s'
     )
-    UNION
-    (
-        SELECT TYPE as object_type
-        FROM mysql.proc
-        WHERE DB = '%(db_name)s' AND NAME = '%(obj_name)s'
-    )
+"""
+
+_OBJTYPE_QUERY2 = """
     UNION
     (
         SELECT 'EVENT' as object_type
         FROM mysql.event
         WHERE DB = '%(db_name)s' AND NAME = '%(obj_name)s'
     )
+    UNION
+    (
+        SELECT TYPE as object_type
+        FROM mysql.proc
+        WHERE DB = '%(db_name)s' AND NAME = '%(obj_name)s'
+    )
 """
+
+_OBJTYPE_QUERY3 = """
+    UNION
+    (
+        SELECT 'EVENT' as object_type
+        FROM information_schema.events
+        WHERE EVENT_SCHEMA = '%(db_name)s' AND EVENT_NAME = '%(obj_name)s'
+    )
+    UNION
+    {
+        SELECT ROUTINE_TYPE as object_type
+        from information_schema.routines
+        WHERE ROUTINE_SCHEMA = '%(db_name)s' AND ROUTINE_NAME = '%(obj_name)s'
+    )
+""" 
 
 _DEFINITION_QUERY = """
   SELECT %(columns)s
@@ -237,6 +255,7 @@ class Database(object):
         if options is None:
             options = {}
         self.source = source
+
         # Get the SQL_MODE set on the source
         self.sql_mode = self.source.select_variable("SQL_MODE")
         # Keep database identifier considering backtick quotes
@@ -1375,7 +1394,13 @@ class Database(object):
             if is_quoted_with_backticks(object_name, self.sql_mode) else \
             object_name
 
-        res = self.source.exec_query(_OBJTYPE_QUERY %
+        query = _OBJTYPE_QUERY
+        if self.source.has_mysqlproc() :
+            query = query + _OBJTYPE_QUERY2
+        else:
+            query = query + _OBJTYPE_QUERY3
+            
+        res = self.source.exec_query(query %
                                      {'db_name': self.db_name,
                                       'obj_name': obj_name})
 
@@ -1555,95 +1580,232 @@ class Database(object):
             _ORDER_BY_NAME = ""
             exclude_param = "TRIGGERS.TRIGGER_NAME"
         elif obj_type == _PROC:
-            _NAMES = """
-            SELECT NAME
-            """
-            names_pos_to_quote = (0,)
-            _FULL = """
-            SELECT DB, NAME, TYPE, SPECIFIC_NAME, LANGUAGE, SQL_DATA_ACCESS,
-                   IS_DETERMINISTIC, SECURITY_TYPE, PARAM_LIST, RETURNS, BODY,
-                   DEFINER, CREATED, MODIFIED, SQL_MODE, COMMENT,
-                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION, DB_COLLATION,
-                   BODY_UTF8
-            """
-            full_pos_to_quote = (0, 1, 3)
-            full_pos_split_quote = ()
-            _MINIMAL = """
-            SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
-                   SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
-                   BODY, SQL_MODE,
-                   CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
-                   DB_COLLATION
-            """
-            minimal_pos_to_quote = (0,)
-            minimal_pos_split_quote = ()
-            _OBJECT_QUERY = """
-            FROM mysql.proc
-            WHERE DB = '%s' AND TYPE = 'PROCEDURE' %s
-            """
+            # mysql >= 8.0 information_schema.ROUTINES            
+            if self.source.has_mysqlproc():
+                _NAMES = """
+                SELECT NAME
+                """
+                names_pos_to_quote = (0,)
+                _FULL = """
+                SELECT DB, NAME, TYPE, SPECIFIC_NAME, LANGUAGE, SQL_DATA_ACCESS,
+                       IS_DETERMINISTIC, SECURITY_TYPE, PARAM_LIST, RETURNS, BODY,
+                       DEFINER, CREATED, MODIFIED, SQL_MODE, COMMENT,
+                       CHARACTER_SET_CLIENT, COLLATION_CONNECTION, DB_COLLATION,
+                       BODY_UTF8
+                """
+                full_pos_to_quote = (0, 1, 3)
+                full_pos_split_quote = ()
+                _MINIMAL = """
+                SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
+                       SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
+                       BODY, SQL_MODE,
+                       CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                       DB_COLLATION
+                """
+                minimal_pos_to_quote = (0,)
+                minimal_pos_split_quote = ()
+                _OBJECT_QUERY = """
+                FROM mysql.proc
+                WHERE DB = '%s' AND TYPE = 'PROCEDURE' %s
+                """
+                exclude_param = "NAME"
+            else:
+                _NAMES = """
+                SELECT ROUTINE_NAME AS NAME
+                """
+                names_pos_to_quote = (0,)
+                _FULL = """
+                SELECT ROUTINE_SCHEMA AS DB, ROUTINE_NAME AS NAME,  
+                ROUTINE_TYPE AS TYPE, SPECIFIC_NAME,
+                EXTERNAL_LANGUAGE AS LANGUAGE, 
+                SQL_DATA_ACCESS, IS_DETERMINISTIC, SECURITY_TYPE,
+                (SELECT GROUP_CONCAT(PARAMETER_NAME,' ',DTD_IDENTIFIER)  
+                  FROM information_schema.parameters p
+                  WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
+                  AND ordinal_position > 0) AS PARAM_LIST,
+                CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
+                    AS RETURNS, ROUTINE_DEFINITION AS BODY, 
+                DEFINER, CREATED, LAST_ALTERED AS MODIFIED, 
+                SQL_MODE, ROUTINE_COMMENT AS COMMENT,                 
+                CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
+                DATABASE_COLLATION AS DB_COLLATION, 
+                ROUTINE_DEFINITION AS BODY_UTF8
+                """
+
+                full_pos_to_quote = (0, 1, 3)
+                full_pos_split_quote = ()
+                _MINIMAL = """
+                SELECT ROUTINE_NAME AS NAME,  
+                EXTERNAL_LANGUAGE AS LANGUAGE, 
+                SQL_DATA_ACCESS, IS_DETERMINISTIC, SECURITY_TYPE,
+                DEFINER, 
+                (SELECT GROUP_CONCAT(PARAMETER_NAME,' ',DTD_IDENTIFIER)  
+                  FROM information_schema.parameters p
+                  WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
+                  AND ordinal_position > 0) AS PARAM_LIST,
+                CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
+                    AS RETURNS, 
+                ROUTINE_DEFINITION AS BODY, SQL_MODE
+                CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
+                DATABASE_COLLATION AS DB_COLLATION
+                """
+                minimal_pos_to_quote = (0,)
+                minimal_pos_split_quote = ()
+                _OBJECT_QUERY = """
+                FROM information_schema.routines
+                WHERE ROUTINE_SCHEMA = '%s' and ROUTINE_TYPE = 'PROCEDURE' %s
+                """
+                exclude_param = "ROUTINE_NAME"
+
             _ORDER_BY_DEFAULT = ""
             _ORDER_BY_NAME = ""
-            exclude_param = "NAME"
         elif obj_type == _FUNC:
-            _NAMES = """
-            SELECT NAME
-            """
-            names_pos_to_quote = (0,)
-            _FULL = """
-            SELECT DB, NAME, TYPE, SPECIFIC_NAME, LANGUAGE, SQL_DATA_ACCESS,
+            if self.source.has_mysqlproc():
+                _NAMES = """
+                SELECT NAME
+                """
+                names_pos_to_quote = (0,)
+                _FULL = """
+                SELECT DB, NAME, TYPE, SPECIFIC_NAME, LANGUAGE, SQL_DATA_ACCESS,
                    IS_DETERMINISTIC, SECURITY_TYPE, PARAM_LIST, RETURNS, BODY,
                    DEFINER, CREATED, MODIFIED, SQL_MODE, COMMENT,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION, DB_COLLATION,
                    BODY_UTF8
-            """
-            full_pos_to_quote = (0, 1, 3)
-            full_pos_split_quote = ()
-            _MINIMAL = """
-            SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
+                """
+                full_pos_to_quote = (0, 1, 3)
+                full_pos_split_quote = ()
+                _MINIMAL = """
+                SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
                    SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
                    BODY, SQL_MODE,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION
-            """
-            minimal_pos_to_quote = (0,)
-            minimal_pos_split_quote = ()
-            _OBJECT_QUERY = """
-            FROM mysql.proc
-            WHERE DB = '%s' AND TYPE = 'FUNCTION' %s
-            """
-            _ORDER_BY_DEFAULT = ""
-            _ORDER_BY_NAME = ""
-            exclude_param = "NAME"
+                """
+                minimal_pos_to_quote = (0,)
+                minimal_pos_split_quote = ()
+                _OBJECT_QUERY = """
+                FROM mysql.proc
+                WHERE DB = '%s' AND TYPE = 'FUNCTION' %s
+                """
+                _ORDER_BY_DEFAULT = ""
+                _ORDER_BY_NAME = ""
+                exclude_param = "NAME"    
+            else:
+                _NAMES = """
+                SELECT ROUTINE_NAME as NAME
+                """
+                names_pos_to_quote = (0,)
+                _FULL = """
+                SELECT ROUTINE_SCHEMA AS DB, ROUTINE_NAME AS NAME,  
+                ROUTINE_TYPE AS TYPE, SPECIFIC_NAME,
+                EXTERNAL_LANGUAGE AS LANGUAGE, 
+                SQL_DATA_ACCESS, IS_DETERMINISTIC, SECURITY_TYPE,
+                (SELECT GROUP_CONCAT(PARAMETER_NAME,' ',DTD_IDENTIFIER)  
+                  FROM information_schema.parameters p
+                  WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
+                  AND ordinal_position > 0) AS PARAM_LIST,
+                CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
+                    AS RETURNS, ROUTINE_DEFINITION AS BODY, 
+                DEFINER, CREATED, LAST_ALTERED AS MODIFIED, 
+                SQL_MODE, ROUTINE_COMMENT AS COMMENT,                 
+                CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
+                DATABASE_COLLATION AS DB_COLLATION, 
+                ROUTINE_DEFINITION AS BODY_UTF8
+                """
+                full_pos_to_quote = (0, 1, 3)
+                full_pos_split_quote = ()
+                _MINIMAL = """
+                SELECT ROUTINE_NAME AS NAME,  
+                EXTERNAL_LANGUAGE AS LANGUAGE, 
+                SQL_DATA_ACCESS, IS_DETERMINISTIC, SECURITY_TYPE,
+                DEFINER, 
+                (SELECT GROUP_CONCAT(PARAMETER_NAME,' ',DTD_IDENTIFIER)  
+                  FROM information_schema.parameters p
+                  WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
+                  AND ordinal_position > 0) AS PARAM_LIST,
+                CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
+                    AS RETURNS, 
+                ROUTINE_DEFINITION AS BODY, SQL_MODE
+                CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
+                DATABASE_COLLATION AS DB_COLLATION
+                """
+                minimal_pos_to_quote = (0,)
+                minimal_pos_split_quote = ()
+                _OBJECT_QUERY = """
+                FROM information_schema.routines
+                WHERE ROUTINE_SCHEMA = '%s' and ROUTINE_TYPE = 'FUNCTION' %s
+                """
+                _ORDER_BY_DEFAULT = ""
+                _ORDER_BY_NAME = ""
+                exclude_param = "ROUTINE_NAME"
         elif obj_type == _EVENT:
-            _NAMES = """
-            SELECT NAME
-            """
-            names_pos_to_quote = (0,)
-            _FULL = """
-            SELECT DB, NAME, BODY, DEFINER, EXECUTE_AT, INTERVAL_VALUE,
+            if self.source.has_mysqlproc():
+                _NAMES = """
+                SELECT NAME
+                """
+                names_pos_to_quote = (0,)
+                _FULL = """
+                SELECT DB, NAME, BODY, DEFINER, EXECUTE_AT, INTERVAL_VALUE,
                    INTERVAL_FIELD, CREATED, MODIFIED, LAST_EXECUTED, STARTS,
                    ENDS, STATUS, ON_COMPLETION, SQL_MODE, COMMENT, ORIGINATOR,
                    TIME_ZONE, CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION, BODY_UTF8
-            """
-            full_pos_to_quote = (0, 1)
-            full_pos_split_quote = ()
-            _MINIMAL = """
-            SELECT NAME, DEFINER, BODY, STATUS,
+                """
+                full_pos_to_quote = (0, 1)
+                full_pos_split_quote = ()
+                _MINIMAL = """
+                SELECT NAME, DEFINER, BODY, STATUS,
                    EXECUTE_AT, INTERVAL_VALUE, INTERVAL_FIELD, SQL_MODE,
                    STARTS, ENDS, STATUS, ON_COMPLETION, ORIGINATOR,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                    DB_COLLATION
-            """
-            minimal_pos_to_quote = (0,)
-            minimal_pos_split_quote = ()
-            _OBJECT_QUERY = """
-            FROM mysql.event
-            WHERE DB = '%s' %s
-            """
-            _ORDER_BY_DEFAULT = ""
-            _ORDER_BY_NAME = ""
-            exclude_param = "NAME"
+                """
+                minimal_pos_to_quote = (0,)
+                minimal_pos_split_quote = ()
+                _OBJECT_QUERY = """
+                FROM mysql.event
+                WHERE DB = '%s' %s
+                """
+                _ORDER_BY_DEFAULT = ""
+                _ORDER_BY_NAME = ""
+                exclude_param = "NAME"
+            else:
+                _NAMES = """
+                SELECT EVENT_NAME
+                """
+                names_pos_to_quote = (0,)
+                _FULL = """
+                SELECT EVENT_SCHEMA AS DB, EVENT_NAME AS NAME, 
+                EVENT_BODY AS BODY, DEFINER, EXECUTE_AT, INTERVAL_VALUE,
+                INTERVAL_FIELD, CREATED, 
+                LAST_ALTERED AS MODIFIED, LAST_EXECUTED, STARTS,
+                ENDS, STATUS, ON_COMPLETION, SQL_MODE, 
+                EVENT_COMMENT AS COMMENT, ORIGINATOR,
+                TIME_ZONE, CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                DATABASE_COLLATION AS DB_COLLATION, 
+                EVENT_BODY AS BODY_UTF8
+                """
+                full_pos_to_quote = (0, 1)
+                full_pos_split_quote = ()
+                _MINIMAL = """
+                SELECT EVENT_NAME AS NAME, DEFINER
+                EVENT_BODY AS BODY, STATUS
+                EXECUTE_AT, INTERVAL_VALUE,
+                INTERVAL_FIELD, SQL_MODE, 
+                STARTS, ENDS, STATUS, ON_COMPLETION,
+                ORIGINATOR,
+                CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
+                DATABASE_COLLATION AS DB_COLLATION, 
+                """
+                minimal_pos_to_quote = (0,)
+                minimal_pos_split_quote = ()
+                _OBJECT_QUERY = """
+                FROM information_schema.events
+                WHERE EVENT_SCHEMA = '%s' %s
+                """
+                _ORDER_BY_DEFAULT = ""
+                _ORDER_BY_NAME = ""
+                exclude_param = "EVENT_NAME"            
         elif obj_type == _GRANT:
             _OBJECT_QUERY = """
             (

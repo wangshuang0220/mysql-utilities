@@ -20,7 +20,7 @@ export_locks test.
 """
 from __future__ import absolute_import
 
-from . import copy_db_parameters
+import copy_db_parameters
 
 from mysql.utilities.exception import MUTLibError
 

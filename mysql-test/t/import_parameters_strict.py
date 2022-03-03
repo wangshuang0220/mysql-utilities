@@ -21,7 +21,7 @@ import_parameters test.
 from __future__ import absolute_import
 
 from builtins import zip
-from . import import_parameters
+import import_parameters
 
 
 class test(import_parameters.test):

@@ -20,7 +20,7 @@ compare_db_sql test.
 """
 from __future__ import absolute_import
 
-from . import compare_db
+import compare_db
 
 from mysql.utilities.exception import MUTLibError
 

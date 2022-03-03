@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from builtins import range
 import os
 
-from . import export_parameters_def
+import export_parameters_def
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

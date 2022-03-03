@@ -20,7 +20,7 @@ copy_user_parameters test.
 """
 from __future__ import absolute_import
 
-from . import copy_user
+import copy_user
 
 from mysql.utilities.exception import MUTLibError
 

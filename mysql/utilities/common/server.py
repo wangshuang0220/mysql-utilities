@@ -806,6 +806,7 @@ class Server(object):
         self.aliases = set()
         self.grants_enabled = None
         self._version = None
+        self._servertype = None
 
     @classmethod
     def fromServer(cls, server, conn_info=None):
@@ -1220,6 +1221,59 @@ class Server(object):
 
         return self._version
 
+    def get_server_type(self):
+        """Return type of the server (MySQL, mariaDB, Percona)
+
+        Get the server type. The respective instance variable is set with
+        the result after querying the server the first time. The type is
+        immediately returned when already known, avoiding querying the server
+        at each time.
+
+        Returns string - version string or None if error
+        """
+        # Return the local version value if already known.
+        if self._servertype:
+            return self._servertype
+
+        # Query the server to find the type; defaults to MySQL
+        try:
+            self._servertype = 'MySQL'
+            res = self.select_variable("VERSION","GLOBAL")
+            if res:
+                match = re.match(r'(MariaDB|Percona)',res)
+                if match:
+                    self._servertype = match.group(1)
+                    return self._servertype
+
+            # Only Percona lets you set the version_comment
+            self.exec_query("SET GLOBAL version_comment = @@version_comment;")
+            self._servertype = "Percona"
+                
+        except UtilError:
+            # Ignore errors and return servertype, initialized with MySQL.
+            pass
+
+        return self._servertype
+    
+
+    def has_mysqlproc(self):
+        """Check if server has mysql.proc table (removed in
+        MySQL version >= 8.0)
+        """
+        servertype = self.get_server_type()
+        if servertype is None:
+            return False
+        elif servertype.lower() in ('mariadb','percona'):
+            return True
+        else:
+            ver = self.get_version();
+            if ver is None:
+                return False
+            else:
+                if self.check_version_compat(8,0,0) :
+                    return False
+                
+                
     def check_version_compat(self, t_major, t_minor, t_rel):
         """Checks version of the server against requested version.
 

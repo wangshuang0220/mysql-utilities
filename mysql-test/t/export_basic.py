@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import os
 
-from . import copy_db_parameters
+import copy_db_parameters
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

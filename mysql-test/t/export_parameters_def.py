@@ -20,7 +20,7 @@ export_parameters_def test.
 """
 from __future__ import absolute_import
 
-from . import export_basic
+import export_basic
 
 from mysql.utilities.exception import MUTLibError
 

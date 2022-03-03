@@ -20,7 +20,7 @@ diff_errors test.
 """
 from __future__ import absolute_import
 
-from . import diff
+import diff
 
 from mysql.utilities.exception import MUTLibError, UtilError
 

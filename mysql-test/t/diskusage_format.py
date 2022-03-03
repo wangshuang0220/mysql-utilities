@@ -20,7 +20,7 @@ diskusage_format test.
 """
 from __future__ import absolute_import
 
-from . import diskusage_basic
+import diskusage_basic
 
 from mysql.utilities.exception import MUTLibError
 

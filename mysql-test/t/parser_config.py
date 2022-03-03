@@ -31,7 +31,7 @@ from mysql.utilities.common.user import grant_proxy_ssl_privileges
 from mutlib.ssl_certs import (ssl_pass, ssl_user, ssl_server_opts,
                               ssl_c_ca, ssl_c_cert, ssl_c_key)
 
-from . import server_info
+import server_info
 
 
 class test(server_info.test):

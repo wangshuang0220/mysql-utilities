@@ -24,7 +24,7 @@ from mysql.utilities.exception import MUTLibError
 
 from mutlib.ssl_certs import ssl_c_ca_b
 
-from . import ssl_connection_simple_test
+import ssl_connection_simple_test
 
 
 class test(ssl_connection_simple_test.test):

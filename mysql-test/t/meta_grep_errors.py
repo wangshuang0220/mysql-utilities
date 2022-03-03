@@ -20,7 +20,7 @@ meta_grep_errors test.
 """
 from __future__ import absolute_import
 
-from . import meta_grep
+import meta_grep
 
 from mysql.utilities.exception import MUTLibError
 

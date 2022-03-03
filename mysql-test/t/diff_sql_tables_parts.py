@@ -20,7 +20,7 @@ diff_sql_tables_parts test.
 """
 from __future__ import absolute_import
 
-from . import test_sql_template
+import test_sql_template
 
 
 # TODO: Partitions are not supported at this time, so the following

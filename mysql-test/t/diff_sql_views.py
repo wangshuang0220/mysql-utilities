@@ -20,7 +20,7 @@ diff_sql_views test.
 """
 from __future__ import absolute_import
 
-from . import test_sql_template
+import test_sql_template
 
 
 _TEST_VIEW_TABLE = "CREATE TABLE `diff_view`.`t1` (a int)"

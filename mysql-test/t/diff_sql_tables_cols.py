@@ -20,7 +20,7 @@ diff_sql_tables_cols test.
 """
 from __future__ import absolute_import
 
-from . import test_sql_template
+import test_sql_template
 
 
 # Note: removing auto_increment does not work correctly.

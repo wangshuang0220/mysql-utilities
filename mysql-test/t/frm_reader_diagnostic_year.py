@@ -23,7 +23,7 @@ from __future__ import absolute_import
 
 import os
 
-from . import frm_reader_base
+import frm_reader_base
 
 from mysql.utilities.exception import MUTLibError
 

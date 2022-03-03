@@ -20,7 +20,7 @@ clone_db_parameters test.
 """
 from __future__ import absolute_import
 
-from . import clone_db
+import clone_db
 
 from mysql.utilities.exception import MUTLibError
 

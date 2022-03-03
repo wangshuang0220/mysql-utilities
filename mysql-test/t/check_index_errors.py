@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import os
 
-from . import check_index
+import check_index
 
 from mysql.utilities.exception import MUTLibError
 

@@ -23,12 +23,13 @@ from __future__ import absolute_import
 from builtins import range
 import os
 
-from . import copy_db
+import copy_db
 
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
+from mysql.utilities.common.server import has_mysqlproc
 
 
 _DEFAULT_MYSQL_OPTS = ('"--report-host=localhost --report-port={0} '
@@ -268,9 +269,15 @@ class test(copy_db.test):
                                     "'joe'@'localhost'")
 
             # Change DEFINER in procedures and functions on the source server
-            self.server1.exec_query("UPDATE mysql.proc SET "
-                                    "DEFINER='joe@localhost' WHERE "
-                                    "DB='util_test'")
+            if self.server1.has_mysqlproc():
+                self.server1.exec_query("UPDATE mysql.proc SET "
+                                        "DEFINER='joe@localhost' WHERE "
+                                        "DB='util_test'")
+            else:
+                self.server1.exec_query("UPDATE information_schema.routines SET "
+                                        "DEFINER='joe@localhost' WHERE "
+                                        "ROUTINE_SCHEMA='util_test'")
+
             self.server1.exec_query("UPDATE mysql.event SET "
                                     "DEFINER='joe@localhost' WHERE "
                                     "DB='util_test'")

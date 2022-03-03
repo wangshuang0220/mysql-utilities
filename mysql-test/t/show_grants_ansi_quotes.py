@@ -22,7 +22,7 @@ from __future__ import absolute_import
 from builtins import str
 import os
 
-from . import show_grants
+import show_grants
 
 from mysql.utilities.exception import MUTLibError
 

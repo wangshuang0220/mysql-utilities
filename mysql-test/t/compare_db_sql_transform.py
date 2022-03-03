@@ -20,7 +20,7 @@ compare_db_sql_transform test.
 """
 from __future__ import absolute_import
 
-from . import test_sql_template
+import test_sql_template
 
 _TABLE1_DEF = """
     CREATE TABLE `comp_db`.`table1` (
