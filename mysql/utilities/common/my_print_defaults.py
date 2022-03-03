@@ -162,7 +162,7 @@ class MyDefaultsReader(object):
             subprocess.call([self._tool_path, "--help"], stdout=out_file)
         else:
             # Redirect stderr to null
-            null_file = open(os.devnull, "w+b")
+            null_file = open(os.devnull, "w+")
             subprocess.call([self._tool_path, "--help"], stdout=out_file,
                             stderr=null_file)
 
@@ -196,7 +196,7 @@ class MyDefaultsReader(object):
             subprocess.call([self._tool_path, "--version"], stdout=out_file)
         else:
             # Redirect stderr to null
-            null_file = open(os.devnull, "w+b")
+            null_file = open(os.devnull, "w+")
             subprocess.call([self._tool_path, "--version"], stdout=out_file,
                             stderr=null_file)
         # Read --version output
@@ -226,12 +226,12 @@ class MyDefaultsReader(object):
                                  "search_my_print_defaults_tool.")
 
         # Create a temporary file to redirect stdout
-        out_file = tempfile.TemporaryFile()
+        out_file = tempfile.TemporaryFile(mode='r+')
         if self._verbosity > 0:
             subprocess.call([self._tool_path, "--help"], stdout=out_file)
         else:
             # Redirect stderr to null
-            null_file = open(os.devnull, "w+b")
+            null_file = open(os.devnull, "w+")
             subprocess.call([self._tool_path, "--help"], stdout=out_file,
                             stderr=null_file)
         # Read --help output
@@ -260,7 +260,7 @@ class MyDefaultsReader(object):
             subprocess.call(mp_cmd, stdout=out_file)
         else:
             # Redirect stderr to null
-            null_file = open(os.devnull, "w+b")
+            null_file = open(os.devnull, "w+")
             subprocess.call(mp_cmd, stdout=out_file, stderr=null_file)
 
         # Read and parse group options values.
