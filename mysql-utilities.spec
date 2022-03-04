@@ -5,7 +5,7 @@
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities
 Version:       %{version}
-Release:       16%{?dist}
+Release:       17%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
 URL:           https://github.com/celane/mysql-utilities
@@ -48,6 +48,9 @@ cd %{NVdir}
 %{__python} setup.py install --skip-build \
        --root %{buildroot}  \
      --install-lib %{python3_sitearch}
+install -d %{buildroot}%{_exec_prefix}/local/bin/
+install  scripts/my_print_defaults  %{buildroot}%{_exec_prefix}/local/bin/
+
 install -d %{buildroot}%{_mandir}/man1
 %{__python} setup.py install_man --root %{buildroot}
 
@@ -94,6 +97,7 @@ rm -rf %{buildroot}
 %{_bindir}/mysqlrplsync
 %{_bindir}/mysqlbinlogmove
 %{_bindir}/mysqlgrants
+%{_exec_prefix}/local/bin/my_print_defaults
 %{python3_sitearch}/*
 %{_mandir}/man1/mysql*.1*
 

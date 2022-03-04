@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+# wrapper for MariaDB my_print_defaults to work with msql-utilities 
+my $rpm = `rpm -qf /usr/bin/my_print_defaults 2>/dev/null`;
+die('no my_print_defaults installed?') if $rpm eq '';
+exec('/usr/bin/my_print_defaults',@ARGV) if $rpm =~ /^mysql/i;
+
+my $loginpath;
+my $grabarg = 0;
+my (@keep);
+
+foreach my $a (@ARGV) {
+    if ($grabarg) {
+        $grabarg = 0;
+        $loginpath  = $a;
+        next;
+    }
+    
+    if ($a eq '-?' || $a eq '--help') {
+        system("/usr/bin/my_print_defaults",@ARGV);
+        print("\t-l, --login_path=name\n");
+        print("\t\t\tpath to be read from the login file\n");
+        exit 0;
+    }
+
+    if ($a eq "-l" || $a eq '--login-path') {
+        $grabarg = 1;
+    } elsif ($a =~ /^\-\-login\-path=(.*)$/) {
+        $loginpath = $1;
+    } else {
+        push(@keep,$a);
+    }
+}
+system("/usr/bin/my_print_defaults",@keep,$loginpath);
+    
+
+
+
