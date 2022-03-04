@@ -48,6 +48,7 @@ cd %{NVdir}
 %{__python} setup.py install --skip-build \
        --root %{buildroot}  \
      --install-lib %{python3_sitearch}
+rm %{buildroot}%{_bindir}/my_print_defaults
 install -d %{buildroot}%{_exec_prefix}/local/bin/
 install  scripts/my_print_defaults  %{buildroot}%{_exec_prefix}/local/bin/
 
