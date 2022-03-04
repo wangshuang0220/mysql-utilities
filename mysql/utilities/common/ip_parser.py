@@ -25,6 +25,7 @@ Methods:
 
 import re
 import os
+import getpass
 import logging
 
 from mysql.utilities.exception import UtilError, FormatError
@@ -440,11 +441,11 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                     config_path_data.update(login_path_data)
                     login_path_data = config_path_data
 
-            user = login_path_data.get('user', None)
+            user = login_path_data.get('user', getpass.getuser())
             passwd = login_path_data.get('password', None)
-            host = login_path_data.get('host', None)
+            host = login_path_data.get('host', 'localhost')
             if not port:
-                port = login_path_data.get('port', None)
+                port = login_path_data.get('port', 3306)
             if not socket:
                 socket = login_path_data.get('socket', None)
 
@@ -457,7 +458,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                 required_options = ('user', 'host', 'port')
 
             missing_options = [opt for opt in required_options
-                               if locals()[opt] is None]
+                               if [opt] is None]
             # If we are on unix and port is missing, user might have specified
             # a socket instead
             if os.name == "posix" and "port" in missing_options:
