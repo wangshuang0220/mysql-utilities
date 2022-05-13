@@ -1,6 +1,32 @@
+
+
+
+Need  python preprocess
+(pip install preprocess or rpm -i python3-preprocess )
+for pre-processing std_data files used in testing.
+
+emacs
+M-x whitespace-mode
+to show tabs
+
+emacs
+M-x picture-mode
+for grid edits
+
+
 need to have a mysql server running,
 .my.cnf in root account (need root for doing stop/start servers?)
   with just the password, no ssl stuff?
+
+some tests fail with password-complexity too low; for
+testing purposes, execute:
+mysql> UNINSTALL COMPONENT 'file://component_validate_password';
+or
+mysql> uninstall plugin validate_password;
+(which one depends on mysql version)
+
+also need
+INSTALL PLUGIN mysql_no_login SONAME 'mysql_no_login.so';
 
 
 note that the mysql-utilities look for info in $HOME/.mylogin.cnf

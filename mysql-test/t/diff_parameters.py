@@ -203,7 +203,8 @@ class test(diff.test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, self.server2)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

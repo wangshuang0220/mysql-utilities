@@ -14,10 +14,10 @@ INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 # Data for table `util_test`.`t2`:
 # Blob data for table `t2`:
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('12 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('13 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  (NULL, 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES (NULL, 'This is a blob.');
 # Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
@@ -39,20 +39,20 @@ SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
 # Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
-INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example');
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example'), ('02 Test Basic database example'), ('03 Test Basic database example'), ('04 Test Basic database example'), ('05 Test Basic database example'), ('06 Test Basic database example'), ('07 Test Basic database example');
 # Data for table `util_test`.`t2`:
 # Table `t2` has no data.
 # Blob data for table `t2`:
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('12 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('13 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  (NULL, 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES (NULL, 'This is a blob.');
 # Data for table `util_test`.`t3`:
-INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys'),  (2, '15 test fkeys'),  (3, '16 test fkeys'),  (4, NULL);
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys'), (2, '15 test fkeys'), (3, '16 test fkeys'), (4, NULL);
 # Data for table `util_test`.`t4`:
-INSERT INTO `util_test`.`t4` VALUES  (3, 2);
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
 # Data for table `util_test`.`t5`:
-INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 19),  (3, 'milk', 0.67, 5),  (4, 'Dr. Pepper', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19), (2, 'M&M', 5.99, 19), (3, 'milk', 0.67, 5), (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - skip blobs
@@ -104,10 +104,10 @@ INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 # Data for table `util_test`.`t2`:
 # Blob data for table `t2`:
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('12 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('13 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  (NULL, 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES (NULL, 'This is a blob.');
 # Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
@@ -338,10 +338,10 @@ INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 # Data for table `util_test`.`t2`:
 # Blob data for table `t2`:
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('12 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('13 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  (NULL, 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES (NULL, 'This is a blob.');
 # Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
@@ -572,10 +572,10 @@ INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 # Data for table `util_test`.`t2`:
 # Blob data for table `t2`:
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('12 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('13 Test Basic database example', 'This is a blob.');
-INSERT INTO `util_test`.`t2` VALUES  (NULL, 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', 'This is a blob.');
+INSERT INTO `util_test`.`t2` VALUES (NULL, 'This is a blob.');
 # Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
@@ -1414,10 +1414,10 @@ INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example');
 # Data for table `util_test`.`t2`:
 # Blob data for table `t2`:
-INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example', 'This is a blob.', 'This is yet another blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('12 Test Basic database example', 'This is a blob.', 'This is yet another blob.');
-INSERT INTO `util_test`.`t2` VALUES  ('13 Test Basic database example', 'This is a blob.', 'This is yet another blob.');
-INSERT INTO `util_test`.`t2` VALUES  (NULL, 'This is a blob.', 'This is yet another blob.');
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example', 'This is a blob.', 'This is yet another blob.');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example', 'This is a blob.', 'This is yet another blob.');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example', 'This is a blob.', 'This is yet another blob.');
+INSERT INTO `util_test`.`t2` VALUES (NULL, 'This is a blob.', 'This is yet another blob.');
 # Data for table `util_test`.`t3`:
 INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
 INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
@@ -1435,31 +1435,30 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 32 - tables with BLOBS with and without NOT NULL UNIQUE INDEXES
 # Source on XXXX-XXXX: ... connected.
 # WARNING: Table `blob_test`.`blobs` contains only BLOB and TEXT fields. Rows will be generated with separate INSERT statements.
-# WARNING: Table `blob_test`.`text_table` contains only BLOB and TEXT fields. Rows will be generated with separate INSERT statements.
 USE `blob_test`;
 # Exporting data from `blob_test`
+# Data for table `blob_test`.`blob_table`:
+INSERT INTO `blob_test`.`blob_table` VALUES (1, 'test', NULL);
+# Blob data for table `blob_table`:
+UPDATE `blob_test`.`blob_table` SET `c` = 0xff0e WHERE `a` = 1 AND `b` = 'test';
 # Data for table `blob_test`.`blobs`:
 # Blob data for table `blobs`:
-INSERT INTO `blob_test`.`blobs` VALUES  ('playing guitar must be cool!', '1', 'ÿ');
-INSERT INTO `blob_test`.`blobs` VALUES  ('riding a bicycle` is cool!', '2', 'ÿ');
-INSERT INTO `blob_test`.`blobs` VALUES  ('python is pretty cool!', '3', 'ÿ');
-INSERT INTO `blob_test`.`blobs` VALUES  (NULL, NULL, NULL);
+INSERT INTO `blob_test`.`blobs` VALUES ('playing guitar must be cool!', 1, 0xff0e);
+INSERT INTO `blob_test`.`blobs` VALUES ('riding a bicycle` is cool!', 2, 0xff0e);
+INSERT INTO `blob_test`.`blobs` VALUES ('python is pretty cool!', 3, 0xff0e);
+INSERT INTO `blob_test`.`blobs` VALUES (NULL, NULL, NULL);
 # Data for table `blob_test`.`blobs_pk`:
-INSERT INTO `blob_test`.`blobs_pk` VALUES (NULL, '1', NULL, 1, 'this');
-INSERT INTO `blob_test`.`blobs_pk` VALUES (NULL, '2', NULL, 2, 'is');
-INSERT INTO `blob_test`.`blobs_pk` VALUES (NULL, '3', NULL, 3, 'strange');
+INSERT INTO `blob_test`.`blobs_pk` VALUES ('playing guitar must be cool!', 1, NULL, 1, 'this');
+INSERT INTO `blob_test`.`blobs_pk` VALUES ('riding a bicycle` is cool!', 2, NULL, 2, 'is');
+INSERT INTO `blob_test`.`blobs_pk` VALUES ('python is pretty cool!', 3, NULL, 3, 'strange');
 INSERT INTO `blob_test`.`blobs_pk` VALUES (NULL, NULL, NULL, 4, '!');
 # Blob data for table `blobs_pk`:
-UPDATE `blob_test`.`blobs_pk` SET `text_col` = 'playing guitar must be cool!', `blob_col` = 'ÿ' WHERE `bin_col` = '1' AND `int_col` = '1' AND `char_col` = 'this';
-UPDATE `blob_test`.`blobs_pk` SET `text_col` = 'riding a bicycle` is cool!', `blob_col` = 'ÿ' WHERE `bin_col` = '2' AND `int_col` = '2' AND `char_col` = 'is';
-UPDATE `blob_test`.`blobs_pk` SET `text_col` = 'python is pretty cool!', `blob_col` = 'ÿ' WHERE `bin_col` = '3' AND `int_col` = '3' AND `char_col` = 'strange';
-# Data for table `blob_test`.`blob_table`:
-INSERT INTO `blob_test`.`blob_table` VALUES (1, NULL, NULL);
-# Blob data for table `blob_table`:
-UPDATE `blob_test`.`blob_table` SET `b` = 'test', `c` = 'ÿ' WHERE `a` = '1';
+UPDATE `blob_test`.`blobs_pk` SET `blob_col` = 0xff0e WHERE `text_col` = 'playing guitar must be cool!' AND `bin_col` = 1 AND `int_col` = 1 AND `char_col` = 'this';
+UPDATE `blob_test`.`blobs_pk` SET `blob_col` = 0xff0e WHERE `text_col` = 'riding a bicycle` is cool!' AND `bin_col` = 2 AND `int_col` = 2 AND `char_col` = 'is';
+UPDATE `blob_test`.`blobs_pk` SET `blob_col` = 0xff0e WHERE `text_col` = 'python is pretty cool!' AND `bin_col` = 3 AND `int_col` = 3 AND `char_col` = 'strange';
+UPDATE `blob_test`.`blobs_pk` SET `blob_col` = NULL WHERE `text_col` = NULL AND `bin_col` = NULL AND `int_col` = 4 AND `char_col` = '!';
 # Data for table `blob_test`.`text_table`:
-# Blob data for table `text_table`:
-INSERT INTO `blob_test`.`text_table` VALUES  ('This is a test');
-INSERT INTO `blob_test`.`text_table` VALUES  ('This is a test 2');
-INSERT INTO `blob_test`.`text_table` VALUES  ('This is a test 3 with special characters: \0\'\"\b\n\r\t\Z\\\%\_');
+INSERT INTO `blob_test`.`text_table` VALUES ('This is a test');
+INSERT INTO `blob_test`.`text_table` VALUES ('This is a test 2');
+INSERT INTO `blob_test`.`text_table` VALUES ('This is a test 3 with special characters: \0\'\"\b\n\r\t\Z\\\%\_');
 #...done.

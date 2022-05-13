@@ -21,7 +21,6 @@ copy_user test.
 from __future__ import print_function
 
 import os
-
 import mutlib
 
 from mysql.utilities.common.user import User
@@ -58,7 +57,14 @@ class test(mutlib.System_test):
         self.drop_all()
         data_file = "./std_data/basic_users.sql"
         try:
-            self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.read_and_exec_ppSQL(self.server1,data_file, self.debug)
+        except MUTLibError as err:
+            raise MUTLibError(
+                "Failed to read commands from file {0}: "
+                "{1}".format(data_file, err.errmsg))
+        data_file = "./std_data/basic_users2.sql"
+        try:
+            self.read_and_exec_ppSQL(self.server2,data_file, self.debug)
         except MUTLibError as err:
             raise MUTLibError(
                 "Failed to read commands from file {0}: "
@@ -179,6 +185,9 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_substring("on [::1]", "on localhost")
+        # Mask authentication type on CREATE USER because it can vary
+        self.replace_substring_portion(" IDENTIFIED WITH '","'","")
+        
         # Mask password field on grant statements since it stopped appearing on
         # versions >= 5.7.6
         self.replace_substring_portion(" IDENTIFIED BY PASSWORD '", "'", "")

@@ -277,6 +277,16 @@ class test(mutlib.System_test):
                         # Display results of command in _TRANSFORM_FILE
                         # Note: flush not to mix output with utility
                         sys.stdout.flush()
+                        if self.res_fname:
+                            print("\nResult file:")
+                            t_res = open(self.res_fname,'r+')
+                            for line in t_res.readline():
+                                print(line, end=' ')
+                            t_res.close()
+                            sys.stdout.flush()
+                            os.unlink(self.res_fname)
+
+                        
                         print("\nContents of output file:")
                         t_file = open(_TRANSFORM_FILE, 'r+')
                         for line in t_file.readlines():

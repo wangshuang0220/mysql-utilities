@@ -106,6 +106,13 @@ class test(show_grants.test):
         """
         self.replace_substring(str(self.server1.port), "PORT1")
         self.remove_result("# - 'root'@'")
+        self.remove_result("# - 'mysql.infoschema'@'")
+        self.remove_result("# - 'mysql.sys'@'")
+        self.remove_result("# - 'mysql.session'@'")
+        # ordering can be randomized, so remove
+        self.remove_result("# WARNING: specified database does not exist")
+        self.remove_result("# WARNING: specified object does not exist")
+        self.remove_result("# WARNING: specified object is not supported")
 
     def get_result(self):
         return self.compare(__name__, self.results)

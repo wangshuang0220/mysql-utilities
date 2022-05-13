@@ -69,10 +69,27 @@ class test(export_basic.test):
 
         self.remove_result("# WARNING: The server supports GTIDs")
 
+        self.remove_result("'root'@'localhost',ALTER") 
+        self.remove_result("'root'@'localhost',CREATE") 
+        self.remove_result("'root'@'localhost',DELETE,") 
+        self.remove_result("'root'@'localhost',DROP,") 
+        self.remove_result("'root'@'localhost',EVENT,") 
+        self.remove_result("'root'@'localhost',EXECUTE,") 
+        self.remove_result("'root'@'localhost',INDEX,") 
+        self.remove_result("'root'@'localhost',INSERT,") 
+        self.remove_result("'root'@'localhost',LOCK ") 
+        self.remove_result("'root'@'localhost',REFERENCES,") 
+        self.remove_result("'root'@'localhost',SELECT,") 
+        self.remove_result("'root'@'localhost',SHOW VIEW,") 
+        self.remove_result("'root'@'localhost',TRIGGER,") 
+        self.remove_result("'root'@'localhost',UPDATE,") 
+
+
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

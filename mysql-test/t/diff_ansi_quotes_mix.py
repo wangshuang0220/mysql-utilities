@@ -295,12 +295,26 @@ class test(diff.test):
         self.replace_result("--- util_test.t1", "--- util_test.t1\n")
         self.replace_result("--- util_test.t2", "--- util_test.t2\n")
 
+        # mysql 8.0 extra stuff to remove 
+        self.replace_substring_portion('/*!40100 DEFAULT CHARACTER SET','*/',
+                                       '/*!40100 DEFAULT CHARACTER SET latin1 */')
+        self.replace_substring_portion(' /*!80016 DEFAULT ENCRYPTION=','*/','')
+        self.replace_substring_portion('CHARSET=utf8mb4','utf8mb4_0900_ai_ci','CHARSET=latin1')
+        
+        # mysql 8.0 show create function returns int -> int(11)
+        self.replace_substring_portion("RET","int(11)","RETURNS int")
+        self.replace_substring_portion('int(11)',"DEFAULT NULL",'int DEFAULT NULL')
+        self.replace_substring_portion('`util_test`.`trg','`',"`trg`")
+        self.replace_substring_portion('"util_test"."trg','"','"trg"')
+        
+        
         self.replace_substring("on [::1]", "on localhost")
 
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
+#                               self.server1, self.server2)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

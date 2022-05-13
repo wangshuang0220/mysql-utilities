@@ -9,35 +9,71 @@ USE `util_test`;
 # TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `a` int NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# #else
+  `c` int NOT NULL,
+  `d` int NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
   `base_price` decimal(20,2) unsigned DEFAULT NULL,
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `product_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # FUNCTION: `util_test`.`f1`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int
+# #endif
     DETERMINISTIC
 RETURN (SELECT 1);
 ||
@@ -55,86 +91,126 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: `util_test`.`v2`
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # VIEW: `util_test`.`v1`
 CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: `util_test`.`v2`
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # TRIGGER: `util_test`.`trg`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER `trg` AFTER INSERT ON `t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #endif
 ||
 DELIMITER ;
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
@@ -200,25 +276,51 @@ USE `util_test`;
 # TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t3`
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+CREATE TABLE `t3` (
+  `a` int NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t4`
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# #else
+CREATE TABLE `t4` (
+  `c` int NOT NULL,
+  `d` int NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t5`
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE `t5` (
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
@@ -226,9 +328,22 @@ CREATE TABLE `t5` (
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+CREATE TABLE `t5` (
+  `product_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # FUNCTION: `util_test`.`f1`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int
+# #endif
     DETERMINISTIC
 RETURN (SELECT 1);
 ||
@@ -246,86 +361,126 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: `util_test`.`v2`
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # VIEW: `util_test`.`v1`
 CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: `util_test`.`v2`
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # TRIGGER: `util_test`.`trg`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER `trg` AFTER INSERT ON `t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #endif
 ||
 DELIMITER ;
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 USE `util_test`;
@@ -365,21 +520,47 @@ CREATE DATABASE `util_test`;
 USE `util_test`;
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+CREATE TABLE `t3` (
+  `a` int NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# #else
+CREATE TABLE `t4` (
+  `c` int NOT NULL,
+  `d` int NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE `t5` (
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
@@ -387,8 +568,21 @@ CREATE TABLE `t5` (
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+CREATE TABLE `t5` (
+  `product_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int
+# #endif
     DETERMINISTIC
 RETURN (SELECT 1);
 ||
@@ -404,48 +598,87 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER `trg` AFTER INSERT ON `t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #endif
 ||
 DELIMITER ;
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
-GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 # Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
@@ -485,35 +718,71 @@ USE `util_test`;
 # TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `a` int NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# #else
+  `c` int NOT NULL,
+  `d` int NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
   `base_price` decimal(20,2) unsigned DEFAULT NULL,
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `product_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # FUNCTION: `util_test`.`f1`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int
+# #endif
     DETERMINISTIC
 RETURN (SELECT 1);
 ||
@@ -531,86 +800,126 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: `util_test`.`v2`
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # VIEW: `util_test`.`v1`
 CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: `util_test`.`v2`
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # TRIGGER: `util_test`.`trg`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER `trg` AFTER INSERT ON `t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #endif
 ||
 DELIMITER ;
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 USE `util_test`;
@@ -657,35 +966,71 @@ USE `util_test`;
 # TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `a` int NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# #else
+  `c` int NOT NULL,
+  `d` int NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
   `base_price` decimal(20,2) unsigned DEFAULT NULL,
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `product_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # FUNCTION: `util_test`.`f1`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int
+# #endif
     DETERMINISTIC
 RETURN (SELECT 1);
 ||
@@ -703,86 +1048,126 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: `util_test`.`v2`
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # VIEW: `util_test`.`v1`
 CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: `util_test`.`v2`
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # TRIGGER: `util_test`.`trg`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER `trg` AFTER INSERT ON `t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #endif
 ||
 DELIMITER ;
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 USE `util_test`;
@@ -826,35 +1211,71 @@ USE `util_test`;
 # TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# #else
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `a` int NOT NULL AUTO_INCREMENT,
+  `b` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# #else
+  `c` int NOT NULL,
+  `d` int NOT NULL,
+  KEY `ref_t3` (`c`),
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
   `base_price` decimal(20,2) unsigned DEFAULT NULL,
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+# #else
+  `product_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `base_price` decimal(20,2) unsigned DEFAULT NULL,
+  `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # FUNCTION: `util_test`.`f1`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int(11)
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `f1`() RETURNS int
+# #endif
     DETERMINISTIC
 RETURN (SELECT 1);
 ||
@@ -872,86 +1293,126 @@ CREATE DEFINER=`XXXX`@`XXXXXXXXX` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: `util_test`.`v2`
-CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # VIEW: `util_test`.`v1`
 CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
+# VIEW: `util_test`.`v2`
+CREATE ALGORITHM=UNDEFINED DEFINER=`XXXX`@`XXXXXXXXX` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
 # TRIGGER: `util_test`.`trg`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` TRIGGER `trg` AFTER INSERT ON `t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
+# #endif
 ||
 DELIMITER ;
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `util_test`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE ROUTINE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE TEMPORARY TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT CREATE VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DELETE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT DROP ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EVENT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT EXECUTE ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INDEX ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT INSERT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT LOCK TABLES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT REFERENCES ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SELECT ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT SHOW VIEW ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe_wildcard'@'%';
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 USE `util_test`;
@@ -992,19 +1453,37 @@ CREATE DATABASE `db``:db`;
 USE `db``:db`;
 # TABLE: `db``:db`.```t``.``export_2`
 CREATE TABLE ```t``.``export_2` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `id``` int(11) NOT NULL AUTO_INCREMENT,
   `other` char(30) DEFAULT NULL,
   PRIMARY KEY (`id```)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+# #else
+  `id``` int NOT NULL AUTO_INCREMENT,
+  `other` char(30) DEFAULT NULL,
+  PRIMARY KEY (`id```)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `db``:db`.```t``export_1`
 CREATE TABLE ```t``export_1` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `id``` int(11) NOT NULL AUTO_INCREMENT,
   `other` char(30) DEFAULT NULL,
   PRIMARY KEY (`id```)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+# #else
+  `id``` int NOT NULL AUTO_INCREMENT,
+  `other` char(30) DEFAULT NULL,
+  PRIMARY KEY (`id```)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # FUNCTION: `db``:db`.`fu``nc`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHARSET latin1
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHARSET utf8mb4
+# #endif
     DETERMINISTIC
 RETURN `a```;
 ||
@@ -1023,40 +1502,58 @@ CREATE EVENT ```e``export_1` ON SCHEDULE EVERY 1 YEAR STARTS [...]
 ||
 DELIMITER ;
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `db``:db`.* TO 'joe'@'user';
 #...done.
 USE `db``:db`;
@@ -1075,19 +1572,37 @@ CREATE DATABASE `db``:db`;
 USE `db``:db`;
 # TABLE: `db``:db`.```t``.``export_2`
 CREATE TABLE ```t``.``export_2` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `id``` int(11) NOT NULL AUTO_INCREMENT,
   `other` char(30) DEFAULT NULL,
   PRIMARY KEY (`id```)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+# #else
+  `id``` int NOT NULL AUTO_INCREMENT,
+  `other` char(30) DEFAULT NULL,
+  PRIMARY KEY (`id```)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # TABLE: `db``:db`.```t``export_1`
 CREATE TABLE ```t``export_1` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `id``` int(11) NOT NULL AUTO_INCREMENT,
   `other` char(30) DEFAULT NULL,
   PRIMARY KEY (`id```)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+# #else
+  `id``` int NOT NULL AUTO_INCREMENT,
+  `other` char(30) DEFAULT NULL,
+  PRIMARY KEY (`id```)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 # FUNCTION: `db``:db`.`fu``nc`
 DELIMITER ||
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHARSET latin1
+# #else
+CREATE DEFINER=`XXXX`@`XXXXXXXXX` FUNCTION `fu``nc`(`a``` TEXT) RETURNS text CHARSET utf8mb4
+# #endif
     DETERMINISTIC
 RETURN `a```;
 ||
@@ -1106,40 +1621,58 @@ CREATE EVENT ```e``export_1` ON SCHEDULE EVERY 1 YEAR STARTS [...]
 ||
 DELIMITER ;
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT ALTER ROUTINE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE ROUTINE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE TEMPORARY TABLES ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT CREATE VIEW ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DELETE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT DROP ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EVENT ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT EXECUTE ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INDEX ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT INSERT ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT LOCK TABLES ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT REFERENCES ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SELECT ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT SHOW VIEW ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT TRIGGER ON `db``:db`.* TO 'joe'@'user';
 # Grant:
+CREATE USER IF NOT EXISTS 'joe'@'user';
 GRANT UPDATE ON `db``:db`.* TO 'joe'@'user';
 #...done.
 USE `db``:db`;
@@ -1240,10 +1773,17 @@ CREATE DATABASE `util_test`;
 USE `util_test`;
 # TABLE: `util_test`.`tt0`
 CREATE TABLE `tt0` (
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` char(10) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+# #else
+  `a` int NOT NULL AUTO_INCREMENT,
+  `b` char(10) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+# #endif
 #...done.
 USE `util_test`;
 # Exporting data from `util_test`

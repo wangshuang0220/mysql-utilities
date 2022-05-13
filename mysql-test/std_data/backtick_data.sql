@@ -23,5 +23,6 @@ CREATE VIEW `db``:db`.```v``export_1` as SELECT * FROM `db``:db`.```t``export_1`
 
 CREATE EVENT `db``:db`.```e``export_1` ON SCHEDULE EVERY 1 YEAR DISABLE DO DELETE FROM `db``:db`.```t``export_1` WHERE other = "not there";
 
+CREATE USER IF NOT EXISTS `joe`@`user`;
 GRANT ALL ON `db``:db`.* TO 'joe'@'user';
 

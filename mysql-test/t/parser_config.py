@@ -40,6 +40,8 @@ class test(server_info.test):
     configuration file.
     """
 
+    server1 = None
+    need_server = False
     config_file_path = os.path.abspath('./temp.cnf')
     test_group_names = []
 
@@ -48,7 +50,6 @@ class test(server_info.test):
         # 'GRANT PROXY ON ...' on previous versions.
         if not self.servers.get_server(0).check_version_compat(5, 5, 8):
             raise MUTLibError("Test requires server version >= 5.5.8")
-        # Check the required number of servers
         return self.check_num_servers(1)
 
     def setup(self):
@@ -57,6 +58,7 @@ class test(server_info.test):
             os.unlink(self.config_file_path)
         except OSError:
             pass
+
         # use --log-error option in order to normalize serverinfo
         # output between 5.6 and 5.7 servers by setting log_err to stderr
         startup_opts = "{0} --log-error=error_log".format(ssl_server_opts())
@@ -101,14 +103,14 @@ class test(server_info.test):
             config_p.set('client', 'user', self.server1.user)
             config_p.set('client', 'password', self.server1.passwd)
             config_p.set('client', 'host', self.server1.host)
-            config_p.set('client', 'port', self.server1.port)
+            config_p.set('client', 'port', "{0}".format(self.server1.port))
 
             self.test_group_names.append(('simple group name', 'simple_login'))
             config_p.add_section('simple_login')
             config_p.set('simple_login', 'user', self.server1.user)
             config_p.set('simple_login', 'password', self.server1.passwd)
             config_p.set('simple_login', 'host', self.server1.host)
-            config_p.set('simple_login', 'port', self.server1.port)
+            config_p.set('simple_login', 'port', "{0}".format(self.server1.port))
 
             group_name = 'very_loooooooooooooooooooooooong_group_name'
             self.test_group_names.append(('long group name ', group_name))
@@ -117,7 +119,7 @@ class test(server_info.test):
             config_p.set(group_name, 'password', self.server1.passwd)
             config_p.set(group_name, 'host', self.server1.host)
 
-            config_p.set(group_name, 'port', self.server1.port)
+            config_p.set(group_name, 'port', "{0}".format(self.server1.port))
 
             group_name = 'c0Mpl1-cat3d//name_group'
             self.test_group_names.append(('complicated group name ',
@@ -126,14 +128,14 @@ class test(server_info.test):
             config_p.set(group_name, 'user', self.server1.user)
             config_p.set(group_name, 'password', self.server1.passwd)
             config_p.set(group_name, 'host', self.server1.host)
-            config_p.set(group_name, 'port', self.server1.port)
+            config_p.set(group_name, 'port', "{0}".format(self.server1.port))
 
             config_p.add_section('ssl-login')
             self.test_group_names.append(('login with ssl', 'ssl-login'))
             config_p.set('ssl-login', 'user', self.server2.user)
             config_p.set('ssl-login', 'password', self.server2.passwd)
             config_p.set('ssl-login', 'host', self.server2.host)
-            config_p.set('ssl-login', 'port', self.server2.port)
+            config_p.set('ssl-login', 'port', "{0}".format(self.server2.port))
             config_p.set('ssl-login', 'ssl-ca', self.server2.ssl_ca)
             config_p.set('ssl-login', 'ssl-cert', self.server2.ssl_cert)
             config_p.set('ssl-login', 'ssl-key', self.server2.ssl_key)

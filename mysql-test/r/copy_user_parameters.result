@@ -2,8 +2,8 @@ Test case 1 - show the grant statements
 WARNING: The --destination option is not required for '--dump' (option ignored).
 # Source on localhost: ... connected.
 # Dumping grants for user joe_nopass@user
-GRANT USAGE ON *.* TO 'joe_nopass'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
+GRANT USAGE ON *.* TO `joe_nopass`@`user`
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_nopass`@`user`
 Test case 2 - show the help
 MySQL Utilities mysqluserclone version X.Y.Z
 License type: GPLv2
@@ -57,12 +57,12 @@ user,host
 jack,user
 jill,user
 john,user
-# Dumping grants for user 'jack'@'user'
-GRANT USAGE ON *.* TO 'jack'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'jack'@'user'
-# Dumping grants for user 'jill'@'user'
-GRANT USAGE ON *.* TO 'jill'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'jill'@'user'
-# Dumping grants for user 'john'@'user'
-GRANT USAGE ON *.* TO 'john'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'john'@'user'
+# Dumping grants for user `jack`@`user`
+GRANT USAGE ON *.* TO `jack`@`user`
+GRANT ALL PRIVILEGES ON `util_test`.* TO `jack`@`user`
+# Dumping grants for user `jill`@`user`
+GRANT USAGE ON *.* TO `jill`@`user`
+GRANT ALL PRIVILEGES ON `util_test`.* TO `jill`@`user`
+# Dumping grants for user `john`@`user`
+GRANT USAGE ON *.* TO `john`@`user`
+GRANT ALL PRIVILEGES ON `util_test`.* TO `john`@`user`

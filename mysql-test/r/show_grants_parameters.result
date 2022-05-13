@@ -115,89 +115,123 @@ Test case 2 - Privilege inheritance with --show=raw
 
 # DATABASE `util_test`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t1`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t2`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t3`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT SELECT ON `util_test`.`t3` TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT SELECT ON `util_test`.`t3` TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `util_test`.`f1`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
 # - For 'priv_test_user2'@'%'
-GRANT ALTER ROUTINE ON FUNCTION `util_test`.`f1` TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT ALTER ROUTINE ON FUNCTION `util_test`.`f1` TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `util_test`.`p1`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT ALTER ROUTINE ON PROCEDURE `util_test`.`p1` TO 'priv_test_user3'@'%' WITH GRANT OPTION
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT ALTER ROUTINE ON PROCEDURE `util_test`.`p1` TO `priv_test_user3`@`%` WITH GRANT OPTION
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 #...done.
 Test case 3 - Privilege inheritance with --show=user_grants
 # Source on localhost: ... connected.
@@ -249,52 +283,70 @@ Test case 4 - Privilege inheritance with --show=raw and --privilege=ALL
 
 # DATABASE `util_test`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t1`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t2`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t3`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `util_test`.`f1`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT ALTER ROUTINE ON FUNCTION `util_test`.`f1` TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT ALTER ROUTINE ON FUNCTION `util_test`.`f1` TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `util_test`.`p1`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT ALTER ROUTINE ON PROCEDURE `util_test`.`p1` TO 'priv_test_user3'@'%' WITH GRANT OPTION
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT ALTER ROUTINE ON PROCEDURE `util_test`.`p1` TO `priv_test_user3`@`%` WITH GRANT OPTION
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 #...done.
 Test case 5 - Privilege inheritance with --show=user_grants and --privilege=ALL
 # Source on localhost: ... connected.
@@ -329,8 +381,6 @@ Test case 5 - Privilege inheritance with --show=user_grants and --privilege=ALL
 #...done.
 Test case 6 - Privilege inheritance with --show=users and --privileges
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
-# WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:
 
@@ -350,8 +400,6 @@ Test case 6 - Privilege inheritance with --show=users and --privileges
 Test case 7 - Privilege inheritance with --show=users, --privileges and verbose
 The list of supported privileges is ALL, ALL PRIVILEGES, ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TABLESPACE, CREATE TEMPORARY TABLES, CREATE USER, CREATE VIEW, DELETE, DROP, EVENT, EXECUTE, FILE, GRANT OPTION, INDEX, INSERT, LOCK TABLES, PROCESS, REFERENCES, RELOAD, REPLICATION CLIENT, REPLICATION SLAVE, SELECT, SHOW DATABASES, SHOW VIEW, SHUTDOWN, SUPER, TRIGGER, UPDATE and USAGE
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
-# WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:
 
@@ -370,8 +418,6 @@ The list of supported privileges is ALL, ALL PRIVILEGES, ALTER, ALTER ROUTINE, C
 #...done.
 Test case 8 - Privilege inheritance with --show=user_grants and --privileges
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
-# WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:
 
@@ -393,152 +439,210 @@ Test case 8 - Privilege inheritance with --show=user_grants and --privileges
 #...done.
 Test case 9 - Privilege inheritance with --show=raw and --privileges
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
-# WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t1`:
 # - For 'priv_test_user2'@'%'
-GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t2`:
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t3`:
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `util_test`.`f1`:
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
 # - For 'priv_test_user2'@'%'
-GRANT ALTER ROUTINE ON FUNCTION `util_test`.`f1` TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT ALTER ROUTINE ON FUNCTION `util_test`.`f1` TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `util_test`.`p1`:
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT ALTER ROUTINE ON PROCEDURE `util_test`.`p1` TO 'priv_test_user3'@'%' WITH GRANT OPTION
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT ALTER ROUTINE ON PROCEDURE `util_test`.`p1` TO `priv_test_user3`@`%` WITH GRANT OPTION
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 #...done.
 Test case 10 - Test --show=raw in objects with and without backticks with --show=raw
 # Source on localhost: ... connected.
-# WARNING: specified database does not exist on base server and will be skipped along any tables and routines belonging to it: db_does_not_exist.
-# WARNING: specified object is not supported (not a DATABASE, FUNCTION, PROCEDURE or TABLE), as such it will be skipped: `util_test`.`v1`.
-# WARNING: specified object does not exist. `util_test`.`does_not_exist` will be skipped.
 
 # DATABASE `db``:db`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `joe`@`user`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # DATABASE `util_test`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `db``:db`.```t``.``export_2`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `joe`@`user`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t1`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT INSERT, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE VIEW, SHOW VIEW, TRIGGER ON `util_test`.`t1` TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t2`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # TABLE `util_test`.`t3`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe`@`user`
 # - For 'joe_wildcard'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_wildcard'@'%'
+GRANT ALL PRIVILEGES ON `util_test`.* TO `joe_wildcard`@`%`
+# #if (server1 == 'MySQL') and (int(version1) >= 80000)
+# - For 'mysql.infoschema'@'localhost'
+GRANT SELECT ON *.* TO `mysql.infoschema`@`localhost`
+# #endif
 # - For 'priv_test_user'@'%'
-GRANT EXECUTE, TRIGGER ON `util_test`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE ON *.* TO 'priv_test_user'@'%'
+GRANT EXECUTE, TRIGGER ON `util_test`.* TO `priv_test_user`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE ON *.* TO `priv_test_user`@`%`
 # - For 'priv_test_user2'@'%'
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
-GRANT SELECT ON `util_test`.`t3` TO 'priv_test_user3'@'%'
-GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+GRANT SELECT ON `util_test`.`t3` TO `priv_test_user3`@`%`
+GRANT UPDATE, DELETE, ALTER ROUTINE ON `util_test`.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `db``:db`.`fu``nc`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `joe`@`user`
 # - For 'priv_test_user'@'%'
-GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
+GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO `priv_test_user`@`%` WITH GRANT OPTION
 # - For 'priv_test_user2'@'%'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 
 # ROUTINE `db``:db`.`pr````oc`:
 # - For 'joe'@'user'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'joe'@'user'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `joe`@`user`
 # - For 'priv_test_user'@'%'
-GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO 'priv_test_user'@'%' WITH GRANT OPTION
+GRANT INSERT, CREATE TEMPORARY TABLES ON `db``:db`.* TO `priv_test_user`@`%` WITH GRANT OPTION
 # - For 'priv_test_user2'@'%'
-GRANT ALL PRIVILEGES ON `db``:db`.* TO 'priv_test_user2'@'%' WITH GRANT OPTION
-GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO 'priv_test_user2'@'%'
+GRANT ALL PRIVILEGES ON `db``:db`.* TO `priv_test_user2`@`%` WITH GRANT OPTION
+GRANT SELECT, UPDATE, SHUTDOWN, EXECUTE ON *.* TO `priv_test_user2`@`%`
 # - For 'priv_test_user3'@'%'
-GRANT DROP, EXECUTE, TRIGGER ON *.* TO 'priv_test_user3'@'%'
+GRANT DROP, EXECUTE, TRIGGER ON *.* TO `priv_test_user3`@`%`
+# - For 'root'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
+GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`@`localhost` WITH GRANT OPTION
 #...done.
 Test case 11 - Test --show=raw in objects with and without backticks with --show=user_grants
 # Source on localhost: ... connected.
-# WARNING: specified database does not exist on base server and will be skipped along any tables and routines belonging to it: db_does_not_exist.
-# WARNING: specified object is not supported (not a DATABASE, FUNCTION, PROCEDURE or TABLE), as such it will be skipped: `util_test`.`v1`.
-# WARNING: specified object does not exist. `util_test`.`does_not_exist` will be skipped.
 
 # DATABASE `db``:db`:
 # - 'joe'@'user' : ALL PRIVILEGES
@@ -594,7 +698,6 @@ Test case 11 - Test --show=raw in objects with and without backticks with --show
 #...done.
 Test case 12 - show grantees, only databases with non existing database for warning
 # Source on localhost: ... connected.
-# WARNING: specified database does not exist on base server and will be skipped along any tables and routines belonging to it: non_existing_db.
 
 # DATABASE `db``:db`:
 # - 'joe'@'user' : ALL PRIVILEGES
@@ -611,8 +714,6 @@ Test case 12 - show grantees, only databases with non existing database for warn
 #...done.
 Test case 13 - show grantees, only tables with non existing table and an object that is not supported.
 # Source on localhost: ... connected.
-# WARNING: specified object is not supported (not a DATABASE, FUNCTION, PROCEDURE or TABLE), as such it will be skipped: `util_test`.`v1`.
-# WARNING: specified object does not exist. `util_test`.`does_not_exist` will be skipped.
 
 # TABLE `db``:db`.```t``.``export_2`:
 # - 'joe'@'user' : ALL PRIVILEGES

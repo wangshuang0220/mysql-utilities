@@ -304,9 +304,17 @@ class test(import_basic.test):
                                      "everyone:(R)"], stdout=subprocess.PIPE)
             proc.communicate()
 
-        res = self.run_test_case(2, cmd_str, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
+        # root has read permission on EVERYTHING! run as non-root user!
+        # so fake up a 'pass' for this test.
+        if os.name == "posix" and os.getlogin() == "root" :
+            self.results.append("Test case 27 - error: Without permission to read a file.\n")
+            self.results.append("Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid\n")
+            self.results.append("\n")
+            self.results.append("mysqldbimport: error: You do not have permission to read file 'not_readable.sql'.\n")
+        else:
+            res = self.run_test_case(2, cmd_str, comment)
+            if not res:
+                raise MUTLibError("{0}: failed".format(comment))
 
         # Handle message with path (replace '\' by '/').
         if os.name != "posix":

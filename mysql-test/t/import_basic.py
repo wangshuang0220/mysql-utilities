@@ -20,6 +20,7 @@ import_basic test.
 """
 
 import os
+import re
 
 import mutlib
 
@@ -41,7 +42,7 @@ class test(mutlib.System_test):
     s1_serverid = None
     s2_serverid = None
     databases_to_drop = None
-
+    
     def check_prerequisites(self):
         self.check_gtid_unsafe()
         # Need at least one server.
@@ -103,7 +104,7 @@ class test(mutlib.System_test):
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
-            self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.read_and_exec_ppSQL(self.server1, data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file "
                               "{0}: {1}".format(data_file, err.errmsg))
@@ -111,7 +112,8 @@ class test(mutlib.System_test):
         # Create backtick database (with weird names)
         data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
         try:
-            self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
+            self.read_and_exec_ppSQL(self.server1, data_file_backticks,
+                                     self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
                               "{1}".format(data_file_backticks, err.errmsg))
@@ -119,7 +121,8 @@ class test(mutlib.System_test):
         # Create database for import tests
         data_file_import = os.path.normpath("./std_data/import_data.sql")
         try:
-            self.server1.read_and_exec_SQL(data_file_import, self.debug)
+            self.read_and_exec_ppSQL(self.server1, data_file_import,
+                                     self.debug)
             self.server1.exec_query("COMMIT")  # Commit SQL
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file "
@@ -129,8 +132,8 @@ class test(mutlib.System_test):
         data_file_db_copy_views = os.path.normpath(
             "./std_data/db_copy_views.sql")
         try:
-            self.server1.read_and_exec_SQL(data_file_db_copy_views,
-                                           self.debug)
+            self.read_and_exec_ppSQL(self.server1, data_file_db_copy_views,
+                                     self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file "
                               "{0}: {1}".format(data_file_db_copy_views,
@@ -140,7 +143,7 @@ class test(mutlib.System_test):
 
     def run_import_test(self, expected_res, from_conn, to_conn, db_list, frmt,
                         imp_type, comment, export_options=None,
-                        import_options=None):
+                        import_options=None, test_num=0):
         """Runs import test.
 
         expected_res[in]     Expected result.
@@ -170,7 +173,7 @@ class test(mutlib.System_test):
                                              imp_type, frmt))
         if import_options is not None:
             import_cmd += import_options
-
+        
         self.results.append(comment + "\n")
 
         # Precheck: check db and save the results.
@@ -182,12 +185,13 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, export_cmd, "Running export...")
         if not res:
             raise MUTLibError("EXPORT: {0}: failed".format(comment))
-
+        
         # Second, run the import from a file.
         res = self.run_test_case(expected_res, import_cmd, "Running import...")
         if not res:
             raise MUTLibError("IMPORT: {0}: failed".format(comment))
-
+        self.server2.flush_logs()
+        
         # Now, check db and save the results.
         self.results.append("AFTER:\n")
         for db in db_list:
@@ -283,29 +287,49 @@ class test(mutlib.System_test):
                 # We test DEFINITIONS and DATA only in other tests
                 self.run_import_test(0, from_conn, to_conn, ['util_test'],
                                      frmt, "BOTH", comment,
-                                     " --display={0}".format(display))
+                                     " --display={0}".format(display),
+                                     test_num=test_num)
                 self.drop_db(self.server2, "util_test")
                 test_num += 1
 
-        # Test database with backticks
-        for display in _DISPLAYS:
-            for frmt in _FORMATS_BACKTICKS:
-                comment = ("Test Case {0} : Testing import with {1} format "
-                           "and {2} display (using backticks)".format(
-                               test_num, frmt, display))
-                self.run_import_test(0, from_conn, to_conn, ['`db``:db`'],
-                                     frmt, "BOTH", comment,
-                                     " --display={0}".format(display))
-                self.drop_db(self.server2, 'db`:db')
-                test_num += 1
-
+        version_str = self.server1.get_version()
+        if version_str is not None:
+            match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', version_str.strip())
+            if match:
+                version = [int(x) for x in match.group(1).split('.')]
+                version = (version + [0])[:3]  # Ensure a 3 elements list
+                version_str = "{0:02d}{1:02d}{2:02d}".format(version[0],version[1],version[2])
+            else:
+                version_str = "000000"
+        else:
+            version_str = "000000"
+                
+        if self.server1.get_server_type() != 'MySQL' or \
+           int(version_str) < int('080000') :
+        
+            # Test database with backticks
+            for display in _DISPLAYS:
+                for frmt in _FORMATS_BACKTICKS:
+                    comment = ("Test Case {0} : Testing import with {1} format "
+                               "and {2} display (using backticks)".format(
+                                   test_num, frmt, display))
+                    self.run_import_test(0, from_conn, to_conn, ['`db``:db`'],
+                                         frmt, "BOTH", comment,
+                                         " --display={0}".format(display),
+                                         test_num=test_num)
+                    self.drop_db(self.server2, 'db`:db')
+                    test_num += 1
+        else:
+            test_num += 6
+                    
         display = 'NAMES'
         frmt = 'SQL'
         comment = ("Test Case {0} : Testing import with {1} format and "
                    "{2} display (using backticks)".format(test_num, frmt,
                                                           display))
         self.run_import_test(0, from_conn, to_conn, ['`db``:db`'], frmt,
-                             "BOTH", comment, " --display={0}".format(display))
+                             "BOTH", comment, " --display={0}".format(display),
+                             test_num=test_num)
         self.drop_db(self.server2, 'db`:db')
         test_num += 1
 
@@ -358,13 +382,19 @@ class test(mutlib.System_test):
                 comment = ("Test Case {0} : Testing import with {1} format "
                            "and {2} display (using views with dependencies)"
                            "".format(test_num, frmt, display))
-                self.run_import_test(0, from_conn, to_conn,
-                                     ['views_test'],
-                                     frmt,
-                                     "BOTH", comment,
-                                     " --display={0}".format(display))
-                self.drop_db(self.server2, 'views_test')
+                # MySQL 8.0.? has a bug in information_schema.views.view_definition: affects views in anything by SQL format
+                if frmt == 'SQL' or \
+                   self.server1.get_server_type() != 'MySQL' or \
+                   int(version_str) < int('080000') :
 
+                    self.run_import_test(0, from_conn, to_conn,
+                                         ['views_test'],
+                                         frmt,
+                                         "BOTH", comment,
+                                         " --display={0}".format(display),
+                                         test_num=test_num)
+                    self.drop_db(self.server2, 'views_test')
+                            
         if os.name != "posix":
             self.replace_result(
                 "# Importing data from std_data\\rpl_data.csv.",
@@ -373,7 +403,8 @@ class test(mutlib.System_test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, self.server2)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

@@ -16,7 +16,7 @@ Test case 1 - diff a sample database
  CREATE TABLE "t1" (
 -  "a" char(30) DEFAULT NULL
 +  "a" char(30) DEFAULT NULL,
-+  "b" int(11) DEFAULT NULL
++  "b" int DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 # Compare failed. One or more differences found.
 Test case 2 - diff a single object - not same
@@ -74,7 +74,7 @@ Test case 5 - diff multiple objects + database - some same
  CREATE TABLE "t1" (
 -  "a" char(30) DEFAULT NULL
 +  "a" char(30) DEFAULT NULL,
-+  "b" int(11) DEFAULT NULL
++  "b" int DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 # Comparing "util_test"."t2" to "util_test"."t2"                   [FAIL]
 # Object definitions differ. (--changes-for=server1)
@@ -99,33 +99,33 @@ Test case 6 - diff two databases on same server w/server2
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server1.util_test1:
-#    PROCEDURE: p1
-#        TABLE: t4
-#      TRIGGER: trg
-#        TABLE: t1
-#        TABLE: t3
 #     FUNCTION: f1
-#         VIEW: v1
-#        TABLE: t5
-#         VIEW: v2
 #     FUNCTION: f2
+#    PROCEDURE: p1
+#        TABLE: t1
 #        TABLE: t2
+#        TABLE: t3
+#        TABLE: t4
+#        TABLE: t5
+#      TRIGGER: trg
+#         VIEW: v1
+#         VIEW: v2
 # Compare failed. One or more differences found.
 Test case 7 - diff two databases on same server
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server1.util_test1:
-#    PROCEDURE: p1
-#        TABLE: t4
-#      TRIGGER: trg
-#        TABLE: t1
-#        TABLE: t3
 #     FUNCTION: f1
-#         VIEW: v1
-#        TABLE: t5
-#         VIEW: v2
 #     FUNCTION: f2
+#    PROCEDURE: p1
+#        TABLE: t1
 #        TABLE: t2
+#        TABLE: t3
+#        TABLE: t4
+#        TABLE: t5
+#      TRIGGER: trg
+#         VIEW: v1
+#         VIEW: v2
 # Compare failed. One or more differences found.
 Test case 8 - diff a sample database with weird names (backticks)
 # WARNING: Using a password on the command line interface can be insecure.
@@ -155,7 +155,7 @@ Test case 10 - diff a sample database containing tables with weird names (no bac
 +++ "db_diff_test"."table-dash"
 @@ -1,4 +1,4 @@
  CREATE TABLE "table-dash" (
-   "id" bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+   "id" bigint unsigned NOT NULL AUTO_INCREMENT,
    PRIMARY KEY ("id")
 -) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
 +) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
@@ -206,7 +206,6 @@ Test case 14 - diff specific objects of different types with the same name (with
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
-# Comparing "db.`:db"."`t`export_1" to "db.`:db"."`t`export_1"     [PASS]
 # Comparing "db.`:db"."`t`export_1" to "db.`:db"."`t`export_1"     [FAIL]
 # Object definitions differ. (--changes-for=server1)
 #
@@ -217,4 +216,5 @@ Test case 14 - diff specific objects of different types with the same name (with
  CREATE DEFINER="root"@"localhost" PROCEDURE "`t`export_1"()
 -SELECT 1
 +SELECT 2
+# Comparing "db.`:db"."`t`export_1" to "db.`:db"."`t`export_1"     [PASS]
 # Compare failed. One or more differences found.

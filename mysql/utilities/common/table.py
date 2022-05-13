@@ -26,6 +26,7 @@ from past.utils import old_div
 from builtins import object
 import multiprocessing
 import sys
+from numbers import Number
 
 
 from mysql.utilities.exception import UtilError, UtilDBError
@@ -33,7 +34,7 @@ from mysql.connector.conversion import MySQLConverter
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.pattern_matching import parse_object_name
-from mysql.utilities.common.server import Server
+from mysql.utilities.common.server import (Server, tostr, tobytearray)
 from mysql.utilities.common.sql_transform import (convert_special_characters,
                                                   quote_with_backticks,
                                                   remove_backtick_quoting,
@@ -93,7 +94,7 @@ class Index(object):
         self.compared = False                    # mark as compared for speed
         self.duplicate_of = None                 # saves duplicate index
         # pylint: disable=R0102
-        if index_tuple[7] > 0:
+        if index_tuple[7] is not None and int(index_tuple[7]) > 0:
             self.column_subparts = True          # check subparts e.g. a(20)
         else:
             self.column_subparts = False
@@ -202,7 +203,7 @@ class Index(object):
         """
 
         col = (column, sub_part)
-        if sub_part > 0:
+        if sub_part is not None and int(sub_part) > 0:
             self.column_subparts = True
         if accept_null:
             self.accept_nulls = True
@@ -263,7 +264,7 @@ class Index(object):
             name, sub_part = (col[0], col[1])
             if backtick_quoting:
                 name = quote_with_backticks(name, self.sql_mode)
-            if sub_part > 0:
+            if sub_part is not None and int(sub_part) > 0:
                 col_str = "{0}({1})".format(name, sub_part)
             else:
                 col_str = name
@@ -278,7 +279,7 @@ class Index(object):
                   "".format(db=self.q_db, table=self.q_table,
                             cols=self.__get_column_list()))
         else:
-            create_str = ("CREATE {unique}{fulltext}INDEX {name} ON "
+            create_str = ("CREATE {unique} {fulltext} INDEX {name} ON "
                           "{db}.{table} ({cols}) {using}")
             unique_str = 'UNIQUE ' if self.unique else ''
             fulltext_str = 'FULLTEXT ' if self.type == 'FULLTEXT' else ''
@@ -367,7 +368,9 @@ class Table(object):
         self.text_columns = []
         self.blob_columns = []
         self.bit_columns = []
-        self.column_format = None
+        self.column_type = []
+        self.column_format = []
+        self.row_format = None
         self.column_names = []
         self.column_name_type = []
         self.q_column_names = []
@@ -434,6 +437,8 @@ class Table(object):
         stop = len(columns)
         self.column_names = []
         self.q_column_names = []
+        self.column_type = []
+        self.column_format = []
         col_format_values = [''] * stop
         if columns is not None:
             for col in range(0, stop):
@@ -447,22 +452,30 @@ class Table(object):
                     self.q_column_names.append(
                         quote_with_backticks(columns[col][0], self.sql_mode))
                 col_type = columns[col][1].lower()
-                if ('char' in col_type or 'enum' in col_type or
-                        'set' in col_type or 'binary' in col_type):
+                self.column_type.append(col_type)
+                
+                if 'char' in col_type or 'enum' in col_type or \
+                        'set' in col_type or 'text' in col_type:
                     self.text_columns.append(col)
-                    col_format_values[col] = "'%s'"
-                elif 'blob' in col_type or 'text'in col_type:
+                    col_format_values[col] = "'{:s}'"
+                elif 'blob' in col_type:
                     self.blob_columns.append(col)
-                    col_format_values[col] = "%s"
+                    col_format_values[col] = "{:s}"
                 elif "date" in col_type or "time" in col_type:
-                    col_format_values[col] = "'%s'"
-                elif "bit" in col_type:
+                    self.text_columns.append(col)
+                    col_format_values[col] = "'{:s}'"
+                elif  "int" in col_type:
                     self.bit_columns.append(col)
-                    col_format_values[col] = "%d"
+                    col_format_values[col] = "{:d}"
+                elif "bit" in col_type or 'binary' in col_type:
+                    self.bit_columns.append(col)
+                    col_format_values[col] = "{:#02x}"
                 else:
-                    col_format_values[col] = "%s"
-        self.column_format = "%s%s%s" % \
-                             (" (", ', '.join(col_format_values), ")")
+                    # decimal, numeric, fixed, float, real, double precision
+                    
+                    col_format_values[col] = "{:s}"
+            self.column_format = col_format_values
+            self.row_format = "({0})".format(', '.join(col_format_values))
 
     def get_col_names(self, quote_backticks=False):
         """Get column names for the export operation.
@@ -473,7 +486,7 @@ class Table(object):
         Return (list) column names
         """
 
-        if self.column_format is None:
+        if self.row_format is None:
             self.column_names = []
             self.q_column_names = []
             rows = self.server.exec_query("explain {0}".format(self.q_table))
@@ -559,6 +572,71 @@ class Table(object):
 
         return self.unique_not_null_indexes
 
+    def _entry_value(self, ncol, val, format='sql'):
+        """Build string for update/insert based on column type
+        ncol[in]   number of column (0..)
+        data[in]    entry (bytearray)
+
+        Returns str appropriately formatted
+        """
+        #print("_entry_value(ncol=",ncol,", val=",val,")")
+        if val is None:
+            return 'NULL'
+
+        if format is None:
+            format = 'sql'
+
+        doquotes = True
+        if format in ('csv', 'tab', 'grid','vertical'):
+            doquotes = False
+        
+        if self.row_format is None:
+            self.get_column_metadata()
+        ctype = self.column_type[ncol]
+        cfmt  = self.column_format[ncol]
+                    
+        if 'blob' in ctype:
+            needbinary = False
+            for j in range(0,len(val)):
+                if val[j] >= 0x08 and val[j] <= 0x0d:
+                    pass
+                elif val[j] == 0 or val[j] == 26:
+                    pass
+                elif val[j] < 0x20 or val[j] > 0x7e:
+                    needbinary = True
+                    break
+                    
+            if needbinary:
+                if len(val) == 1:
+                    val = "{0:d}".format(tostr(val))
+                else:
+                    newval = "0x"
+                    for j in range(0,len(val)):
+                        newval = newval + "{0:02x}".format(val[j])
+                    val = newval
+            else:
+                val = convert_special_characters(tostr(val))
+                if doquotes:
+                    val = tostr(MySQLConverter().quote(tobytearray(val)))
+                
+        elif 'char' in ctype or 'enum' in ctype or \
+             'set' in ctype or 'text' in ctype or \
+             'date' in ctype or 'time' in ctype:
+
+            val =  convert_special_characters(tostr(val))
+            if doquotes:
+                val = tostr(MySQLConverter().quote(tobytearray(val)))
+        elif 'bit' in ctype:
+            if isinstance(val,bytearray):
+                val = int.from_bytes(val,sys.byteorder)
+                val = "{:#02x}".format(val)
+    
+        if isinstance(val, bytearray):
+            val = tostr(val)
+
+        #print("_entry_value returns: ",val)
+        return val
+            
     def _build_update_blob(self, row, new_db, name):
         """Build an UPDATE statement to update blob fields.
 
@@ -568,7 +646,7 @@ class Table(object):
 
         Returns UPDATE string
         """
-        if self.column_format is None:
+        if self.row_format is None:
             self.get_column_metadata()
 
         blob_insert = "UPDATE %s.%s SET " % (new_db, name)
@@ -578,22 +656,18 @@ class Table(object):
         stop = len(row)
         for col in range(0, stop):
             col_name = self.q_column_names[col]
+            val = self._entry_value(col,row[col])
             if col in self.blob_columns:
-                if row[col] is not None and len(row[col]) > 0:
                     if do_commas:
                         blob_insert += ", "
-                    blob_insert += "%s = " % col_name + "%s" % \
-                                   MySQLConverter().quote(
-                                       convert_special_characters(row[col]))
+                    
+                    blob_insert += "{0} = {1}".format(col_name,val)
                     has_data = True
                     do_commas = True
             else:
-                # Convert None values to NULL (not '' to NULL)
-                if row[col] is None:
-                    value = 'NULL'
-                else:
-                    value = "'{0}'".format(row[col])
-                where_values.append("{0} = {1}".format(col_name, value))
+                where_values.append("{0} = {1}".format(col_name, val))
+
+
         if has_data:
             return "{0} WHERE {1};".format(blob_insert,
                                            " AND ".join(where_values))
@@ -608,41 +682,35 @@ class Table(object):
 
         Returns INSERT string.
         """
-        if self.column_format is None:
+        if self.row_format is None:
             self.get_column_metadata()
 
         converter = MySQLConverter()
         row_vals = []
-        # Deal with blob, special characters and NULL values.
-        for index, column in enumerate(row):
-            # pylint: disable=W0212
-            if index in self.blob_columns:
-                row_vals.append(converter.quote(
-                    convert_special_characters(column)))
-            elif index in self.text_columns:
-                if column is None:
-                    row_vals.append("NULL")
-                else:
-                    row_vals.append(convert_special_characters(column))
-            elif index in self.bit_columns:
-                if column is None:
-                    row_vals.append("NULL")
-                else:
-                    row_vals.append(converter._BIT_to_python(column))
-            else:
-                if column is None:
-                    row_vals.append("NULL")
-                else:
-                    row_vals.append(column)
+        stop = len(row)
+        do_commas = False
+        has_data = False
+        blob_insert = ''
+
+        for col in range(0, stop):
+            col_name = self.q_column_names[col]
+            val = self._entry_value(col,row[col])
+            if col in self.blob_columns:
+                    if do_commas:
+                        blob_insert += ", "
+                    
+                    blob_insert += "{0} = {1}".format(col_name,val)
+                    has_data = True
+                    do_commas = True
+            row_vals.append(val)
 
         # Create the insert statement.
-        insert_stm = ("INSERT INTO {0}.{1} VALUES {2};"
-                      "".format(new_db, tbl_name,
-                                self.column_format % tuple(row_vals)))
+        foo = "({0})".format(", ".join(row_vals))
+
+        insert_stm = "INSERT INTO {0}.{1} VALUES {2};".format(new_db, tbl_name,foo)
 
         # Replace 'NULL' occurrences with NULL values.
         insert_stm = insert_stm.replace("'NULL'", "NULL")
-
         return insert_stm
 
     def get_column_string(self, row, new_db, skip_blobs=False):
@@ -655,7 +723,7 @@ class Table(object):
         Returns (string) column list
         """
 
-        if self.column_format is None:
+        if self.row_format is None:
             self.get_column_metadata()
 
         blob_inserts = []
@@ -683,26 +751,12 @@ class Table(object):
                     values[col] = "NULL"
 
         if not is_blob_insert:
-            # Replace single quotes located in the value for a text field with
-            # the correct special character escape sequence. This fixes SQL
-            # errors related to using single quotes in a string value that is
-            # single quoted. For example, 'this' is it' is changed to
-            # 'this\' is it'.
-            for col in self.text_columns:
-                # Check if the value is not None before replacing quotes
-                if values[col]:
-                    # Apply escape sequences to special characters
-                    values[col] = convert_special_characters(values[col])
+            for col in range(0,len(row)):
+                if col not in self.blob_columns:
+                    values[col] = self._entry_value(col,row[col])
 
-            for col in self.bit_columns:
-                if values[col] is not None:
-                    # Convert BIT to INTEGER for dump.
-                    # pylint: disable=W0212
-                    values[col] = MySQLConverter()._BIT_to_python(values[col])
-
-            # Build string (add quotes to "string" like types)
-            val_str = self.column_format % tuple(values)
-
+            val_str = "({0})".format(", ".join(tostr(values)))
+            
             # Change 'None' occurrences with "NULL"
             val_str = val_str.replace(", None", ", NULL")
             val_str = val_str.replace("(None", "(NULL")
@@ -711,7 +765,7 @@ class Table(object):
 
         else:
             val_str = None
-
+        #print("get_column_string got val_str:",val_str," blob_inserts:",blob_inserts)
         return val_str, blob_inserts
 
     def make_bulk_insert(self, rows, new_db, columns_names=None,
@@ -730,7 +784,7 @@ class Table(object):
         Returns (tuple) - (bulk insert statements, blob data inserts)
         """
 
-        if self.column_format is None:
+        if self.row_format is None:
             self.get_column_metadata()
 
         data_inserts = []
@@ -743,7 +797,7 @@ class Table(object):
             if row_count == 0:
                 if columns_names:
                     insert_str = "INSERT INTO {0}.{1} ({2}) VALUES ".format(
-                        new_db, self.q_tbl_name, ", ".join(columns_names)
+                        new_db, self.q_tbl_name, ", ".join(tostr(columns_names))
                     )
                 else:
                     insert_str = self._insert % (new_db, self.q_tbl_name)
@@ -874,7 +928,7 @@ class Table(object):
         # First, turn off foreign keys if turned on
         dest.disable_foreign_key_checks(True)
 
-        if self.column_format is None:
+        if self.row_format is None:
             self.get_column_metadata()
         data_lists = self.make_bulk_insert(rows, new_db)
         insert_data = data_lists[0]
@@ -922,7 +976,7 @@ class Table(object):
                 If spawn == False, None
         """
 
-        if self.column_format is None:
+        if self.row_format is None:
             self.get_column_metadata()
 
         if self.dest_vals is None:
@@ -1082,7 +1136,6 @@ class Table(object):
             if rows is None:
                 raise StopIteration()
             yield rows
-
         cur.close()
 
     def get_dest_values(self, destination=None):

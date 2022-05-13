@@ -64,6 +64,7 @@ class test(diff.test):
 
         cmd_str = "mysqldiff.py {0} {1} ".format(s1_conn, s2_conn)
 
+        
         test_num += 1
         cmd_opts = " util_test1:util_test"
         comment = "Test case {0} - database doesn't exist".format(test_num)
@@ -168,7 +169,8 @@ class test(diff.test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, self.server2)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

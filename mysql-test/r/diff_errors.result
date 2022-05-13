@@ -13,8 +13,13 @@ Test case 1 - Use diff  --difftype=differ
 -   `a` char(30) DEFAULT NULL
 +   `a` char(30) DEFAULT NULL,
 ?                            +
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 +   `b` int(11) DEFAULT NULL
   ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+# #else
++   `b` int DEFAULT NULL
+  ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+# #endif
 # Compare failed. One or more differences found.
 Test case 2 - database doesn't exist
 # server1 on localhost: ... connected.
@@ -58,8 +63,13 @@ ERROR: The object util_test.t33 does not exist.
  CREATE TABLE `t1` (
 -  `a` char(30) DEFAULT NULL
 +  `a` char(30) DEFAULT NULL,
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+# #else
++  `b` int DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+# #endif
 # Compare failed. One or more differences found.
 Test case 9 - check all existing objects using --force
 # server1 on localhost: ... connected.
@@ -77,8 +87,13 @@ ERROR: The object util_test.t31 does not exist.
  CREATE TABLE `t1` (
 -  `a` char(30) DEFAULT NULL
 +  `a` char(30) DEFAULT NULL,
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
+# #else
++  `b` int DEFAULT NULL
+ ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+# #endif
 # Compare failed. One or more differences found.
 Test case 10 - malformed argument util_test.t3:util_test 
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4

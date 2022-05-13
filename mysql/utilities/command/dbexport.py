@@ -31,7 +31,8 @@ from mysql.utilities.common.format import (format_tabular_list,
                                            format_vertical_list)
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.replication import negotiate_rpl_connection
-from mysql.utilities.common.server import connect_servers, Server, has_mysqlproc
+from mysql.utilities.common.server import (connect_servers, Server,
+                                           tostr, tobytearray)
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.table import Table
 from mysql.utilities.exception import UtilError, UtilDBError
@@ -206,13 +207,13 @@ def _export_metadata(source, db_list, output_file, options):
                     if not quiet:
                         output_file.write("# Grant:\n")
                     if dbobj[1][3]:
-                        create_str = "GRANT {0} ON {1}.{2} TO {3};\n".format(
+                        create_str = "CREATE USER IF NOT EXISTS {3};\nGRANT {0} ON {1}.{2} TO {3};\n".format(
                             dbobj[1][1], db.q_db_name,
                             quote_with_backticks(dbobj[1][3], sql_mode),
                             dbobj[1][0]
                         )
                     else:
-                        create_str = "GRANT {0} ON {1}.* TO {2};\n".format(
+                        create_str = "CREATE USER IF NOT EXISTS {2};\nGRANT {0} ON {1}.* TO {2};\n".format(
                             dbobj[1][1], db.q_db_name, dbobj[1][0]
                         )
                     output_file.write(create_str)
@@ -275,15 +276,20 @@ def _export_metadata(source, db_list, output_file, options):
                     elif frmt == "tab":
                         list_options['print_header'] = not no_headers
                         list_options['separator'] = '\t'
+                        list_options['none_to_zls'] = True
                         format_tabular_list(output_file, rows[0], rows[1],
                                             list_options)
                     elif frmt == "csv":
                         list_options['print_header'] = not no_headers
                         list_options['separator'] = ','
+                        list_options['none_to_zls'] = True
                         format_tabular_list(output_file, rows[0], rows[1],
                                             list_options)
                     else:  # default to table format
-                        format_tabular_list(output_file, rows[0], rows[1])
+                        list_options['print_header'] = not no_headers
+                        list_options['none_to_zls'] = False
+                        format_tabular_list(output_file, rows[0], rows[1],
+                                            list_options)
 
     if not quiet:
         output_file.write("#...done.\n")
@@ -316,19 +322,16 @@ def _export_row(data_rows, cur_table, out_format, single, skip_blobs,
         outfile = sys.stdout  # default file handle
     if out_format == 'sql':
         if single:
-            if single:
-                data = data_rows
-            else:
-                data = data_rows[1]
             blob_rows = []
-            for row in data:
+            for row in data_rows:
+              
                 columns = cur_table.get_column_string(row, q_db_name,
                                                       skip_blobs)
                 if len(columns[1]) > 0:
                     blob_rows.extend(columns[1])
                 if columns[0]:
-                    row_str = "INSERT INTO {0} VALUES{1};\n".format(full_name,
-                                                                    columns[0])
+                    row_str = "INSERT INTO {0} VALUES {1};\n".format(full_name,
+                                                                    tostr(columns[0]))
                     outfile.write(row_str)
         else:
             # Generate bulk insert statements
@@ -354,26 +357,40 @@ def _export_row(data_rows, cur_table, out_format, single, skip_blobs,
                 for blob_row in blob_rows:
                     outfile.write("{0}\n".format(blob_row))
 
-    # Cannot use print_list here because we must manipulate
-    # the behavior of format_tabular_list
-    elif out_format == "vertical":
-        format_vertical_list(outfile, cur_table.get_col_names(),
-                             data_rows, list_options)
-    elif out_format == "tab":
-        list_options['print_header'] = first
-        list_options['separator'] = '\t'
-        list_options['quiet'] = not no_headers
-        format_tabular_list(outfile, cur_table.get_col_names(True),
-                            data_rows, list_options)
-    elif out_format == "csv":
-        list_options['print_header'] = first
-        list_options['separator'] = ','
-        list_options['quiet'] = not no_headers
-        format_tabular_list(outfile, cur_table.get_col_names(True),
-                            data_rows, list_options)
-    else:  # default to table format - header is always printed
-        format_tabular_list(outfile, cur_table.get_col_names(),
-                            data_rows, list_options)
+    else:
+        tabdata = []
+        #print("data_rows: ",data_rows)
+        for row in data_rows:
+            columns = []
+            for j in range(0,len(row)):
+                val = row[j]
+                val = cur_table._entry_value(j,val,format=out_format)
+                if isinstance(val, bytearray):
+                    val = tostr(val)
+                columns.append(val)
+            tabdata.append(columns)
+            
+        # Cannot use print_list here because we must manipulate
+        # the behavior of format_tabular_list
+        
+        if out_format == "vertical":
+            format_vertical_list(outfile, cur_table.get_col_names(),
+                                 tabdata, list_options)
+        elif out_format == "tab":
+            list_options['print_header'] = first
+            list_options['separator'] = '\t'
+            list_options['quiet'] = not no_headers
+            format_tabular_list(outfile, cur_table.get_col_names(True),
+                                tabdata, list_options)
+        elif out_format == "csv":
+            list_options['print_header'] = first
+            list_options['separator'] = ','
+            list_options['quiet'] = not no_headers
+            format_tabular_list(outfile, cur_table.get_col_names(True),
+                                tabdata, list_options)
+        else:  # default to table format - header is always printed
+            format_tabular_list(outfile, cur_table.get_col_names(),
+                                tabdata, list_options)
 
 
 def export_data(server_values, db_list, options):
@@ -443,6 +460,8 @@ def _export_data(source, server_values, db_list, output_file, options):
         tables = source_db.get_db_objects("TABLE")
         for table in tables:
             table_list.append((db_name, table[0]))
+
+    table_list.sort()
 
     previous_db = ""
     export_tbl_tasks = []
@@ -583,7 +602,7 @@ def _export_table_data(source_srv, table, output_file, options):
             # Store result in a temporary file (merged later).
             # Used by multiprocess export.
             tempfile_used = True
-            outfile = tempfile.NamedTemporaryFile(delete=False)
+            outfile = tempfile.NamedTemporaryFile(mode="w+", delete=False)
 
     message = "# Data for table {0}:".format(q_tbl_name)
     outfile.write("{0}\n".format(message))
@@ -608,8 +627,8 @@ def _export_table_data(source_srv, table, output_file, options):
     # then rows won't be correctly copied using the update statement,
     # so we must warn the user.
     if (not skip_blobs and frmt == "sql" and
-            (cur_table.blob_columns == len(cur_table.column_names) or
-             (not unique_indexes and cur_table.blob_columns))):
+            (len(cur_table.blob_columns) == len(cur_table.column_names) or
+             (not unique_indexes and len(cur_table.blob_columns)>0))):
         print("# WARNING: Table {0}.{1} contains only BLOB and TEXT "
               "fields. Rows will be generated with separate INSERT "
               "statements.".format(cur_table.q_db_name, cur_table.q_tbl_name))

@@ -83,7 +83,7 @@ def object_diff(server1_val, server2_val, object1, object2, options,
             return []
 
         # Merge types found for both objects
-        obj_types = set(obj1_types + obj2_types)
+        obj_types = sorted(list(set(obj1_types + obj2_types)))
 
         # Diff objects considering all types found
         result = []

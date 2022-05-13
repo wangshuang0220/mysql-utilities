@@ -183,6 +183,7 @@ class test(mutlib.System_test):
         """
         self.replace_substring(str(self.server1.port), "PORT1")
         self.remove_result("# - 'root'@'")
+        self.remove_result("# - 'mysql.")
 
     def get_result(self):
         return self.compare(__name__, self.results)

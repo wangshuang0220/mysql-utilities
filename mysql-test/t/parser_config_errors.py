@@ -77,7 +77,7 @@ class test(mutlib.System_test):
             config_p.set('simple_login', 'user', self.server1.user)
             config_p.set('simple_login', 'password', self.server1.passwd)
             config_p.set('simple_login', 'host', self.server1.host)
-            config_p.set('simple_login', 'port', self.server1.port)
+            config_p.set('simple_login', 'port', "{0}".format(self.server1.port))
 
             config_p.write(config_f)
 

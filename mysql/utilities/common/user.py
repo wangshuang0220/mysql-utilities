@@ -60,13 +60,15 @@ def change_user_privileges(server, user_name, user_passwd, host,
     if disable_binlog:
         server.exec_query("SET SQL_LOG_BIN=0")
     if create_user:
-        server.exec_query("CREATE USER '{0}'@'{1}' IDENTIFIED BY "
+        server.exec_query("CREATE USER IF NOT EXISTS '{0}'@'{1}' IDENTIFIED BY "
                           "'{2}'".format(user_name, host, user_passwd))
     if grant_list:
         grants_str = ", ".join(grant_list)
-        server.exec_query("GRANT {0} ON *.* TO '{1}'@'{2}' IDENTIFIED BY "
-                          "'{3}'".format(grants_str, user_name, host,
-                                         user_passwd))
+        cline = "GRANT {0} ON *.* TO '{1}'@'{2}' ".format(grants_str, user_name, host)
+        if server.get_server_type() != "MySQL" or not server.check_version_compat(8,0,0):
+            cline = cline + " IDENTIFIED BY '{1}'".format(user_password)
+
+        server.exec_query(cline)
     if revoke_list:
         revoke_str = ", ".join(revoke_list)
         server.exec_query("REVOKE {0} ON *.* FROM '{1}'@'{2}'"
@@ -83,9 +85,9 @@ def parse_user_host(user_name):
     returns - tuple - user, passwd, host
     """
     # Check for anonymous user. If not, continue.
-    if user_name == "''@'%'":
+    if user_name == "``@`%`":
         return ('', None, '%')
-    no_ticks = user_name.replace("'", "")
+    no_ticks = user_name.replace("`", "")
     try:
         conn_values = parse_connection(no_ticks)
     except FormatError:
@@ -115,19 +117,31 @@ def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
     Note: Raises UtilError on any Error.
     """
 
+    create_parts = [
+        "CREATE USER IF NOT EXISTS",
+        "'{0}'@'{1}'".format(user, at),
+        "IDENTIFIED BY '{0}'".format(passw),
+        "REQUIRE SSL" if ssl else ""
+    ]
+    
+    try:
+        server.exec_query(" ".join(create_parts))
+    except UtilDBError as err:
+        raise UtilError("Cannot create new user {0} at {1}:{2} reason:"
+                        "{3}".format(user, server.host, server.port,
+                                     err.errmsg))
+
     grant_parts = [
         "GRANT", privs,
         "ON *.*",
         "TO '{0}'@'{1}'".format(user, at),
-        "IDENTIFIED BY '{0}'".format(passw) if passw else "",
-        "REQUIRE SSL" if ssl else "",
         "WITH GRANT OPTION" if grant_opt else ""
     ]
 
     try:
         server.exec_query(" ".join(grant_parts))
     except UtilDBError as err:
-        raise UtilError("Cannot create new user {0} at {1}:{2} reason:"
+        raise UtilError("Cannot grant privs to {0} at {1}:{2} reason:"
                         "{3}".format(user, server.host, server.port,
                                      err.errmsg))
 
@@ -216,17 +230,20 @@ class User(object):
         else:
             self.sql_mode = ""
         self.user, self.passwd, self.host = parse_user_host(user)
-        self.verbosity = verbosity
+        if verbosity is None:
+            verbosity = 0
+        self.verbosity = int(verbosity)
         self.current_user = None
         self.grant_dict = None
         self.global_grant_dict = None
         self.grant_list = None
         self.global_grant_list = None
+        self.require = None
         self.query_options = {
             'fetch': False
         }
 
-    def create(self, new_user=None, authentication=None):
+    def create(self, new_user=None, authentication=None, require=None):
         """Create the user
 
         Attempts to create the user. If the operation fails, an error is
@@ -237,6 +254,7 @@ class User(object):
                            on the class instance user name.
         authentication[in] Special authentication clause for non-native
                            authentication plugins
+        require[in]        REQUIRE SSL, TLS, etc. 
         """
         auth_str = "SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE " \
                    "PLUGIN_NAME = '{0}' AND PLUGIN_STATUS = 'ACTIVE';"
@@ -244,9 +262,9 @@ class User(object):
         user, passwd, host = None, None, None
         if new_user:
             user, passwd, host = parse_user_host(new_user)
-            user_host_str = "'{0}'@'{1}' ".format(user, host)
+            user_host_str = "`{0}`@`{1}` ".format(user, host)
         else:
-            user_host_str = "'{0}'@'{1}' ".format(self.user, self.host)
+            user_host_str = "`{0}`@`{1}` ".format(self.user, self.host)
             passwd = self.passwd
         query_str += user_host_str
 
@@ -255,17 +273,20 @@ class User(object):
                   "not permited. The password will be used instead of the "
                   "authentication plugin.")
         if passwd:
-            query_str += "IDENTIFIED BY '{0}'".format(passwd)
+            query_str += "IDENTIFIED BY '{0}' ".format(passwd)
         elif authentication:
             # need to validate authentication plugin
             res = self.server1.exec_query(auth_str.format(authentication))
             if (res is None) or (res == []):
                 raise UtilDBError("Plugin {0} not loaded or not active. "
                                   "Cannot create user.".format(authentication))
-            query_str += "IDENTIFIED WITH '{0}'".format(authentication)
+            query_str += "IDENTIFIED WITH '{0}' ".format(authentication)
         if self.verbosity > 0:
             print(query_str)
 
+        if self.require:
+            query_str += "REQUIRE {0} ".format(require)
+            
         self.server1.exec_query(query_str, self.query_options)
 
     def drop(self, new_user=None):
@@ -281,9 +302,9 @@ class User(object):
         query_str = "DROP USER "
         if new_user:
             user, _, host = parse_user_host(new_user)
-            query_str += "'%s'@'%s' " % (user, host)
+            query_str += "`%s`@`%s` " % (user, host)
         else:
-            query_str += "'%s'@'%s' " % (self.user, self.host)
+            query_str += "`%s`@`%s` " % (self.user, self.host)
 
         if self.verbosity > 0:
             print(query_str)
@@ -645,6 +666,7 @@ class User(object):
             return None
         return res[0][0]
 
+
     def clone(self, new_user, destination=None, globals_privs=False):
         """Clone the current user to the new user
 
@@ -673,12 +695,13 @@ class User(object):
                 # Add authentication if available
                 user.create(authentication=auth)
 
+                # backticks for user/host post v4.0.13
             if globals_privs and '%' in row[0]:
-                base_user_ticks = "'" + self.user + "'@'" + '%' + "'"
+                base_user_ticks = "`" + self.user + "`@`" + '%' + "`"
             else:
-                base_user_ticks = "'" + self.user + "'@'" + self.host + "'"
+                base_user_ticks = "`" + self.user + "`@`" + self.host + "`"
             user, _, host = parse_user_host(new_user)
-            new_user_ticks = "'" + user + "'@'" + host + "'"
+            new_user_ticks = "`" + user + "`@`" + host + "`"
             grant = row[0].replace(base_user_ticks, new_user_ticks, 1)
 
             # Need to remove the IDENTIFIED BY clause for the base user.
@@ -710,6 +733,7 @@ class User(object):
             GRANT\s(.+)?\sON\s # grant or list of grants
             (?:(?:PROCEDURE\s)|(?:FUNCTION\s))? # optional for routines only
             (?:(?:(\*|`?[^']+`?)\.(\*|`?[^']+`?)) # object where grant applies
+            | ("[^"]*"@"[^"]*") # For proxy grants user/host ansi 
             | (`[^`]*`@`[^`]*`)) # For proxy grants user/host
             \sTO\s([^@]+@[\S]+) # grantee
             (?:\sIDENTIFIED\sBY\sPASSWORD

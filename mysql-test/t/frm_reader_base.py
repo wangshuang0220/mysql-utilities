@@ -41,6 +41,9 @@ class test(mutlib.System_test):
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 11):
             raise MUTLibError("Test requires server version 5.6.11 and later.")
+        if self.servers.get_server(0).check_version_compat(8,0,0):
+            raise MUTLibError("FRM files removed in version 8.0.0")
+
         self.server0 = None
         self.server1 = None
         return self.check_num_servers(1)

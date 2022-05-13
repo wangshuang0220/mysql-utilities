@@ -275,6 +275,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
 
       - user[:password]@host[:port][:socket]
       - login-path[:port][:socket]
+      - dictionary of connection information
 
     A dictionary is returned containing the connection parameters. The
     function is designed so that it shall be possible to use it with a
@@ -318,11 +319,70 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
             raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
         return grp.groups()
 
+
     # SSL options, must not be overwritten with those from options.
     ssl_ca = None
     ssl_cert = None
     ssl_key = None
     ssl = None
+
+    if isinstance(connection_values,dict):
+        ssl_cert = connection_values.get("ssl_cert",None)
+        ssl_ca = connection_values.get("ssl_ca",None)
+        ssl_key = connection_values.get("ssl_key",None)
+        ssl = connection_values.get("ssl",None)
+        charset = connection_values.get("charset",None)
+        
+        connection = connection_values
+        
+        if isinstance(options, dict):
+            charset = options.get("charset", None)
+            # If one SSL option was found before, not mix with those in options.
+            if not ssl_cert and not ssl_ca and not ssl_key and not ssl:
+                ssl_cert = options.get("ssl_cert", None)
+                ssl_ca = options.get("ssl_ca", None)
+                ssl_key = options.get("ssl_key", None)
+                ssl = options.get("ssl", None)
+
+        else:
+            # options is an instance of optparse.Values
+            try:
+                charset = options.charset  # pylint: disable=E1103
+            except AttributeError:
+                charset = None
+            # If one SSL option was found before, not mix with those in options.
+            if not ssl_cert and not ssl_ca and not ssl_key and not ssl:
+                try:
+                    ssl_cert = options.ssl_cert  # pylint: disable=E1103
+                except AttributeError:
+                    ssl_cert = None
+                try:
+                    ssl_ca = options.ssl_ca  # pylint: disable=E1103
+                except AttributeError:
+                    ssl_ca = None
+                try:
+                    ssl_key = options.ssl_key  # pylint: disable=E1103
+                except AttributeError:
+                    ssl_key = None
+                try:
+                    ssl = options.ssl  # pylint: disable=E1103
+                except AttributeError:
+                    ssl = None
+
+        if charset:
+            connection["charset"] = charset
+        if ssl_cert:
+            connection["ssl_cert"] = ssl_cert
+        if ssl_ca:
+            connection["ssl_ca"] = ssl_ca
+        if ssl_key:
+            connection["ssl_key"] = ssl_key
+        if ssl:
+            connection["ssl"] = ssl
+
+        return connection
+
+
 
     # Split on the '@' to determine the connection string format.
     # The user/password may have the '@' character, split by last occurrence.

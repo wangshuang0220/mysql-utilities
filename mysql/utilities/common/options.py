@@ -868,7 +868,10 @@ def obj2sql(obj):
 
     This function convert Python objects to SQL values using the
     conversion functions in the database connector package."""
-    return MySQLConverter().quote(obj)
+    if isinstance(obj,str):
+        obj = bytes(obj,'utf-8')
+    got = MySQLConverter().quote(obj)
+    return str(got,'utf-8')
 
 
 def parse_user_password(userpass_values, my_defaults_reader=None,

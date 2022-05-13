@@ -68,6 +68,10 @@ class test(copy_db_parameters.test):
 
         self.replace_result("Time:", "Time:       XXXXXX\n")
 
+        # Mask root account creation
+        self.remove_result_and_lines_around("CREATE USER IF NOT EXISTS 'root'@",
+                                            1,1)
+
         _REPLACEMENTS = ("PROCEDURE", "FUNCTION", "TRIGGER", "SQL")
 
         for replace in _REPLACEMENTS:
@@ -81,7 +85,8 @@ class test(copy_db_parameters.test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, None)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

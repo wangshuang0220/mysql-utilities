@@ -26,7 +26,6 @@ import mutlib
 from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.tools import get_tool_path
 
-
 class test(mutlib.System_test):
     """Export Data
     This test executes the export utility on a single server and demonstrates
@@ -112,7 +111,7 @@ class test(mutlib.System_test):
         self.server2_conn = "-u{0} -p{1} --host=localhost ".format(conn_val[0],
                                                                    conn_val[1])
         if conn_val[3] is not None:
-            self.server2_conn = "{0}--port={1} ".format(self.server2_conn,
+            self.server2_conn = "{0} --port={1} ".format(self.server2_conn,
                                                         conn_val[3])
 
         cmd = "mysqldbexport.py {0} util_test --skip-gtid ".format(from_conn)
@@ -127,7 +126,7 @@ class test(mutlib.System_test):
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-
+        
         self.results.append("{0}\n".format(
             self.check_objects(self.server2, "util_test", False)))
 
@@ -152,6 +151,7 @@ class test(mutlib.System_test):
         except UtilError:
             raise MUTLibError("Cannot drop database before import.")
 
+        self.server2.flush_logs()
         self.results.append("{0}\n".format(
             self.check_objects(self.server2, "util_test", False)))
 
@@ -166,6 +166,12 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        #test = "mysql {0} --protocol=tcp -e 'show tables;' util_test".format(self.server2_conn)
+        #print(test)
+        #os.system(test)
+        #print(self.server2.host,self.server2.port,self.server2.socket)
+
+        self.server2.flush_logs()
         self.results.append("{0}\n".format(
             self.check_objects(self.server2, "util_test", False)))
 
@@ -173,7 +179,7 @@ class test(mutlib.System_test):
         self.show_data("t2")
         self.show_data("t3")
         self.show_data("t4")
-
+        
         self.remove_result("Warning: Using a password on the")
         # mysql client might also issue a warning if a password is used on the
         # command line.

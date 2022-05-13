@@ -36,7 +36,7 @@ def _show_user_grants(source, user_source, base_user, verbosity):
     try:
         if not user_source:
             user_source = User(source, base_user, verbosity)
-        print("# Dumping grants for user " + base_user)
+        print("# Dumping grants for user " + base_user.replace("'","`"))
         user_source.print_grants()
     except UtilError:
         print("# Cannot show grants for user %s." % base_user + \
@@ -79,7 +79,7 @@ def show_users(src_val, verbosity, fmt, dump=False):
     print_list(sys.stdout, fmt, cols, users)
     if dump:
         for user in users:
-            _show_user_grants(source, None, "'%s'@'%s'" % user[0:2], verbosity)
+            _show_user_grants(source, None, "`%s`@`%s`" % user[0:2], verbosity)
 
 
 def clone_user(src_val, dest_val, base_user, new_user_list, options):
@@ -218,10 +218,13 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
             else:
                 # Our user lacks some privileges, lets create an informative
                 # error message
+
+                    
                 pluralize = '' if len(missing_privs) == 1 else 's'
                 missing_privs_str = ', '.join(
                     ["{0} on {1}.{2}".format(priv, db, table) for
                      priv, db, table in missing_privs])
+
                 raise UtilError("User {0} cannot be cloned because destination"
                                 " user {1}@{2} is missing the following "
                                 "privilege{3}: {4}."

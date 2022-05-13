@@ -18,13 +18,17 @@ NAME
 `p1`
 # VIEWS in `util_test`:
 TABLE_NAME
-`v2`
 `v1`
+`v2`
 # TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
 # EVENTS in `util_test`:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 NAME
+# #else
+EVENT_NAME
+# #endif
 `e1`
 # GRANTS in `util_test`:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
@@ -86,13 +90,17 @@ NAME
 `p1`
 # VIEWS in `util_test`:
 TABLE_NAME
-`v2`
 `v1`
+`v2`
 # TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
 # EVENTS in `util_test`:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 NAME
+# #else
+EVENT_NAME
+# #endif
 `e1`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
@@ -116,8 +124,8 @@ NAME
 `p1`
 # VIEWS in `util_test`:
 TABLE_NAME
-`v2`
 `v1`
+`v2`
 # TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
@@ -139,8 +147,8 @@ NAME
 `p1`
 # VIEWS in `util_test`:
 TABLE_NAME
-`v2`
 `v1`
+`v2`
 # TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
@@ -159,8 +167,8 @@ TABLE_NAME
 `t5`
 # VIEWS in `util_test`:
 TABLE_NAME
-`v2`
 `v1`
+`v2`
 # TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
@@ -179,8 +187,8 @@ TABLE_NAME
 `t5`
 # VIEWS in `util_test`:
 TABLE_NAME
-`v2`
 `v1`
+`v2`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - no data,,grants,events,functions,procedures,triggers,views

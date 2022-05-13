@@ -1,6 +1,10 @@
 #
 # DROP DATABASE IF EXISTS util_test;
 #
+# #if (server == "MySQL") and (int(version) >= 80000)
+GRANT ALL ON *.* TO root@localhost WITH GRANT OPTION;
+-- above is a misfeature of mysql 8.0 grant definition
+# #endif
 CREATE DATABASE util_test;
 CREATE TABLE util_test.t1 (a char(30)) ENGINE=MEMORY;
 INSERT INTO util_test.t1 VALUES ("01 Test Basic database example"); 
@@ -46,10 +50,10 @@ CREATE VIEW util_test.v1 as SELECT * FROM util_test.t1;
 
 CREATE EVENT util_test.e1 ON SCHEDULE EVERY 1 YEAR DISABLE DO DELETE FROM util_test.t1 WHERE a = "not there";
 
-CREATE USER 'joe_wildcard'@'%';
+CREATE USER `joe_wildcard`@`%`;
 
-CREATE USER 'joe'@'user';
+CREATE USER `joe`@`user`;
 
-GRANT ALL ON util_test.* TO 'joe'@'user';
+GRANT ALL ON util_test.* TO `joe`@`user`;
 
-GRANT ALL ON util_test.* TO 'joe_wildcard'@'%';
+GRANT ALL ON util_test.* TO `joe_wildcard`@`%`;

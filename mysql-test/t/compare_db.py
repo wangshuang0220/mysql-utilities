@@ -34,7 +34,7 @@ class test(mutlib.System_test):
     This test executes a consistency check of two databases on
     separate servers.
     """
-
+    
     server1 = None
     server2 = None
     need_server = False
@@ -45,23 +45,21 @@ class test(mutlib.System_test):
         # Need at least one server.
         self.server1 = None
         self.server2 = None
-        self.need_server = False
-        if not self.check_num_servers(2):
-            self.need_server = True
-        return self.check_num_servers(1)
+        self.need_server = True
+        #if not self.check_num_servers(1):
+        #    self.need_server = True
+        return self.check_num_servers(0)
 
     # pylint: disable=W0221
     def setup(self, spawn_servers=True):
-        if spawn_servers:
-            self.server1 = self.servers.get_server(0)
-            if self.need_server:
-                try:
-                    self.servers.spawn_new_servers(2)
-                except MUTLibError as err:
-                    raise MUTLibError("Cannot spawn needed servers: "
-                                      "{0}".format(err.errmsg))
-        if self.server2 is None:
-            self.server2 = self.servers.get_server(1)
+        if self.need_server:
+            try:
+                self.servers.spawn_new_servers(3)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: "
+                                  "{0}".format(err.errmsg))
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
         self.drop_all()
 
         # load SQL source files
@@ -394,7 +392,7 @@ class test(mutlib.System_test):
         cmd_arg = ('--all --exclude=inventory --exclude=db% '
                    '--exclude=%quotes% --exclude=___________keys')
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
-        res = self.run_test_case(0, cmd, comment)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -409,7 +407,7 @@ class test(mutlib.System_test):
                            '--exclude="k.ys$"')
         cmd_arg = '--all --exclude=inventory {0} --regexp'.format(exclude_arg)
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
-        res = self.run_test_case(0, cmd, comment)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

@@ -128,6 +128,7 @@ CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 Test Case 11 : Testing import with SQL format and BRIEF display (using backticks)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -206,6 +207,7 @@ CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 2, views = 1, triggers = 0, procedures = 1, functions = 1, events = 1 
+# #endif
 Test Case 17 : Testing import with SQL format and NAMES display (using backticks)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -236,7 +238,7 @@ Comparing tables...
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     customers                               pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Databases are consistent.
 #
@@ -258,7 +260,7 @@ Comparing tables...
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     customers                               pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Databases are consistent.
 #
@@ -295,6 +297,7 @@ CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 Test Case 23 : Testing import with CSV format and BRIEF display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -347,6 +350,7 @@ CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
+# #endif
 Test Case 27 : Testing import with SQL format and FULL display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -360,6 +364,7 @@ CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 Test Case 28 : Testing import with CSV format and FULL display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -412,3 +417,4 @@ CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
+# #endif

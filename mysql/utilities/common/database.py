@@ -81,7 +81,7 @@ _OBJTYPE_QUERY3 = """
         WHERE EVENT_SCHEMA = '%(db_name)s' AND EVENT_NAME = '%(obj_name)s'
     )
     UNION
-    {
+    (
         SELECT ROUTINE_TYPE as object_type
         from information_schema.routines
         WHERE ROUTINE_SCHEMA = '%(db_name)s' AND ROUTINE_NAME = '%(obj_name)s'
@@ -103,7 +103,7 @@ _PARTITION_QUERY = """
 
 _COLUMN_QUERY = """
   SELECT ORDINAL_POSITION, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE,
-         COLUMN_DEFAULT, EXTRA, COLUMN_COMMENT, COLUMN_KEY
+         COLUMN_DEFAULT, REPLACE(EXTRA,'DEFAULT_GENERATED',''), COLUMN_COMMENT, COLUMN_KEY
   FROM INFORMATION_SCHEMA.COLUMNS
   WHERE TABLE_SCHEMA = '%(db)s' AND TABLE_NAME = '%(name)s'
 """
@@ -1143,6 +1143,8 @@ class Database(object):
         or without the table options, according to the Database object
         property 'skip_table_opts'.
 
+        ...and maybe without DEFAULT_GENERATED option, even with table opts
+
         db[in]             Database name.
         table[in]          Table name.
 
@@ -1183,7 +1185,16 @@ class Database(object):
             create_tbl, sep, tbl_opts = create_tbl.rpartition(') ')
             # Reconstruct CREATE TABLE without table options.
             create_tbl = "{0}{1}{2}".format(create_tbl, sep, part_opts)
-
+        else:
+            create_tbl,sep,tbl_opts = create_tbl.rpartition(') ')
+            if not create_tbl:
+                create_tbl = tbl_opts
+                tbl_opts = None
+            else:
+                optlist = tbl_opts.split(' ')
+                if 'DEFAULT_GENERATED' in optlist:
+                    optlist.remove('DEFAULT_GENERATED')
+                tbl_opts = ' '.join(optlist)
         return create_tbl, tbl_opts
 
     def get_table_options(self, db, table):
@@ -1191,6 +1202,9 @@ class Database(object):
 
         This method returns the list of used table options (from the CREATE
         TABLE statement).
+        
+        remove the 'DEFAULT_GENERATED' option (if present) unless
+        the keep_table_default_generated option is true.
 
         db[in]             Database name.
         table[in]          Table name.
@@ -1221,7 +1235,10 @@ class Database(object):
         # Then, separate table options from table definition.
         create_tbl, _, tbl_opts = create_tbl.rpartition(') ')
         table_options = tbl_opts.split()
+        if 'DEFAULT_GENERATED' in table_options:
+            table_options.remove('DEFAULT_GENERATED')
 
+        
         return table_options
 
     def get_object_definition(self, db, name, obj_type):
@@ -1317,6 +1334,24 @@ class Database(object):
                 col_def = self.source.exec_query(_COLUMN_QUERY % values)
                 part_def = self.source.exec_query(_PARTITION_QUERY % values)
                 definition.append((basic_def, col_def, part_def))
+           # elif obj_type == _VIEW:
+           #     cstmt = self.get_create_statement(db, name, _VIEW)
+           #     #CREATE ... VIEW `name` (`col1`,...)
+           #     #   AS select [(coldef) AS `name`,...
+           #    # dummy, goodstuff = cstmt.split(' VIEW ',1)
+           #     re.sub(r'^CREATE\s','',cstmt,1)
+           #     re.sub(r'^ALGORITHM=[\w\-]+\s','',cstmt,1)
+           #     re.sub(r'^DEFINER=`\w+`@`\w+`\s','',cstmt,1)
+           #     re.sub(r'^SQL\s','',cstmt,1)
+           #     re.sub(r'^SECURITY\s','',cstmt,1)
+           #     re.sub(r'^DEFINER\s','',cstmt,1)
+           #     re.sub(r'^VIEW\s','',cstmt,1)
+           #     if cstmt[0] == "`":
+           #         re.sub(r'^`.*[^`](``)*`\s','',cstmt,1)
+           #     else:
+           #         re.sub(r'^[^\s]+\s','',cstmt,1)
+           #     #if cstmt[0] == "(":
+           #     print(cstmt)    
             else:
                 definition.append(rows[0])
 
@@ -1623,13 +1658,12 @@ class Database(object):
                   FROM information_schema.parameters p
                   WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
                   AND ordinal_position > 0) AS PARAM_LIST,
-                CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
-                    AS RETURNS, ROUTINE_DEFINITION AS BODY, 
+                DTD_IDENTIFIER AS RETURNS, ROUTINE_DEFINITION AS BODY, 
                 DEFINER, CREATED, LAST_ALTERED AS MODIFIED, 
                 SQL_MODE, ROUTINE_COMMENT AS COMMENT,                 
                 CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
                 DATABASE_COLLATION AS DB_COLLATION, 
-                ROUTINE_DEFINITION AS BODY_UTF8
+                convert(ROUTINE_DEFINITION USING utf8mb4) AS BODY_UTF8
                 """
 
                 full_pos_to_quote = (0, 1, 3)
@@ -1645,7 +1679,7 @@ class Database(object):
                   AND ordinal_position > 0) AS PARAM_LIST,
                 CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
                     AS RETURNS, 
-                ROUTINE_DEFINITION AS BODY, SQL_MODE
+                ROUTINE_DEFINITION AS BODY, SQL_MODE,
                 CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
                 DATABASE_COLLATION AS DB_COLLATION
                 """
@@ -1704,13 +1738,12 @@ class Database(object):
                   FROM information_schema.parameters p
                   WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
                   AND ordinal_position > 0) AS PARAM_LIST,
-                CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
-                    AS RETURNS, ROUTINE_DEFINITION AS BODY, 
+                DTD_IDENTIFIER  AS RETURNS, ROUTINE_DEFINITION AS BODY, 
                 DEFINER, CREATED, LAST_ALTERED AS MODIFIED, 
                 SQL_MODE, ROUTINE_COMMENT AS COMMENT,                 
                 CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
                 DATABASE_COLLATION AS DB_COLLATION, 
-                ROUTINE_DEFINITION AS BODY_UTF8
+                convert(ROUTINE_DEFINITION USING utf8mb4) AS BODY_UTF8
                 """
                 full_pos_to_quote = (0, 1, 3)
                 full_pos_split_quote = ()
@@ -1723,9 +1756,8 @@ class Database(object):
                   FROM information_schema.parameters p
                   WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
                   AND ordinal_position > 0) AS PARAM_LIST,
-                CONCAT(DTD_IDENTIFIER,' CHARSET ',CHARACTER_SET_NAME) 
-                    AS RETURNS, 
-                ROUTINE_DEFINITION AS BODY, SQL_MODE
+                DTD_IDENTIFIER AS RETURNS, 
+                ROUTINE_DEFINITION AS BODY, SQL_MODE,
                 CHARACTER_SET_CLIENT, COLLATION_CONNECTION, 
                 DATABASE_COLLATION AS DB_COLLATION
                 """
@@ -1776,26 +1808,26 @@ class Database(object):
                 names_pos_to_quote = (0,)
                 _FULL = """
                 SELECT EVENT_SCHEMA AS DB, EVENT_NAME AS NAME, 
-                EVENT_BODY AS BODY, DEFINER, EXECUTE_AT, INTERVAL_VALUE,
+                EVENT_DEFINITION AS BODY, DEFINER, EXECUTE_AT, INTERVAL_VALUE,
                 INTERVAL_FIELD, CREATED, 
                 LAST_ALTERED AS MODIFIED, LAST_EXECUTED, STARTS,
                 ENDS, STATUS, ON_COMPLETION, SQL_MODE, 
                 EVENT_COMMENT AS COMMENT, ORIGINATOR,
                 TIME_ZONE, CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
                 DATABASE_COLLATION AS DB_COLLATION, 
-                EVENT_BODY AS BODY_UTF8
+                convert(EVENT_DEFINITION USING utf8mb4) AS BODY_UTF8
                 """
                 full_pos_to_quote = (0, 1)
                 full_pos_split_quote = ()
                 _MINIMAL = """
-                SELECT EVENT_NAME AS NAME, DEFINER
-                EVENT_BODY AS BODY, STATUS
+                SELECT EVENT_NAME AS NAME, DEFINER,
+                EVENT_DEFINITION AS BODY, STATUS,
                 EXECUTE_AT, INTERVAL_VALUE,
                 INTERVAL_FIELD, SQL_MODE, 
-                STARTS, ENDS, STATUS, ON_COMPLETION,
+                STARTS, ENDS, ON_COMPLETION,
                 ORIGINATOR,
                 CHARACTER_SET_CLIENT, COLLATION_CONNECTION,
-                DATABASE_COLLATION AS DB_COLLATION, 
+                DATABASE_COLLATION AS DB_COLLATION 
                 """
                 minimal_pos_to_quote = (0,)
                 minimal_pos_split_quote = ()

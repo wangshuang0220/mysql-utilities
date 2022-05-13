@@ -251,7 +251,7 @@ if __name__ == '__main__':
     else:
         # Always send output to a file for performance reasons (contents sent
         # at the end to the stdout).
-        output_file = tempfile.NamedTemporaryFile(delete=False)
+        output_file = tempfile.NamedTemporaryFile(mode='w+', delete=False)
         output_filename = None
 
     # Set options for database operations.

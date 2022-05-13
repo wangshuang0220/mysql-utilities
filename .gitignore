@@ -10,6 +10,7 @@ scripts/*.bak.py
 
 # editor backups
 *~
+\#*\#
 
 #  ************************
 

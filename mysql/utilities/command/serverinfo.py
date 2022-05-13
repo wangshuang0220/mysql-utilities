@@ -151,8 +151,8 @@ def _server_info(server_val, get_defaults=False, options=None):
 
     # Identify server by string: 'host:port[:socket]'.
     server_id = "{0}:{1}".format(server.host, server.port)
-    if source_values.get('socket', None):
-        server_id = "{0}:{1}".format(server_id, source_values.get('socket'))
+    if server.host is None:
+        server_id = "socket: {0}".format(server.socket)
     params_dict['server'] = server_id
 
     # Get _SERVER_VARIABLES values from the server
@@ -165,7 +165,8 @@ def _server_info(server_val, get_defaults=False, options=None):
                             ".".format(server_var, server_id))
 
     # Verify if the server is a local server.
-    server_is_local = server.is_alias('localhost')
+    server_is_local = server.is_alias('localhost') or \
+        server.host is None
 
     # Get _LOG_FILES_VARIABLES values from the server
     for msg, log_tpl in _LOG_FILES_VARIABLES.items():
@@ -316,7 +317,9 @@ def _start_server(server_val, basedir, datadir, options=None):
     """Start an instance of a server in read only mode
 
     This method is used to start the server in read only mode. It will launch
-    the server with --skip-grant-tables and --read_only options set.
+    the server with --skip-grant-tables and --read-only options set.
+
+    NOTE: --skip-grant-tables disables tcp/ip connections, so use sockets
 
     Caller must stop the server with _stop_server().
 
@@ -339,19 +342,18 @@ def _start_server(server_val, basedir, datadir, options=None):
     version = get_mysqld_version(mysqld_path)
     print("done.")
     if version is not None and int(version[0]) >= 5:
-        post_5_5 = int(version[1]) >= 5
-        post_5_6 = int(version[1]) >= 6
-        post_5_7_4 = int(version[1]) >= 7 and int(version[2]) > 4
+        post_5_5 = int(version[0]) > 5 or int(version[1]) >= 5
+        post_5_6 = int(version[0]) > 5 or int(version[1]) >= 6
+        post_5_7_4 = int(version[0]) > 5 or (int(version[1]) >= 7 and int(version[2]) > 4)
+        post_8 = int(version[0]) > 7
     else:
         print("# Warning: cannot get server version.")
         post_5_5 = False
         post_5_6 = False
         post_5_7_4 = False
+        post_8 = False
 
-    # Get the user executing the utility to use in the mysqld options.
-    # Note: the option --user=user_name is mandatory to start mysqld as root.
-    user_name = getpass.getuser()
-
+    
     # Start the instance
     if verbosity > 0:
         print("# Starting read-only instance of the server ...")
@@ -362,31 +364,56 @@ def _start_server(server_val, basedir, datadir, options=None):
     args.extend([
         "--no-defaults",
         "--skip-grant-tables",
-        "--read_only",
-        "--port=%(port)s" % server_val,
+        "--read-only",
         "--basedir=" + basedir,
         "--datadir=" + datadir,
-        "--user={0}".format(user_name),
     ])
 
-    # It the server is 5.6 or later, we must use additional parameters
+    
+    # Get the user executing the utility to use in the mysqld options.
+    # Note: the option --user=user_name is mandatory to start mysqld as root.
+    # but only root can use the --user option. 
+    user_name = getpass.getuser()
+    if user_name == "root":
+        args.append("--user=root")
+
+    
+    # If the server is 5.6 or later, we must use additional parameters
     if post_5_5:
         server_args = [
-            "--skip-slave-start",
             "--default-storage-engine=MYISAM",
             "--server-id=0",
         ]
+        if post_8:
+            server_args.append("--skip-replica-start")
+        else:
+            server_args.append("--skip-slave-start")
         if post_5_6:
             server_args.append("--default-tmp-storage-engine=MYISAM")
         if not post_5_7_4:
             server_args.append("--skip-innodb")
         args.extend(server_args)
 
+
+
+    # since skip-grant-tables disallows tcp/ip, need to remove any
+    # tcp/ip type options from the server_val list
+        
+    server_val.pop("host")
+
     socket = server_val.get('unix_socket', None)
-    if not socket and post_5_7_4 and os.name == "posix":
+    if not socket and post_5_6 and os.name == "posix":
         socket = os.path.normpath(os.path.join(datadir, "mysql.sock"))
+    # not sure how windoze handles this...
+        
     if socket is not None:
         args.append("--socket={0}".format(socket))
+        server_val["unix_socket"] = "{0}".format(socket)
+    else:
+        # MUST have a socket
+        raise error
+
+    
     if verbosity > 0:
         subprocess.Popen(args, shell=False)
     else:
@@ -626,6 +653,8 @@ def show_server_info(servers, options):
                                     " or cannot be parsed.")
                 new_server = _start_server(server_val, basedir,
                                            datadir, options)
+                server = new_server.get_connection_values()
+                
         info_dict, defaults = _server_info(server, show_defaults, options)
         warnings.extend(info_dict['warnings'])
         if info_dict:

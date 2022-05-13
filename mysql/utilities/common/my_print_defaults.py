@@ -173,7 +173,7 @@ class MyDefaultsReader(object):
 
         # find the "--show" option used to show passwords in plain text.
         for line in lines:
-            if "--show" in line:
+            if bytes("--show",'utf-8') in line:
                 return True
 
         # The option was not found in the tool help output.

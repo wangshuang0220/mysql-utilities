@@ -32,7 +32,8 @@ UNLOAD_PLUGIN = "UNINSTALL PLUGIN mysql_no_login"
 CREATE_AUTH_USER = "CREATE USER jillnopass@localhost IDENTIFIED WITH " \
                    "mysql_no_login"
 CHECK_AUTH_USERS = "SELECT user, host, plugin FROM mysql.user " \
-                   "WHERE user in ('jillnopass', 'jakenopass')"
+                   "WHERE user in ('jillnopass', 'jakenopass') "\
+                   "ORDER BY user "
 
 
 class test(mutlib.System_test):
@@ -69,13 +70,14 @@ class test(mutlib.System_test):
         # Load users data for test.
         data_file = "./std_data/basic_users.sql"
         try:
-            self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.read_and_exec_ppSQL(self.server1, data_file, self.debug)
         except (MUTLibError, UtilError) as err:
             raise MUTLibError(
                 "Failed to read commands from file {0}: {1}".format(
                     data_file, err.errmsg))
         return True
 
+    
     def show_user_grants(self, user):
         """Show user grants.
 
@@ -259,6 +261,7 @@ class test(mutlib.System_test):
         # Mask password field on grant statements since it stopped appearing on
         # versions >= 5.7.6
         self.replace_substring_portion(" IDENTIFIED BY PASSWORD '", "'", "")
+        self.replace_substring_portion(" IDENTIFIED WITH '", "'","")
         self.replace_result("GRANT USAGE ON *.* TO 'joe_nopass'@'user'",
                             "GRANT USAGE ON *.* TO 'joe_nopass'@'user'\n")
         # Mask root,localhost (should exist on all MySQL server versions).
@@ -269,6 +272,8 @@ class test(mutlib.System_test):
         self.remove_result("joe_wildcard,")
         # The mysql.sys user is only on 5.7.9+
         self.remove_result("mysql.sys,")
+        self.remove_result("mysql.infoschema,")
+        self.remove_result("mysql.session,")
         # Mask windows output, remove single quotes around hostname
         if os.name == 'nt':
             self.replace_result("# Dumping grants for user remote@'%'",

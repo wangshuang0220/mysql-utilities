@@ -199,6 +199,8 @@ def _report_error(message, test_name, mode, start_test, error=True):
         skipped_tests.append(test)
 
 
+        
+
 def _exec_and_report(procedure, default_message, test_name, action,
                      start_test_time, exception_procedure=None,
                      error=True):
@@ -749,6 +751,8 @@ if __name__ == "__main__":
                     test_case.remove_result("# WARNING: Using a password on "
                                             "the com")
                     test_case.remove_result("# WARNING: The use of InnoDB is")
+#                    test_case.remove_result("WARNING: using a password and "
+#                                            "an authentication plugin ")
             except MUTLibError:
                 _, e, _ = sys.exc_info()
                 if debug_mode:

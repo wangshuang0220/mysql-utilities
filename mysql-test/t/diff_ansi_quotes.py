@@ -291,6 +291,18 @@ class test(diff.test):
         self.replace_result("--- util_test.t1", "--- util_test.t1\n")
         self.replace_result("--- util_test.t2", "--- util_test.t2\n")
 
+        # mysql 8.0 extra stuff to remove 
+        self.replace_substring_portion('/*!40100 DEFAULT CHARACTER SET','*/',
+                                       '/*!40100 DEFAULT CHARACTER SET latin1 */')
+        self.replace_substring_portion(' /*!80016 DEFAULT ENCRYPTION=','*/','')
+        self.replace_substring_portion('CHARSET=utf8mb4','utf8mb4_0900_ai_ci','CHARSET=latin1')
+        
+        # mysql 8.0 show create function returns int -> int(11)
+        self.replace_substring_portion("RET","int(11)","RETURNS int")
+        self.replace_substring_portion('"id"',"bigint(20)",'"id" bigint')
+        self.replace_substring_portion('"b"','int(11)','"b" int')
+
+        
         self.replace_substring("on [::1]", "on localhost")
 
         return True

@@ -155,7 +155,7 @@ class test(clone_user.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = "mysqluserclone.py --list -vvv"
+        cmd_str = "mysqluserclone.py --list "
         comment = ("Test case {0} - error: missing source "
                    "option".format(test_num))
         res = self.run_test_case(2, cmd_str, comment)
@@ -236,7 +236,7 @@ class test(clone_user.test):
                                  "ERROR: Access denied for user",
                                  "Error Access denied for user"],
                                 "Error XXXX: Access denied\n")
-
+        
         self.replace_result("mysqluserclone: error: Source connection "
                             "values invalid",
                             "mysqluserclone: error: Source connection "

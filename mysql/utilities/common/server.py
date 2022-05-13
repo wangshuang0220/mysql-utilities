@@ -61,36 +61,74 @@ def tostr(value):
 
     Returns value as str instance or None.
     """
-    return None if value is None else str(value,'utf-8')
+    #print("tostr(",value,"), type:",type(value))
+    if isinstance(value,bytes) or isinstance(value,bytearray):
+        value = str(value,'utf-8')
+    elif isinstance(value,list):
+        newval = []
+        for v in value:
+            newval.append(tostr(v))
+        value = newval
+    elif isinstance(value, tuple):
+        newval = []
+        for v in value:
+            newval.append(tostr(v))
+        value = tuple(newval)
+    #print("    result: ",value)
+    #print("    returning: ",value,"  type:",type(value))
+    return value
 
+def tobytearray(value):
+    """ cat value to bytearray
+    value[in]
+    returns value as a bytearray or None.
+    """
+    if isinstance(value,str):
+        value = bytearray(value,'utf-8')
+    elif isinstance(value,bytes):
+        value = bytearray(value)
+    elif isinstance(value,list):
+        newval = []
+        for v in value:
+            newval.append(tobytearray(v))
+        value = newval
+    elif isinstance(value, tuple):
+        newval = []
+        for v in value:
+            newval.append(tobytearray(v))
+        value = tuple(newval)
+    #print("    result: ",value)
+    return value
+    
+    
 
 class MySQLUtilsCursorRaw(mysql.connector.cursor.MySQLCursorRaw):
     """
-    Cursor for Connector/Python v2.0, returning str instead of bytearray
+    Cursor for Connector/Python v2.0, returning bytearray
     """
     def fetchone(self):
         row = self._fetch_row()
         if row:
-            return tuple([tostr(v) for v in row])
+            return tuple([tobytearray(v) for v in row])
         return None
 
     def fetchall(self):
         rows = []
         all_rows = super(MySQLUtilsCursorRaw, self).fetchall()
         for row in all_rows:
-            rows.append(tuple([tostr(v) for v in row]))
+            rows.append(tuple([tobytearray(v) for v in row]))
         return rows
 
 
 class MySQLUtilsCursorBufferedRaw(
         mysql.connector.cursor.MySQLCursorBufferedRaw):
     """
-    Cursor for Connector/Python v2.0, returning str instead of bytearray
+    Cursor for Connector/Python v2.0, returning  bytearray
     """
     def fetchone(self):
         row = self._fetch_row()
         if row:
-            return tuple([tostr(v) for v in row])
+            return tuple([tobytearray(v) for v in row])
         return None
 
     def fetchall(self):
@@ -102,7 +140,7 @@ class MySQLUtilsCursorBufferedRaw(
         rows = []
         all_rows = [r for r in self._rows[self._next_row:]]
         for row in all_rows:
-            rows.append(tuple([tostr(v) for v in row]))
+            rows.append(tuple([tobytearray(v) for v in row]))
         return rows
 
 
@@ -127,7 +165,7 @@ def get_connection_dictionary(conn_info, ssl_dict=None):
         return conn_info
 
     conn_val = {}
-    if isinstance(conn_info, dict) and 'host' in conn_info:
+    if isinstance(conn_info, dict) and ("host" in conn_info or "unix_socket" in conn_info):
         # Not update conn_info if already has any ssl certificate.
         if (ssl_dict is not None and
                 not (conn_info.get("ssl_ca", None) or
@@ -210,7 +248,10 @@ def _print_connection(prefix, conn_info):
     conn_info[in]          Connection information
     """
     conn_val = get_connection_dictionary(conn_info)
-    print("# %s on %s: ..." % (prefix, conn_val["host"]), end=' ')
+    host = conn_val["host"]
+    if host is None and "unix_socket" in conn_val:
+        host = "socket: {0}".format(conn_val['unix_socket'])
+    print("# {0} on {1}: ...".format(prefix, host), end=' ')
 
 
 def get_local_servers(all_proc=False, start=3306, end=3333,
@@ -441,7 +482,7 @@ def connect_servers(src_val, dest_val, options=None):
     src_name = options.get("src_name", "Source")
     dest_name = options.get("dest_name", "Destination")
     version = options.get("version", None)
-    charset = options.get("charset", "utf8")
+    charset = options.get("charset", None) #CEL utf-8? 
     verbose = options.get('verbose', False)
 
     ssl_dict = {}
@@ -459,10 +500,12 @@ def connect_servers(src_val, dest_val, options=None):
 
     # Get connection dictionaries
     src_dict = get_connection_dictionary(src_val, ssl_dict)
-    if "]" in src_dict['host']:
-        src_dict['host'] = clean_IPv6(src_dict['host'])
+    if 'host' in src_dict and src_dict['host'] is not None \
+       and "]" in src_dict['host']:
+            src_dict['host'] = clean_IPv6(src_dict['host'])
     dest_dict = get_connection_dictionary(dest_val)
-    if dest_dict and "]" in dest_dict['host']:
+    if dest_dict and "host" in dest_dict and dest_dict['host'] is not None \
+       and "]" in dest_dict['host']:
         dest_dict['host'] = clean_IPv6(dest_dict['host'])
 
     # Add character set
@@ -777,15 +820,11 @@ class Server(object):
         self.has_ssl = False
         conn_values = get_connection_dictionary(options.get("conn_info"))
         try:
-            self.host = conn_values["host"]
+            self.host = conn_values.get("host", None) 
             self.user = conn_values["user"]
-            self.passwd = conn_values["passwd"] \
-                if "passwd" in conn_values else None
-            self.socket = conn_values["unix_socket"] \
-                if "unix_socket" in conn_values else None
-            self.port = 3306
-            if conn_values["port"] is not None:
-                self.port = int(conn_values["port"])
+            self.passwd = conn_values.get("passwd", None)
+            self.socket = conn_values.get("unix_socket",None)
+            self.port = int(conn_values.get("port",3306))
             self.charset = options.get("charset",
                                        conn_values.get("charset", None))
             # Optional values
@@ -872,6 +911,8 @@ class Server(object):
 
         Returns True if ip_or_hostname is a server alias, otherwise False.
         """
+        if ip_or_hostname is None:
+            return False
         host_or_ip_aliases = self._get_aliases(ip_or_hostname)
         host_or_ip_aliases.add(ip_or_hostname)
 
@@ -883,14 +924,14 @@ class Server(object):
         else:  # Check with and without suffixes
             no_suffix_server_aliases = set()
             no_suffix_host_aliases = set()
-
+            
             for suffix in suffix_list:
                 # Add alias with and without suffix from self.aliases
                 for alias in self.aliases:
                     if alias.endswith(suffix):
                         try:
                             host, _ = alias.rsplit('.', 1)
-                            no_suffix_host_aliases.add(host)
+                            no_suffix_server_aliases.add(host)
                         except:
                             pass  # Ok if parts don't split correctly
                     no_suffix_server_aliases.add(alias)
@@ -917,6 +958,9 @@ class Server(object):
     def _get_aliases(self, host):
         """Gets the aliases for the given host
         """
+        if host is None:
+            return set()
+        
         aliases = set([clean_IPv6(host)])
         if hostname_is_ip(clean_IPv6(host)):  # IP address
             try:
@@ -980,6 +1024,9 @@ class Server(object):
         Returns bool - True = host_or_ip is an alias
         """
         # List of possible suffixes
+        if host_or_ip is None:
+            return False
+        
         suffixes = ('.local', '.lan', '.localdomain')
 
         host_or_ip = clean_IPv6(host_or_ip.lower())
@@ -1041,7 +1088,7 @@ class Server(object):
         # Check if any of the aliases of ip_or_host is also an alias of the
         # host server.
         return self._update_alias(host_or_ip, suffixes)
-
+        
     def user_host_exists(self, user, host_or_ip):
         """Check to see if a user, host exists
 
@@ -1073,9 +1120,9 @@ class Server(object):
         if self.passwd:
             conn_vals["passwd"] = self.passwd
         if self.socket:
-            conn_vals["socket"] = self.socket
+            conn_vals["unix_socket"] = self.socket
         if self.port:
-            conn_vals["port"] = self.port
+            conn_vals["port"] = int(self.port)
         if self.ssl_ca:
             conn_vals["ssl_ca"] = self.ssl_ca
         if self.ssl_cert:
@@ -1149,8 +1196,9 @@ class Server(object):
                 parameters['passwd'] = self.passwd
             if self.charset:
                 parameters['charset'] = self.charset
-            parameters['host'] = parameters['host'].replace("[", "")
-            parameters['host'] = parameters['host'].replace("]", "")
+            if parameters['host'] is not None:
+                parameters['host'] = parameters['host'].replace("[", "")
+                parameters['host'] = parameters['host'].replace("]", "")
 
             # Add SSL parameters ONLY if they are not None
             if self.ssl_ca is not None:
@@ -1320,6 +1368,8 @@ class Server(object):
                            (default is True)
             commit         Perform a commit (if needed) automatically at the
                            end (default: True).
+            bytearray      return results as bytearray (if false, return
+                           as string) (default: False)
         exec_timeout[in]   Timeout value in seconds to kill the query execution
                            if exceeded. Value must be greater than zero for
                            this feature to be enabled. By default 0, meaning
@@ -1327,6 +1377,7 @@ class Server(object):
 
         Returns result set or cursor
         """
+        #print("exec_query('",query_str,"'")
         if options is None:
             options = {}
         params = options.get('params', ())
@@ -1334,6 +1385,7 @@ class Server(object):
         fetch = options.get('fetch', True)
         raw = options.get('raw', True)
         do_commit = options.get('commit', True)
+        return_bytearray = options.get('bytearray', False)
 
         # Guard for connect() prerequisite
         assert self.db_conn, "You must call connect before executing a query."
@@ -1395,6 +1447,9 @@ class Server(object):
             if fetch or columns:
                 try:
                     results = cur.fetchall()
+                    if not return_bytearray:
+                        results = tostr(results)
+                            
                     if columns:
                         col_headings = cur.column_names
                         col_names = []

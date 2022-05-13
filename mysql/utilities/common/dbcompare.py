@@ -24,6 +24,7 @@ from __future__ import print_function
 from builtins import zip
 from builtins import range
 from past.utils import old_div
+import sys
 import re
 import tempfile
 import difflib
@@ -140,9 +141,11 @@ def _get_objects(server, database, options):
     if not db_obj.exists():
         raise UtilDBError("The database does not exist: {0}".format(database))
     db_obj.init()
-    db_objects = db_obj.objects
-    db_objects.sort()
+    db_objects = sorted(db_obj.objects,key=_ObjListKey)
 
+    #print("objects.orig = ",db_obj.objects,"\n")
+    #print("objects.sort = ",db_objects,"\n")
+    
     return db_objects
 
 
@@ -218,6 +221,18 @@ def print_missing_list(item_list, first, second):
     return True
 
 
+def _ObjListKey(item):
+   """ make a key for sorting print_missing_list
+
+   """
+   
+   k1 = item[0]
+   k2 = item[1][0]
+   key = k1+':'+k2
+  # print('Item: ',item,' key: ',key,"\n")
+   return key
+
+
 def server_connect(server1_val, server2_val, object1, object2, options):
     """Connect to the servers
 
@@ -281,7 +296,10 @@ def get_common_lists(list1, list2):
     s1 = set(list1)
     s2 = set(list2)
     both = s1 & s2
-    return(list(both), list(s1 - both), list(s2 - both))
+    return(sorted(list(both)),
+           sorted(list(s1 - both)),
+           sorted(list(s2 - both))
+           )
 
 
 def get_common_objects(server1, server2, db1, db2,
@@ -614,8 +632,9 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     # difference report otherwise, ignore it.
     if (object_type == "DATABASE") and (object1 != object2):
         quotes = ["'", '"', "`"]
-        db1 = object1.translate(None, "".join(quotes))
-        db2 = object2.translate(None, "".join(quotes))
+        qstrip = "".maketrans("","","".join(quotes))
+        db1 = object1.translate(qstrip)
+        db2 = object2.translate(qstrip)
         first = object1_create.replace(db1, "")[1::]
         second = object2_create.replace(db2, "")[1::]
         if first == second:
@@ -688,6 +707,7 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     if diff_list and same_tbl_def and same_part_def and \
        re.match(regex_pattern, diff_list[1]):
         print("[PASS]")
+        sys.stdout.flush()  # async problems testing
         return None
 
     if diff_list and direction is None and same_tbl_def and not tbl_opts_diff:
@@ -696,6 +716,7 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
             print("# WARNING: The tables structure is the same, but the "
                   "columns order is different. Use --change-for to take the "
                   "order into account.")
+            sys.stdout.flush()  # async problems testing
         return None
 
     # Check for failure to generate SQL statements
@@ -711,6 +732,7 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
 
         if not quiet:
             print("[FAIL]")
+            sys.stdout.flush()  # async problems testing
 
         for line in diff_list:
             print(line)
@@ -718,6 +740,7 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
         print("# WARNING: Could not generate SQL statements for differences "
               "between {0} and {1}. No changes required or not supported "
               "difference.".format(object1, object2))
+        sys.stdout.flush()  # async problems testing
 
         return diff_list
 
@@ -736,6 +759,7 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
                 print("# WARNING: Partition changes were not generated "
                       "(not supported).")
 
+        sys.stdout.flush()  # async problems testing
         return diff_list
 
     if not quiet:
@@ -746,6 +770,7 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
             for diff in tbl_opts_diff:
                 print("# {0}".format(diff))
 
+    sys.stdout.flush()  # async problems testing
     return None
 
 

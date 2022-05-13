@@ -29,7 +29,6 @@ from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
-from mysql.utilities.common.server import has_mysqlproc
 
 
 _DEFAULT_MYSQL_OPTS = ('"--report-host=localhost --report-port={0} '

@@ -55,14 +55,14 @@ class test(export_parameters_def.test):
 
         from_conn = "--server={0}".format(
             self.build_connection_string(self.server3))
-        test_num = 13
-        cmd_str = "mysqldbexport.py --skip-gtid {0} ".format(from_conn)
-        cmd_opts = "--skip=grants,events --all --export=both"
-        comment = "Test case {0} - copy all databases".format(test_num)
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
-
+#        test_num = 13
+#        cmd_str = "mysqldbexport.py --skip-gtid {0} ".format(from_conn)
+#        cmd_opts = "--skip=grants,events --all --export=both"
+#        comment = "Test case {0} - copy all databases".format(test_num)
+#        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+#        if not res:
+#            raise MUTLibError("{0}: failed".format(comment))
+#
         # Mask known source.
         self.replace_result("# Source on localhost: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
@@ -72,11 +72,26 @@ class test(export_parameters_def.test):
             "| None             | util_test       | trg           | INSERT",
             "| None             | util_test       | trg           | INSERT\n"
         )
+        # some outputs differ from the run_test_case masking
+        for n in range(1,6):
+            j = "{0}".format(n)
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    11, " XXXXXXXXXX   ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    12, " XXXXXXXXXX         ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    14, " XXXXXXXXXX ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    16, " XXXX-XX-XX XX:XX:XX  ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    17, " XXXX-XX-XX XX:XX:XX  ")
 
+        
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

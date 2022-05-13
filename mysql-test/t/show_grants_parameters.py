@@ -253,16 +253,28 @@ class test(show_grants.test):
         """Mask non deterministic output"""
 
         show_grants.test.do_masks(self)
+        self.replace_substring_portion("GRANT ",
+                                       " ON *.* TO `root`",
+                                       "GRANT ALL PRIVILEGES ON *.* TO `root`@`localhost`")
         self.remove_many_result([
-            "GRANT ALL PRIVILEGES ON *.* TO 'root'@'",
-            "# - For 'root'@'",
-        ])
+            "# WARNING: EXECUTE does not apply to tables",
+            "# WARNING: INSERT and SELECT do not apply to routines",
+            "# WARNING: specified database does not exist",
+            "# WARNING: specified object does not exist",
+            "# WARNING: specified object is not supported",
+            ])
+#        self.remove_many_result([
+#            "GRANT ALL PRIVILEGES ON *.* TO 'root'@'",
+#            "# - For 'root'@'",
+#        ])
+        
         self.replace_result("MySQL Utilities mysqlgrants version",
                             "MySQL Utilities mysqlgrants version XXXX\n")
         self.replace_substring_portion(", 'root'@'", '\n', '\n')
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

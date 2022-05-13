@@ -32,6 +32,7 @@ import subprocess
 import difflib
 import itertools
 import os
+import sys
 import platform
 import re
 import socket
@@ -50,6 +51,7 @@ from mysql.utilities.command.serverclone import clone_server
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
 from future.utils import with_metaclass
+from preprocess import preprocess
 
 # Constants
 MAX_SERVER_POOL = 10
@@ -223,7 +225,7 @@ def get_port(process_id):
             for line in f:
                 try:
                     columns = line.split()
-                    if columns[pid_column] == str(process_id):
+                    if columns[pid_column] == "{0}".format(process_id):
                         return columns[port_column].rsplit(':', 1)[-1]
                 except IndexError:  # we might be reading some warning messages
                     pass
@@ -236,6 +238,9 @@ def get_port(process_id):
             raise MUTLibError("# ERROR: Unable to retrieve port information")
 
 
+
+
+        
 class ServerList(object):
     """The Server_list class is used by the MySQL Utilities Test (MUT)
     facility to gather all the servers used by the tests.
@@ -474,6 +479,7 @@ class ServerList(object):
                                            self.get_next_id(), "root",
                                            parameters=mysqld)
             datadir = server[0].show_server_variable('datadir')[0][1]
+            
             self.server_list.append((server[0], True,
                                      self.get_process_id(datadir)))
 
@@ -1205,8 +1211,7 @@ class System_test(with_metaclass(ABCMeta, object)):
         linenums = []
         for linenum, line in enumerate(self.results):
             for prefix in prefix_list:
-                index = line.find(prefix)
-                if index == 0:
+                if prefix in line:
                     linenums.append(linenum)
                     break
         # Remove lines in reverse order
@@ -1473,7 +1478,14 @@ class System_test(with_metaclass(ABCMeta, object)):
         # Use ndiff to compare to known result file
         #
         res_file = open(res_fname)
-        diff = difflib.ndiff(res_file.readlines(), actual)
+        got_file = open(os.path.join(self.res_dir,
+                                     "{0}.got".format(name)),'w+')
+        for x in actual:
+            got_file.write(x)
+        got_file.close()
+
+        
+        diff = difflib.ndiff(res_file.readlines(), actual, charjunk=None)
         #
         # Now convert the diff to a string list and write reject file
         #
@@ -1591,9 +1603,15 @@ class System_test(with_metaclass(ABCMeta, object)):
         Returns True if success.
         """
         # Check before you drop to avoid warning
-        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
-        if not res:
-            return True  # Ok to exit here as there weren't any dbs to drop
+        #print("\ndropping database: ",db)
+        #res = server.exec_query("SHOW DATABASES")
+        #print("Databases: ",res)
+        #sys.stdout.flush()
+    
+        
+#        res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
+#        if not res:
+#            return True  # Ok to exit here as there weren't any dbs to drop
         try:
             q_db = quote_with_backticks(db, server.select_variable("SQL_MODE"))
             server.exec_query("DROP DATABASE {0}".format(q_db))
@@ -1603,6 +1621,8 @@ class System_test(with_metaclass(ABCMeta, object)):
                                                                 err.errmsg))
             return False
         return True
+
+
 
     @abstractmethod
     def check_prerequisites(self):
@@ -1684,3 +1704,156 @@ class System_test(with_metaclass(ABCMeta, object)):
         Returns: True = no errors, False = errors occurred
         """
         pass
+    
+    def read_and_exec_ppSQL(self, server, input_file, verbose=False):
+        """Read an input file containing SQL statements and execute them.
+    
+        input_file[in]     The full path to the file
+        verbose[in]        Print the command read
+                           Default = False
+
+        Returns True = success, False = error
+
+        TODO : Make method read multi-line queries.
+        """
+
+        if server is None:
+            raise UtilError("no server given")
+
+        if server.db_conn is None:
+            raise UtilError("server not connected")
+
+        server_type = server.get_server_type()
+        version_str = server.get_version()
+        if version_str is not None:
+            match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', version_str.strip())
+            if match:
+                version = [int(x) for x in match.group(1).split('.')]
+                version = (version + [0])[:3]  # Ensure a 3 elements list
+                version_str = "{0:02d}{1:02d}{2:02d}".format(version[0],version[1],version[2])
+            else:
+                version_str = "000000"
+        else:
+            version_str = "000000"
+
+        f = tempfile.NamedTemporaryFile(mode="w+",delete=False)
+    
+        # contentType just sets style for comments
+    
+        fname = f.name
+
+        preprocess(input_file, outfile=fname, contentType="Python",
+                   defines={'server': server_type, 'version': version_str},
+                   keepLines = 1, substitute = 0)
+        f.close()
+        res = server.read_and_exec_SQL(fname, verbose)
+        try:
+            os.unlink(fname)
+        except OSError:
+            pass
+
+        return res
+
+    def compare_pp(self, name, actual, server1=None, server2=None):
+        """Read result file preprocessing based on server info
+    
+        name[in]           test name (use __name__)
+        actual[in]         string list of actual results
+        server1[in]        basis for definitions
+        server2[in]        basis for defiitions
+
+        Returns: (bool, diff) where:
+            (True, None) = results identical
+            (False, "result file missing") = result file missing
+            (False, <string list>) = results differ      
+
+        """
+        #
+        # Check to see if result file exists first.
+        #
+        res_fname = os.path.normpath(os.path.join(self.res_dir,
+                                                  "{0}.result".format(name)))
+
+        got_file = open(os.path.join(self.res_dir,
+                                     "{0}.got".format(name)),'w+')
+        for x in actual:
+            got_file.write(x)
+        got_file.close()
+
+        if not os.access(res_fname, os.F_OK):
+            actual.insert(0, "Result file missing - actual results:\n\n")
+            return False, actual
+
+        defs = {}
+        if server1 is not None:
+            defs['server1'] = server1.get_server_type()
+            v = server1.get_version()
+            if v is not None:
+                match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', v.strip())
+                if match:
+                    version = [int(x) for x in match.group(1).split('.')]
+                    version = (version + [0])[:3]  # Ensure a 3 elements list
+                    v = "{0:02d}{1:02d}{2:02d}".format(version[0],version[1],version[2])
+            else:
+                v = "000000"
+        else:
+            v = "000000"
+        defs['version1'] = v
+
+        if server2 is not None:
+            defs['server2'] = server2.get_server_type()
+            v = server2.get_version()
+            if v is not None:
+                match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', v.strip())
+                if match:
+                    version = [int(x) for x in match.group(1).split('.')]
+                    version = (version + [0])[:3]  # Ensure a 3 elements list
+                    v = "{0:02d}{1:02d}{2:02d}".format(version[0],version[1],version[2])
+                else:
+                    v = "000000"
+        else:
+            v = "000000"
+        defs['version2'] = v
+
+        res_file = tempfile.NamedTemporaryFile(mode="w+",delete=True)
+    
+        # contentType just sets style for comments
+    
+        fname = res_file.name
+
+        preprocess(res_fname, outfile=fname, contentType="Python",
+                   defines=defs,
+                   keepLines = 0, substitute = 0)
+        res_file.seek(0,0)
+
+        #
+        # Use ndiff to compare to known result file
+        #
+        diff = difflib.ndiff(res_file.readlines(), actual)
+        #
+        # Now convert the diff to a string list and write reject file
+        #
+        rej_fname = os.path.normpath(os.path.join(self.res_dir,
+                                                  "{0}.reject".format(name)))
+        rej_file = open(rej_fname, 'w+')
+        rej_list = []
+        try:
+            while 1:
+                str_ = next(diff)
+                if str_[0] in ['-', '+', '?']:
+                    rej_list.append(str_)
+                rej_file.write(str_)
+        except StopIteration:
+            pass
+        rej_file.close()
+        res_file.close()
+    
+        # Write preamble if there are differences
+        if rej_list != []:
+            rej_list.insert(0, "Result file mismatch:\n")
+
+        # If test passed, delete the reject file if it exists
+        elif os.access(rej_fname, os.F_OK):
+            os.unlink(rej_fname)
+
+        return rej_list == [], rej_list

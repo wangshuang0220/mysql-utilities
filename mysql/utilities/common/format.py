@@ -70,12 +70,10 @@ class UnicodeWriter(object):
 
         row[in]     sequence of strings or numbers
         """
-        self.writer.writerow([val if isinstance(val, str)
-                              else str(val) for val in row])
+        self.writer.writerow(str(val) for val in row)
         data = self.queue.getvalue()
-#        data = data.decode("utf-8")  # pylint: disable=R0204
-#        data = self.encoder.encode(data)
         self.stream.write(data)
+        self.queue.seek(0,0)
         self.queue.truncate(0)
 
     def writerows(self, rows):
@@ -115,7 +113,7 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
     """
     i = 0
     if len(columns) == 1 and row != columns:
-        row = [row]
+        row = list(row)
     for i, _ in enumerate(columns):
         if not quiet:
             f_out.write("| ")
@@ -179,6 +177,7 @@ def format_tabular_list(f_out, columns, rows, options=None):
         quiet          if True, do not print the grid text (no borders)
         print_footer   if False, do not print footer
         none_to_null   if True converts None values to NULL
+        none_to_zls    if True converts None values to zero-length string
     """
     if options is None:
         options = {}
@@ -187,11 +186,31 @@ def format_tabular_list(f_out, columns, rows, options=None):
     quiet = options.get("quiet", False)
     print_footer = options.get("print_footer", True)
     none_to_null = options.get("none_to_null", False)
+    none_to_zls = options.get("none_to_zls", False)
     convert_to_sql = options.get('to_sql', False)
 
     # do nothing if no rows.
     if len(rows) == 0:
         return
+
+    modrows = []
+    for row in rows:
+        row = tuple(str(val) for val in row)
+        if convert_to_sql:
+            # Convert value to SQL (i.e. add quotes if needed).
+            row = tuple(('NULL' if col is None else to_sql(col)
+                   for col in row))
+        if none_to_null:
+            # Convert None values to 'NULL'
+            row = tuple(('NULL' if val is None else val for val in row))
+        if none_to_zls:
+            # convert None values to ''
+            row = tuple(('' if (val is None) or (val == 'None') else val
+                          for val in row))
+        modrows.append(row)
+        
+    rows = modrows
+
     if separator is not None:
         if os.name == "posix":
             # Use \n as line terminator in POSIX (non-Windows) systems.
@@ -203,14 +222,6 @@ def format_tabular_list(f_out, columns, rows, options=None):
         if print_header:
             csv_writer.writerow(columns)
         for row in rows:
-            row = [val if isinstance(val, str)
-                   else str(val) for val in row]
-            if convert_to_sql:
-                # Convert value to SQL (i.e. add quotes if needed).
-                row = ['NULL' if col is None else to_sql(col) for col in row]
-            if none_to_null:
-                # Convert None values to 'NULL'
-                row = ['NULL' if val is None else val for val in row]
             csv_writer.writerow(row)
     else:
         # Calculate column width for each column
@@ -224,15 +235,6 @@ def format_tabular_list(f_out, columns, rows, options=None):
             _format_row_separator(f_out, columns, col_widths, columns, quiet)
         _format_col_separator(f_out, columns, col_widths, quiet)
         for row in rows:
-            # Note: lists need to be converted to tuple as expected by
-            # next method (to handle single column rows correctly)
-            if convert_to_sql:
-                # Convert value to SQL (i.e. add quotes if needed).
-                row = tuple(('NULL' if col is None else to_sql(col)
-                             for col in row))
-            if none_to_null:
-                # Convert None values to 'NULL'
-                row = tuple(('NULL' if val is None else val for val in row))
             _format_row_separator(f_out, columns, col_widths, row, quiet)
         if print_footer:
             _format_col_separator(f_out, columns, col_widths, quiet)

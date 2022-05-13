@@ -38,12 +38,17 @@ class test(export_basic.test):
         self.server0 = self.servers.get_server(0)
         if not self.server0.check_version_compat(5, 7, 9):
             raise MUTLibError("Test requires server version 5.7.9 and later.")
+        self.server0.exec_query("SET @@SESSION.sql_mode=''")
+
         sql_mode = self.server0.show_server_variable("SQL_MODE")[0]
         if len(sql_mode[1]):
             raise MUTLibError("Test requires servers with sql_mode = ''.")
         # The innodb_default_row_format was introduce in 5.7.9
         if not self.servers.get_server(0).check_version_compat(5, 7, 9):
             raise MUTLibError("Test requires server version 5.7.9 and later.")
+
+        self.server0.exec_query("SET GLOBAL innodb_default_row_format='COMPACT'")
+
         innodb_row_format = \
             self.server0.show_server_variable("innodb_default_row_format")[0]
         if innodb_row_format[1].upper() != "COMPACT":
@@ -232,17 +237,24 @@ class test(export_basic.test):
                             "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "
                             "STARTS XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n")
 
+
+        # Mask root account creation
+        self.remove_result_and_lines_around("CREATE USER IF NOT EXISTS 'root'@",
+                                            1,1)
+
         # Mask known source.
         self.replace_result("# Source on localhost: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Source on [::1]: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
 
+
         self.remove_result("# WARNING: The server supports GTIDs")
         self._mask_grid()
         self._mask_csv()
         self._mask_tab()
         self._mask_vertical()
+
 
         self.replace_result(
             "| None             | util_test       | trg           | INSERT",
@@ -254,24 +266,28 @@ class test(export_basic.test):
     def _mask_grid(self):
         """Masks grid.
         """
-        self.mask_column_result("| def ", "|", 2, " None           ")
-        self.mask_column_result("| None           | util_test       | trg",
-                                "|", 2, " None             ")
-        self.mask_column_result("| None             | util_test       | trg",
-                                "|", 6, " None                  ")
-        self.mask_column_result("| None           | util_test     | t", "|",
-                                16, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| None           | util_test     | t", "|",
-                                11, " XXXXXXXXXX ")
-        self.mask_column_result("| None           | util_test     | t", "|",
-                                12, " XXXXXXXXXX ")
-        self.mask_column_result("| None           | util_test     | t", "|",
-                                14, " XXXXXXXXXX ")
-        self.mask_column_result("| None           | util_test     | t", "|",
-                                17, " XXXX-XX-XX XX:XX:XX ")
-        self.mask_column_result("| None           | util_test "
-                                "    | e1          |", "|", 14,
-                                " XXXX-XX-XX XX:XX:XX ")
+        #self.mask_column_result("| def            | util_test       | trg",
+        #                        "|", 2, " None             ")
+        #self.mask_column_result("| def            | util_test       | trg",
+        #                        "|", 6, " None                  ")
+        self.mask_column_result("| def              | util_test       | trg",
+                                "|", 18, " XXXX-XX-XX XX:XX:XX     ")
+
+        for n in range(1,6):
+            j = "{0}".format(n)
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    11, " XXXXXXXXXX  ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    12, " XXXXXXXXXX  ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    14, " XXXXXXXXXX     ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    16, " XXXX-XX-XX XX:XX:XX ")
+            self.mask_column_result("| def            | util_test     | t"+j, "|",
+                                    17, " XXXX-XX-XX XX:XX:XX ")
+        #elf.mask_column_result("| None           | util_test "
+        #                       "    | e1          |", "|", 14,
+        #                       " XXXX-XX-XX XX:XX:XX ")
         self.mask_column_result("| util_test  | e1    |", "|", 18,
                                 " X           ")
         self.mask_column_result("| util_test  | e1    |", "|", 9,
@@ -279,10 +295,10 @@ class test(export_basic.test):
         self.mask_column_result("| util_test  | e1    |", "|", 10,
                                 " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| util_test  | e1    |", "|", 12,
-                                " XXXX-XX-XX XX:XX:XX  ")
+                                 " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| e1    | root@localhost  |", "|", 10,
                                 " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| e1    | root@localhost  |", "|", 14,
+        self.mask_column_result("| e1    | root@localhost  |", "|", 13,
                                 " X           ")
         self.mask_column_result("| util_test  | p1", "|", 14,
                                 " XXXX-XX-XX XX:XX:XX  ")
@@ -296,32 +312,47 @@ class test(export_basic.test):
                                 " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| util_test  | f2", "|", 15,
                                 " XXXX-XX-XX XX:XX:XX  ")
-        self.mask_column_result("| util_test  | f2", "|", 15,
-                                " XXXX-XX-XX XX:XX:XX  ")
         # Fix MySQL 5.7 output differences
-        self.replace_result("+------------------+-----------------+"
-                            "---------------+---------------------+",
-                            "+------------------+-----------------+"
-                            "---------------+---------------------+\n")
-        self.replace_result("| None             | util_test       |"
-                            "trg           | INSERT",
-                            "| None             | util_test       |"
-                            "trg           | INSERT\n")
-        self.replace_result("| TRIGGER_CATALOG  | TRIGGER_SCHEMA  |"
-                            " TRIGGER_NAME  |",
-                            "| TRIGGER_CATALOG  | TRIGGER_SCHEMA  |"
-                            " TRIGGER_NAME  |\n")
+#        self.replace_result("+------------------+-----------------+"
+#                            "---------------+---------------------+",
+#                            "+------------------+-----------------+"
+#                            "---------------+---------------------+\n")
+#        self.replace_result("| None             | util_test       |"
+#                            "trg           | INSERT",
+#                            "| None             | util_test       |"
+#                            "trg           | INSERT\n")
+#        self.replace_result("| TRIGGER_CATALOG  | TRIGGER_SCHEMA  |"
+#                            " TRIGGER_NAME  |",
+#                            "| TRIGGER_CATALOG  | TRIGGER_SCHEMA  |"
+#                            " TRIGGER_NAME  |\n")
+
+        self.remove_result("| 'root'@'localhost'  | ALTER") 
+        self.remove_result("| 'root'@'localhost'  | CREATE") 
+        self.remove_result("| 'root'@'localhost'  | DELETE ") 
+        self.remove_result("| 'root'@'localhost'  | DROP ") 
+        self.remove_result("| 'root'@'localhost'  | EVENT ") 
+        self.remove_result("| 'root'@'localhost'  | EXECUTE ") 
+        self.remove_result("| 'root'@'localhost'  | INDEX ") 
+        self.remove_result("| 'root'@'localhost'  | INSERT ") 
+        self.remove_result("| 'root'@'localhost'  | LOCK ") 
+        self.remove_result("| 'root'@'localhost'  | REFERENCES ") 
+        self.remove_result("| 'root'@'localhost'  | SELECT ") 
+        self.remove_result("| 'root'@'localhost'  | SHOW VIEW ") 
+        self.remove_result("| 'root'@'localhost'  | TRIGGER ") 
+        self.remove_result("| 'root'@'localhost'  | UPDATE ") 
+
+
 
     def _mask_csv(self):
         """Masks CSV.
         """
-        self.mask_column_result("`e1`,root@localhost,", ",", 5,
-                                "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("`e1`,root@localhost,", ",", 9,
                                 "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`,root@localhost,", ",", 10,
-                                "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`,root@localhost,", ",", 13, "XX")
+       # self.mask_column_result("`e1`,root@localhost,", ",", 9,
+       #                         "XXXX-XX-XX XX:XX:XX")
+       # self.mask_column_result("`e1`,root@localhost,", ",", 10,
+       #                         "XXXX-XX-XX XX:XX:XX")
+        self.mask_column_result("`e1`,root@localhost,", ",", 12, "XX")
         self.mask_column_result("def,`util_test`,", ",", 1, "")
         self.mask_column_result(",`util_test`,`trg`", ",", 5, "")
         self.mask_column_result(",`util_test`,`t", ",", 10, "XXXXXXXXXX")
@@ -355,6 +386,22 @@ class test(export_basic.test):
         self.mask_column_result(",`util_test`,`trg", ",", 8, "X")
         self.mask_column_result(",`util_test`,`trg", ",", 17, "")
 
+        self.remove_result("'root'@'localhost',ALTER") 
+        self.remove_result("'root'@'localhost',CREATE") 
+        self.remove_result("'root'@'localhost',DELETE,") 
+        self.remove_result("'root'@'localhost',DROP,") 
+        self.remove_result("'root'@'localhost',EVENT,") 
+        self.remove_result("'root'@'localhost',EXECUTE,") 
+        self.remove_result("'root'@'localhost',INDEX,") 
+        self.remove_result("'root'@'localhost',INSERT,") 
+        self.remove_result("'root'@'localhost',LOCK ") 
+        self.remove_result("'root'@'localhost',REFERENCES,") 
+        self.remove_result("'root'@'localhost',SELECT,") 
+        self.remove_result("'root'@'localhost',SHOW VIEW,") 
+        self.remove_result("'root'@'localhost',TRIGGER,") 
+        self.remove_result("'root'@'localhost',UPDATE,") 
+
+        
     def _mask_tab(self):
         """Masks tab.
         """
@@ -364,7 +411,7 @@ class test(export_basic.test):
                                 "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("`e1`	root@localhost", "\t", 10,
                                 "XXXX-XX-XX XX:XX:XX")
-        self.mask_column_result("`e1`	root@localhost", "\t", 13, "XX")
+        self.mask_column_result("`e1`	root@localhost", "\t", 12, "XX")
         self.mask_column_result("def	`util_test`	`t", "\t", 1, "")
         self.mask_column_result("def	`util_test`	`v", "\t", 1, "")
         self.mask_column_result("	`util_test`	`trg`", "\t", 5, "")
@@ -397,6 +444,21 @@ class test(export_basic.test):
         # Mask MySQL 5.7 changes
         self.mask_column_result("	`util_test`	`trg", "\t", 17,
                                 "XXXX-XX-XX XX:XX:XX")
+
+        self.remove_result("'root'@'localhost'\tALTER") 
+        self.remove_result("'root'@'localhost'\tCREATE") 
+        self.remove_result("'root'@'localhost'\tDELETE\t") 
+        self.remove_result("'root'@'localhost'\tDROP\t") 
+        self.remove_result("'root'@'localhost'\tEVENT\t") 
+        self.remove_result("'root'@'localhost'\tEXECUTE\t") 
+        self.remove_result("'root'@'localhost'\tINDEX\t") 
+        self.remove_result("'root'@'localhost'\tINSERT\t") 
+        self.remove_result("'root'@'localhost'\tLOCK") 
+        self.remove_result("'root'@'localhost'\tREFERENCES\t") 
+        self.remove_result("'root'@'localhost'\tSELECT\t") 
+        self.remove_result("'root'@'localhost'\tSHOW VIEW\t") 
+        self.remove_result("'root'@'localhost'\tTRIGGER\t") 
+        self.remove_result("'root'@'localhost'\tUPDATE\t") 
 
     def _mask_vertical(self):
         """Masks vertical.
@@ -470,9 +532,12 @@ class test(export_basic.test):
         self.replace_result("                    CREATED:",
                             "                    CREATED: "
                             "XXXX-XX-XX XX:XX:XX\n")
+        self.remove_result_and_lines_around("        GRANTEE: 'root'@'localhost'",1,5)
 
+        
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server0)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

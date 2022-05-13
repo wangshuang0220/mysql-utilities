@@ -83,6 +83,8 @@ class test(mutlib.System_test):
                             "            relay_log_pos: XXXX\n")
         self.replace_result("                   server: localhost:",
                             "                   server: localhost: XXXX\n")
+        self.replace_result("                   server: socket:",
+                            "                   server: socket: XXXX\n")        
         self.replace_result("              general_log:",
                             "              general_log: XXXX\n")
         self.replace_result("         general_log_file:",
@@ -105,7 +107,9 @@ class test(mutlib.System_test):
             "WARNING: Unable to get size information from 'stderr' "
             "for 'error log'.", lines_before=3, lines_after=1)
         self.remove_result("# Warning: cannot get server version")
-
+        self.replace_result("# Source on socket:",
+                            "# Source on socket: XXXX ... connected.\n")
+        
     def start_stop_newserver(self, delete_log=True, stop_server=True):
         """Start and stop new server.
 

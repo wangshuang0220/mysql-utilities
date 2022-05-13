@@ -85,17 +85,11 @@ class test(copy_user.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.remove_result("root,")
-        self.remove_result("# Dumping grants for user 'root'")
-        self.remove_result("GRANT ALL PRIVILEGES ON *.* TO 'root'")
-        self.remove_result("GRANT PROXY ON ''@'' TO 'root'")
         self.remove_result("# Cannot show grants for user")
 
-        # The mysql.sys user is only on 5.7.9+
-        self.remove_result("mysql.sys,")
-        self.remove_result("# Dumping grants for user 'mysql.sys'@'localhost'")
-        self.remove_result("GRANT USAGE ON *.* TO 'mysql.sys'@")
-        self.remove_result("GRANT TRIGGER ON `sys`.* TO 'mysql.sys'@")
-        self.remove_result("GRANT SELECT ON `sys`.`sys_config` TO 'mysql.sys'")
+        # The mysql.* users are only on 5.7.9+
+        self.remove_many_result(["`root`", "mysql.sys", "mysql.infoschema",
+                                 "mysql.session"])
 
         self.replace_substring("on [::1]", "on localhost")
 

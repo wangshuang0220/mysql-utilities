@@ -807,28 +807,46 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
             # Create PROCEDURE or FUNCTION statement
             if obj_type == "FUNCTION":
                 func_str = " RETURNS %s" % defn[col_ref.get("RETURNS", 7)]
-                if defn[col_ref.get("IS_DETERMINISTI", 3)] == 'YES':
+                if defn[col_ref.get("IS_DETERMINISTIC", 3)] == 'YES':
                     func_str = "%s DETERMINISTIC" % func_str
             else:
                 func_str = ""
+            
+            params = defn[col_ref.get("PARAM_LIST", 6)]
+            if params is None or params == 'None' or params == '':
+                params = ''
+            else:
+                pnew = []
+                pars = params.split(',')
+                for c in pars:
+                    pname, ptype = c.split(' ')
+                    if '`' in pname \
+                       and not is_quoted_with_backticks(pname, sql_mode):
+                        pname = quote_with_backticks(pname,sql_mode)
+                    pnew.append("{0} {1}".format(pname,ptype))
+                params = ','.join(pnew)
+
+            body_str = defn[col_ref.get("BODY", 8)]
+            
+                
             create_str = (
                 "CREATE DEFINER={defr}"
                 " {type} {scma}.{name}({par_lst})"
                 "{func_ret} {body};"
             ).format(defr=defn[col_ref.get("DEFINER", 5)],
                      type=obj_type, scma=obj_db, name=obj_name,
-                     par_lst=defn[col_ref.get("PARAM_LIST", 6)],
+                     par_lst=params,
                      func_ret=func_str,
-                     body=defn[col_ref.get("BODY", 8)])
+                     body=body_str)
             create_strings.append(create_str)
         elif obj_type == "EVENT":
             # Quote required identifiers with backticks
             obj_db = quote_with_backticks(db, sql_mode) \
                 if not is_quoted_with_backticks(db, sql_mode) else db
 
-            if not is_quoted_with_backticks(defn[col_ref.get("NAME", 0)],
+            if not is_quoted_with_backticks(defn[col_ref.get("EVENT_NAME", 0)],
                                             sql_mode):
-                obj_name = quote_with_backticks(defn[col_ref.get("NAME", 0)],
+                obj_name = quote_with_backticks(defn[col_ref.get("EVENT_NAME", 0)],
                                                 sql_mode)
             else:
                 obj_name = defn[col_ref.get("NAME", 0)]
