@@ -94,8 +94,8 @@ Test case 2 - Use  -t --difftype=unified --format=grid
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -116,7 +116,7 @@ Test case 2 - Use  -t --difftype=unified --format=grid
  +-------+----------------------+
  | code  | name                 |
  +-------+----------------------+
--| 4     | None                 |
+-| 4     | NULL                 |
 -| 2     | Never Enough Inc.    |
 +| 4     | Acme Corporation     |
 +| 2     | Wesayso Corporation  |
@@ -127,7 +127,7 @@ Test case 2 - Use  -t --difftype=unified --format=grid
 | code  | name               |
 +-------+--------------------+
 | 6     |                    |
-| 5     | None               |
+| 5     | NULL               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -144,11 +144,11 @@ Test case 2 - Use  -t --difftype=unified --format=grid
  +---------------+-----------------+------+--------+------------+--------+-----------+
  | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
  +---------------+-----------------+------+--------+------------+--------+-----------+
--| 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 -| 11186         | Plastic polish  | 1    | 9.99   | polishing  |        | 1         |
+-| 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 -| 11040         | Leather care    | 1    | 9.99   | other      |        | 1         |
-+| 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 +| 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
++| 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 +| 11040         | Leather care    | 1    | 10.00  | other      |        | 1         |
  +---------------+-----------------+------+--------+------------+--------+-----------+
 
@@ -156,12 +156,12 @@ Test case 2 - Use  -t --difftype=unified --format=grid
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
-| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
-| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
-| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
 | 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
@@ -169,8 +169,8 @@ Test case 2 - Use  -t --difftype=unified --format=grid
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
-| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 | 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
@@ -183,8 +183,8 @@ Test case 3 - Use  -t --difftype=unified --format=csv
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -203,7 +203,7 @@ Test case 3 - Use  -t --difftype=unified --format=csv
 +++ `inventory`.`supplier`
 @@ -1,3 +1,3 @@
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -211,7 +211,7 @@ Test case 3 - Use  -t --difftype=unified --format=csv
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -225,27 +225,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -257,8 +257,8 @@ Test case 4 - Use  -t --difftype=unified --format=tab
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -277,7 +277,7 @@ Test case 4 - Use  -t --difftype=unified --format=tab
 +++ `inventory`.`supplier`
 @@ -1,3 +1,3 @@
  code	name
--4	
+-4	NULL
 -2	Never Enough Inc.
 +4	Acme Corporation
 +2	Wesayso Corporation
@@ -285,7 +285,7 @@ Test case 4 - Use  -t --difftype=unified --format=tab
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
 6	
-5	
+5	NULL
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -299,27 +299,27 @@ code	name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number	description	qty	cost	type	notes	supplier
--11146	Speed shine	1	9.99	repair		1
 -11186	Plastic polish	1	9.99	polishing		1
+-11146	Speed shine	1	9.99	repair		1
 -11040	Leather care	1	9.99	other		1
-+11146	Speed shine	1	10.00	repair		1
 +11186	Plastic polish	1	10.00	polishing		1
++11146	Speed shine	1	10.00	repair		1
 +11040	Leather care	1	10.00	other		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
-11270	Carpet cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
 11136	Rubber cleaner	1	9.99	cleaning		1
-11104	Interior cleaner	1	9.99	cleaning		1
-11173	Vinyl and rubber dressing	1	9.99	cleaning		1
 11106	Wheel cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11104	Interior cleaner	1	9.99	cleaning		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
 11116	Microfiber wax removal towel	3	16.99	waxing		1
-10665	Glass polish pad	3	10.00	polishing		1
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+10665	Glass polish pad	3	10.00	polishing		1
 
 
 # Database consistency check failed.
@@ -331,8 +331,8 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -352,7 +352,7 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
 @@ -1,7 +1,7 @@
  *************************       1. row *************************
   code: 4
-- name: None
+- name: NULL
 + name: Acme Corporation
  *************************       2. row *************************
   code: 2
@@ -366,7 +366,7 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
  name: 
 *************************       2. row *************************
  code: 5
- name: None
+ name: NULL
 *************************       3. row *************************
  code: 3
  name: Never Enough Inc.
@@ -382,21 +382,21 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
 --- `inventory`.`supplies`
 +++ `inventory`.`supplies`
 @@ -2,7 +2,7 @@
-  stock_number: 11146
-   description: Speed shine
-           qty: 1
--         cost: 9.99
-+         cost: 10.00
-          type: repair
-         notes:
-      supplier: 1
-@@ -10,7 +10,7 @@
   stock_number: 11186
    description: Plastic polish
            qty: 1
 -         cost: 9.99
 +         cost: 10.00
           type: polishing
+         notes:
+      supplier: 1
+@@ -10,7 +10,7 @@
+  stock_number: 11146
+   description: Speed shine
+           qty: 1
+-         cost: 9.99
++         cost: 10.00
+          type: repair
          notes:
       supplier: 1
 @@ -18,7 +18,7 @@
@@ -411,16 +411,16 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 *************************       1. row *************************
- stock_number: 11270
-  description: Carpet cleaner
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
           qty: 1
          cost: 9.99
          type: cleaning
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 11056
-  description: Microfiber and foam pad cleaner
+ stock_number: 11270
+  description: Carpet cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -435,8 +435,8 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
         notes: 
      supplier: 1
 *************************       4. row *************************
- stock_number: 11104
-  description: Interior cleaner
+ stock_number: 11106
+  description: Wheel cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -451,8 +451,8 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
         notes: 
      supplier: 1
 *************************       6. row *************************
- stock_number: 11106
-  description: Wheel cleaner
+ stock_number: 11104
+  description: Interior cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -470,19 +470,19 @@ Test case 5 - Use  -t --difftype=unified --format=vertical
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 10665
-  description: Glass polish pad
-          qty: 3
-         cost: 10.00
-         type: polishing
-        notes: 
-     supplier: 1
-*************************       3. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
           qty: 3
          cost: 16.99
          type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
         notes: 
      supplier: 1
 3 rows.
@@ -497,8 +497,8 @@ Test case 6 - Use  -t --difftype=context --format=grid
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -520,7 +520,7 @@ Test case 6 - Use  -t --difftype=context --format=grid
   +-------+----------------------+
   | code  | name                 |
   +-------+----------------------+
-! | 4     | None                 |
+! | 4     | NULL                 |
 ! | 2     | Never Enough Inc.    |
   +-------+----------------------+
 --- 1,6 ----
@@ -536,7 +536,7 @@ Test case 6 - Use  -t --difftype=context --format=grid
 | code  | name               |
 +-------+--------------------+
 | 6     |                    |
-| 5     | None               |
+| 5     | NULL               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -554,16 +554,16 @@ Test case 6 - Use  -t --difftype=context --format=grid
   +---------------+-----------------+------+--------+------------+--------+-----------+
   | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
   +---------------+-----------------+------+--------+------------+--------+-----------+
-! | 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 ! | 11186         | Plastic polish  | 1    | 9.99   | polishing  |        | 1         |
+! | 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 ! | 11040         | Leather care    | 1    | 9.99   | other      |        | 1         |
   +---------------+-----------------+------+--------+------------+--------+-----------+
 --- 1,7 ----
   +---------------+-----------------+------+--------+------------+--------+-----------+
   | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
   +---------------+-----------------+------+--------+------------+--------+-----------+
-! | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 ! | 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
+! | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 ! | 11040         | Leather care    | 1    | 10.00  | other      |        | 1         |
   +---------------+-----------------+------+--------+------------+--------+-----------+
 
@@ -571,12 +571,12 @@ Test case 6 - Use  -t --difftype=context --format=grid
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
-| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
-| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
-| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
 | 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
@@ -584,8 +584,8 @@ Test case 6 - Use  -t --difftype=context --format=grid
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
-| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 | 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
@@ -598,8 +598,8 @@ Test case 7 - Use  -t --difftype=context --format=csv
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -619,7 +619,7 @@ Test case 7 - Use  -t --difftype=context --format=csv
 ***************
 *** 1,3 ****
   code,name
-! '4',NULL
+! '4','NULL'
 ! '2','Never Enough Inc.'
 --- 1,3 ----
   code,name
@@ -629,7 +629,7 @@ Test case 7 - Use  -t --difftype=context --format=csv
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -644,29 +644,29 @@ code,name
 ***************
 *** 1,4 ****
   stock_number,description,qty,cost,type,notes,supplier
-! '11146','Speed shine','1','9.99','repair','','1'
 ! '11186','Plastic polish','1','9.99','polishing','','1'
+! '11146','Speed shine','1','9.99','repair','','1'
 ! '11040','Leather care','1','9.99','other','','1'
 --- 1,4 ----
   stock_number,description,qty,cost,type,notes,supplier
-! '11146','Speed shine','1','10.00','repair','','1'
 ! '11186','Plastic polish','1','10.00','polishing','','1'
+! '11146','Speed shine','1','10.00','repair','','1'
 ! '11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -678,8 +678,8 @@ Test case 8 - Use  -t --difftype=context --format=tab
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -699,7 +699,7 @@ Test case 8 - Use  -t --difftype=context --format=tab
 ***************
 *** 1,3 ****
   code	name
-! 4	
+! 4	NULL
 ! 2	Never Enough Inc.
 --- 1,3 ----
   code	name
@@ -709,7 +709,7 @@ Test case 8 - Use  -t --difftype=context --format=tab
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
 6	
-5	
+5	NULL
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -724,29 +724,29 @@ code	name
 ***************
 *** 1,4 ****
   stock_number	description	qty	cost	type	notes	supplier
-! 11146	Speed shine	1	9.99	repair		1
 ! 11186	Plastic polish	1	9.99	polishing		1
+! 11146	Speed shine	1	9.99	repair		1
 ! 11040	Leather care	1	9.99	other		1
 --- 1,4 ----
   stock_number	description	qty	cost	type	notes	supplier
-! 11146	Speed shine	1	10.00	repair		1
 ! 11186	Plastic polish	1	10.00	polishing		1
+! 11146	Speed shine	1	10.00	repair		1
 ! 11040	Leather care	1	10.00	other		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
-11270	Carpet cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
 11136	Rubber cleaner	1	9.99	cleaning		1
-11104	Interior cleaner	1	9.99	cleaning		1
-11173	Vinyl and rubber dressing	1	9.99	cleaning		1
 11106	Wheel cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11104	Interior cleaner	1	9.99	cleaning		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
 11116	Microfiber wax removal towel	3	16.99	waxing		1
-10665	Glass polish pad	3	10.00	polishing		1
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+10665	Glass polish pad	3	10.00	polishing		1
 
 
 # Database consistency check failed.
@@ -758,8 +758,8 @@ Test case 9 - Use  -t --difftype=context --format=vertical
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -780,7 +780,7 @@ Test case 9 - Use  -t --difftype=context --format=vertical
 *** 1,7 ****
   *************************       1. row *************************
    code: 4
-!  name: None
+!  name: NULL
   *************************       2. row *************************
    code: 2
 !  name: Never Enough Inc.
@@ -800,7 +800,7 @@ Test case 9 - Use  -t --difftype=context --format=vertical
  name: 
 *************************       2. row *************************
  code: 5
- name: None
+ name: NULL
 *************************       3. row *************************
  code: 3
  name: Never Enough Inc.
@@ -817,36 +817,36 @@ Test case 9 - Use  -t --difftype=context --format=vertical
 --- `inventory`.`supplies`
 ***************
 *** 2,8 ****
-   stock_number: 11146
-    description: Speed shine
+   stock_number: 11186
+    description: Plastic polish
             qty: 1
 !          cost: 9.99
-           type: repair
+           type: polishing
           notes:
        supplier: 1
 --- 2,8 ----
-   stock_number: 11146
-    description: Speed shine
+   stock_number: 11186
+    description: Plastic polish
             qty: 1
 !          cost: 10.00
-           type: repair
+           type: polishing
           notes:
        supplier: 1
 ***************
 *** 10,16 ****
-   stock_number: 11186
-    description: Plastic polish
+   stock_number: 11146
+    description: Speed shine
             qty: 1
 !          cost: 9.99
-           type: polishing
+           type: repair
           notes:
        supplier: 1
 --- 10,16 ----
-   stock_number: 11186
-    description: Plastic polish
+   stock_number: 11146
+    description: Speed shine
             qty: 1
 !          cost: 10.00
-           type: polishing
+           type: repair
           notes:
        supplier: 1
 ***************
@@ -869,16 +869,16 @@ Test case 9 - Use  -t --difftype=context --format=vertical
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 *************************       1. row *************************
- stock_number: 11270
-  description: Carpet cleaner
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
           qty: 1
          cost: 9.99
          type: cleaning
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 11056
-  description: Microfiber and foam pad cleaner
+ stock_number: 11270
+  description: Carpet cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -893,8 +893,8 @@ Test case 9 - Use  -t --difftype=context --format=vertical
         notes: 
      supplier: 1
 *************************       4. row *************************
- stock_number: 11104
-  description: Interior cleaner
+ stock_number: 11106
+  description: Wheel cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -909,8 +909,8 @@ Test case 9 - Use  -t --difftype=context --format=vertical
         notes: 
      supplier: 1
 *************************       6. row *************************
- stock_number: 11106
-  description: Wheel cleaner
+ stock_number: 11104
+  description: Interior cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -928,19 +928,19 @@ Test case 9 - Use  -t --difftype=context --format=vertical
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 10665
-  description: Glass polish pad
-          qty: 3
-         cost: 10.00
-         type: polishing
-        notes: 
-     supplier: 1
-*************************       3. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
           qty: 3
          cost: 16.99
          type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
         notes: 
      supplier: 1
 3 rows.
@@ -955,8 +955,8 @@ Test case 10 - Use  -t --difftype=differ --format=grid
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -974,7 +974,7 @@ Test case 10 - Use  -t --difftype=differ --format=grid
   +-------+----------------------+
   | code  | name                 |
   +-------+----------------------+
-- | 4     | None                 |
+- | 4     | NULL                 |
 - | 2     | Never Enough Inc.    |
 + | 4     | Acme Corporation     |
 + | 2     | Wesayso Corporation  |
@@ -985,7 +985,7 @@ Test case 10 - Use  -t --difftype=differ --format=grid
 | code  | name               |
 +-------+--------------------+
 | 6     |                    |
-| 5     | None               |
+| 5     | NULL               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -999,13 +999,13 @@ Test case 10 - Use  -t --difftype=differ --format=grid
   +---------------+-----------------+------+--------+------------+--------+-----------+
   | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
   +---------------+-----------------+------+--------+------------+--------+-----------+
-- | 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
-?                                            ^ ^^^
-+ | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
-?                                            ^^ ^^
 - | 11186         | Plastic polish  | 1    | 9.99   | polishing  |        | 1         |
 ?                                            ^ ^^^
 + | 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
+?                                            ^^ ^^
+- | 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
+?                                            ^ ^^^
++ | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 ?                                            ^^ ^^
 - | 11040         | Leather care    | 1    | 9.99   | other      |        | 1         |
 ?                                            ^ ^^^
@@ -1017,12 +1017,12 @@ Test case 10 - Use  -t --difftype=differ --format=grid
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
-| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
-| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
-| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
 | 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
@@ -1030,8 +1030,8 @@ Test case 10 - Use  -t --difftype=differ --format=grid
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
-| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 | 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
@@ -1044,8 +1044,8 @@ Test case 11 - Use  -t --difftype=differ --format=csv
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -1061,7 +1061,7 @@ Test case 11 - Use  -t --difftype=differ --format=csv
 #
 # Data differences found among rows:
   code,name
-- '4',NULL
+- '4','NULL'
 - '2','Never Enough Inc.'
 + '4','Acme Corporation'
 + '2','Wesayso Corporation'
@@ -1069,7 +1069,7 @@ Test case 11 - Use  -t --difftype=differ --format=csv
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -1080,14 +1080,14 @@ code,name
 #
 # Data differences found among rows:
   stock_number,description,qty,cost,type,notes,supplier
-- '11146','Speed shine','1','9.99','repair','','1'
-?                            ^ ^^
-+ '11146','Speed shine','1','10.00','repair','','1'
-?                            ^^ ^^
 - '11186','Plastic polish','1','9.99','polishing','','1'
 ?                               ^ ^^
 + '11186','Plastic polish','1','10.00','polishing','','1'
 ?                               ^^ ^^
+- '11146','Speed shine','1','9.99','repair','','1'
+?                            ^ ^^
++ '11146','Speed shine','1','10.00','repair','','1'
+?                            ^^ ^^
 - '11040','Leather care','1','9.99','other','','1'
 ?                             ^ ^^
 + '11040','Leather care','1','10.00','other','','1'
@@ -1095,18 +1095,18 @@ code,name
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -1118,8 +1118,8 @@ Test case 12 - Use  -t --difftype=differ --format=tab
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -1135,7 +1135,7 @@ Test case 12 - Use  -t --difftype=differ --format=tab
 #
 # Data differences found among rows:
   code	name
-- 4	
+- 4	NULL
 - 2	Never Enough Inc.
 + 4	Acme Corporation
 + 2	Wesayso Corporation
@@ -1143,7 +1143,7 @@ Test case 12 - Use  -t --difftype=differ --format=tab
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
 6	
-5	
+5	NULL
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -1154,14 +1154,14 @@ code	name
 #
 # Data differences found among rows:
   stock_number	description	qty	cost	type	notes	supplier
-- 11146	Speed shine	1	9.99	repair		1
-?                     ^ ^^
-+ 11146	Speed shine	1	10.00	repair		1
-?                     ^^ ^^
 - 11186	Plastic polish	1	9.99	polishing		1
 ?                        ^ ^^
 + 11186	Plastic polish	1	10.00	polishing		1
 ?                        ^^ ^^
+- 11146	Speed shine	1	9.99	repair		1
+?                     ^ ^^
++ 11146	Speed shine	1	10.00	repair		1
+?                     ^^ ^^
 - 11040	Leather care	1	9.99	other		1
 ?                      ^ ^^
 + 11040	Leather care	1	10.00	other		1
@@ -1169,18 +1169,18 @@ code	name
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
-11270	Carpet cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
 11136	Rubber cleaner	1	9.99	cleaning		1
-11104	Interior cleaner	1	9.99	cleaning		1
-11173	Vinyl and rubber dressing	1	9.99	cleaning		1
 11106	Wheel cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11104	Interior cleaner	1	9.99	cleaning		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
 11116	Microfiber wax removal towel	3	16.99	waxing		1
-10665	Glass polish pad	3	10.00	polishing		1
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+10665	Glass polish pad	3	10.00	polishing		1
 
 
 # Database consistency check failed.
@@ -1192,8 +1192,8 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -1210,7 +1210,7 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
 # Data differences found among rows:
   *************************       1. row *************************
    code: 4
--  name: None
+-  name: NULL
 +  name: Acme Corporation
   *************************       2. row *************************
    code: 2
@@ -1224,7 +1224,7 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
  name: 
 *************************       2. row *************************
  code: 5
- name: None
+ name: NULL
 *************************       3. row *************************
  code: 3
  name: Never Enough Inc.
@@ -1238,17 +1238,6 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
 #
 # Data differences found among rows:
   *************************       1. row *************************
-   stock_number: 11146
-    description: Speed shine
-            qty: 1
--          cost: 9.99
-?                ^ ^^
-+          cost: 10.00
-?                ^^ ^^
-           type: repair
-          notes:
-       supplier: 1
-  *************************       2. row *************************
    stock_number: 11186
     description: Plastic polish
             qty: 1
@@ -1257,6 +1246,17 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
 +          cost: 10.00
 ?                ^^ ^^
            type: polishing
+          notes:
+       supplier: 1
+  *************************       2. row *************************
+   stock_number: 11146
+    description: Speed shine
+            qty: 1
+-          cost: 9.99
+?                ^ ^^
++          cost: 10.00
+?                ^^ ^^
+           type: repair
           notes:
        supplier: 1
   *************************       3. row *************************
@@ -1274,16 +1274,16 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 *************************       1. row *************************
- stock_number: 11270
-  description: Carpet cleaner
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
           qty: 1
          cost: 9.99
          type: cleaning
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 11056
-  description: Microfiber and foam pad cleaner
+ stock_number: 11270
+  description: Carpet cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -1298,8 +1298,8 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
         notes: 
      supplier: 1
 *************************       4. row *************************
- stock_number: 11104
-  description: Interior cleaner
+ stock_number: 11106
+  description: Wheel cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -1314,8 +1314,8 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
         notes: 
      supplier: 1
 *************************       6. row *************************
- stock_number: 11106
-  description: Wheel cleaner
+ stock_number: 11104
+  description: Interior cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -1333,19 +1333,19 @@ Test case 13 - Use  -t --difftype=differ --format=vertical
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 10665
-  description: Glass polish pad
-          qty: 3
-         cost: 10.00
-         type: polishing
-        notes: 
-     supplier: 1
-*************************       3. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
           qty: 3
          cost: 16.99
          type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
         notes: 
      supplier: 1
 3 rows.
@@ -1368,8 +1368,8 @@ Test case 17 -  --format=csv -t --width=65
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -1388,7 +1388,7 @@ Test case 17 -  --format=csv -t --width=65
 +++ `inventory`.`supplier`
 @@ -1,3 +1,3 @@
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -1396,7 +1396,7 @@ Test case 17 -  --format=csv -t --width=65
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                      pass    FAIL    -       
@@ -1410,27 +1410,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -1442,8 +1442,8 @@ Test case 18 -  --format=csv -t --width=60
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -1462,7 +1462,7 @@ Test case 18 -  --format=csv -t --width=60
 +++ `inventory`.`supplier`
 @@ -1,3 +1,3 @@
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -1470,7 +1470,7 @@ Test case 18 -  --format=csv -t --width=60
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                 pass    FAIL    -       
@@ -1484,27 +1484,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -1516,27 +1516,28 @@ Test case 19 -  --format=csv -vvv -t
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 Looking for object types table, view, trigger, procedure, function, and event.
 Object types found common to both databases:
-     FUNCTION : 0
-      TRIGGER : 0
-        TABLE : 2
-        EVENT : 0
-    PROCEDURE : 0
          VIEW : 0
+      TRIGGER : 0
+    PROCEDURE : 0
+     FUNCTION : 0
+        EVENT : 0
+        TABLE : 2
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL   
+#           - Find row differences                                  FAIL    
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
   `code` int(11) NOT NULL,
@@ -1550,6 +1551,21 @@ CREATE TABLE `supplier` (
   `name` char(30) DEFAULT NULL,
   PRIMARY KEY (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #else
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table supplier the index PRIMARY is used to compare.
@@ -1562,7 +1578,7 @@ CREATE TABLE `supplier` (
 +++ `inventory`.`supplier`
 @@ -1,3 +1,3 @@
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -1570,13 +1586,14 @@ CREATE TABLE `supplier` (
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL   
+#           - Find row differences                                  FAIL    
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
   `stock_number` int(11) NOT NULL DEFAULT '0',
@@ -1600,6 +1617,31 @@ CREATE TABLE `supplies` (
   `supplier` int(11) DEFAULT NULL,
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #else
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table supplies the index PRIMARY is used to compare.
@@ -1612,27 +1654,27 @@ CREATE TABLE `supplies` (
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -1644,27 +1686,28 @@ Test case 20 -  --format=csv -vvv -t --disable-binary-logging
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 Looking for object types table, view, trigger, procedure, function, and event.
 Object types found common to both databases:
-     FUNCTION : 0
-      TRIGGER : 0
-        TABLE : 2
-        EVENT : 0
-    PROCEDURE : 0
          VIEW : 0
+      TRIGGER : 0
+    PROCEDURE : 0
+     FUNCTION : 0
+        EVENT : 0
+        TABLE : 2
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL   
+#           - Find row differences                                  FAIL    
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
   `code` int(11) NOT NULL,
@@ -1678,6 +1721,21 @@ CREATE TABLE `supplier` (
   `name` char(30) DEFAULT NULL,
   PRIMARY KEY (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #else
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table supplier the index PRIMARY is used to compare.
@@ -1690,7 +1748,7 @@ CREATE TABLE `supplier` (
 +++ `inventory`.`supplier`
 @@ -1,3 +1,3 @@
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -1698,13 +1756,14 @@ CREATE TABLE `supplier` (
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL   
+#           - Find row differences                                  FAIL    
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
   `stock_number` int(11) NOT NULL DEFAULT '0',
@@ -1728,6 +1787,31 @@ CREATE TABLE `supplies` (
   `supplier` int(11) DEFAULT NULL,
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #else
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table supplies the index PRIMARY is used to compare.
@@ -1740,27 +1824,27 @@ CREATE TABLE `supplies` (
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -1772,27 +1856,28 @@ Test case 21 -  --format=csv -vvv -t --span-key-size=16
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
 Looking for object types table, view, trigger, procedure, function, and event.
 Object types found common to both databases:
-     FUNCTION : 0
-      TRIGGER : 0
-        TABLE : 2
-        EVENT : 0
-    PROCEDURE : 0
          VIEW : 0
+      TRIGGER : 0
+    PROCEDURE : 0
+     FUNCTION : 0
+        EVENT : 0
+        TABLE : 2
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     supplier                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL   
+#           - Find row differences                                  FAIL    
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
   `code` int(11) NOT NULL,
@@ -1806,6 +1891,21 @@ CREATE TABLE `supplier` (
   `name` char(30) DEFAULT NULL,
   PRIMARY KEY (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #else
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplier:
+CREATE TABLE `supplier` (
+  `code` int NOT NULL,
+  `name` char(30) DEFAULT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table supplier the index PRIMARY is used to compare.
@@ -1818,21 +1918,22 @@ CREATE TABLE `supplier` (
 +++ `inventory`.`supplier`
 @@ -1,3 +1,3 @@
  code,name
+-'4','NULL'
 -'2','Never Enough Inc.'
--'4',NULL
-+'2','Wesayso Corporation'
 +'4','Acme Corporation'
++'2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-'5',NULL
-'3','Never Enough Inc.'
 '6',''
+'5','NULL'
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL   
+#           - Find row differences                                  FAIL    
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
   `stock_number` int(11) NOT NULL DEFAULT '0',
@@ -1856,6 +1957,31 @@ CREATE TABLE `supplies` (
   `supplier` int(11) DEFAULT NULL,
   PRIMARY KEY (`stock_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #else
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+
+# Definition for object inventory.supplies:
+CREATE TABLE `supplies` (
+  `stock_number` int NOT NULL DEFAULT '0',
+  `description` char(40) DEFAULT NULL,
+  `qty` int DEFAULT NULL,
+  `cost` float(10,2) DEFAULT NULL,
+  `type` enum('cleaning','washing','waxing','polishing','repair','drying','tools','other') DEFAULT NULL,
+  `notes` char(4) DEFAULT NULL,
+  `supplier` int DEFAULT NULL,
+  PRIMARY KEY (`stock_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table supplies the index PRIMARY is used to compare.
@@ -1868,27 +1994,27 @@ CREATE TABLE `supplies` (
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
+-'11186','Plastic polish','1','9.99','polishing','','1'
 -'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
--'11186','Plastic polish','1','9.99','polishing','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
 +'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
-+'11186','Plastic polish','1','10.00','polishing','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
 '11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11104','Interior cleaner','1','9.99','cleaning','','1'
-'11136','Rubber cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -1914,6 +2040,7 @@ Test case 23a - Changes for server1  (not skipping table options).
 # Object definitions differ. (--changes-for=server1)
 #
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 --- `db_diff_test`.`table-dash`
 +++ `db_diff_test`.`table-dash`
 @@ -1,4 +1,4 @@
@@ -1922,6 +2049,16 @@ Test case 23a - Changes for server1  (not skipping table options).
    PRIMARY KEY (`id`)
 -) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
 +) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+# #else
+--- `db_diff_test`.`table-dash`
++++ `db_diff_test`.`table-dash`
+@@ -1,4 +1,4 @@
+ CREATE TABLE `table-dash` (
+   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+   PRIMARY KEY (`id`)
+-) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
++) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+# #endif
 
 
 # Database consistency check failed.
@@ -1935,7 +2072,7 @@ Test case 23b - Changes for server1  (skipping table options).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    SKIP    SKIP   
+# TABLE     table-dash                              pass    SKIP    SKIP    
 
 # Databases are consistent given skip options specified.
 #
@@ -1953,6 +2090,7 @@ Test case 24a - Changes for server2  (not skipping table options).
 # Object definitions differ. (--changes-for=server2)
 #
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 --- `db_diff_test`.`table-dash`
 +++ `db_diff_test`.`table-dash`
 @@ -1,4 +1,4 @@
@@ -1961,6 +2099,16 @@ Test case 24a - Changes for server2  (not skipping table options).
    PRIMARY KEY (`id`)
 -) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
 +) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+# #else
+--- `db_diff_test`.`table-dash`
++++ `db_diff_test`.`table-dash`
+@@ -1,4 +1,4 @@
+ CREATE TABLE `table-dash` (
+   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+   PRIMARY KEY (`id`)
+-) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
++) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+# #endif
 
 
 # Database consistency check failed.
@@ -1974,7 +2122,7 @@ Test case 24b - Changes for server2  (skipping table options).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    SKIP    SKIP   
+# TABLE     table-dash                              pass    SKIP    SKIP    
 
 # Databases are consistent given skip options specified.
 #
@@ -1992,6 +2140,7 @@ Test case 25a - Changes for server1 --difftype=context (not skipping table optio
 # Object definitions differ. (--changes-for=server1)
 #
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 *** `db_diff_test`.`table-dash`
 --- `db_diff_test`.`table-dash`
 ***************
@@ -2005,6 +2154,21 @@ Test case 25a - Changes for server1 --difftype=context (not skipping table optio
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`)
 ! ) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+# #else
+*** `db_diff_test`.`table-dash`
+--- `db_diff_test`.`table-dash`
+***************
+*** 1,4 ****
+  CREATE TABLE `table-dash` (
+    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+--- 1,4 ----
+  CREATE TABLE `table-dash` (
+    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+# #endif
 
 
 # Database consistency check failed.
@@ -2018,7 +2182,7 @@ Test case 25b - Changes for server1 --difftype=context (skipping table options).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    SKIP    SKIP   
+# TABLE     table-dash                              pass    SKIP    SKIP    
 
 # Databases are consistent given skip options specified.
 #
@@ -2036,6 +2200,7 @@ Test case 26a - Changes for server2 --difftype=context (not skipping table optio
 # Object definitions differ. (--changes-for=server2)
 #
 
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 *** `db_diff_test`.`table-dash`
 --- `db_diff_test`.`table-dash`
 ***************
@@ -2049,6 +2214,21 @@ Test case 26a - Changes for server2 --difftype=context (not skipping table optio
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`)
 ! ) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+# #else
+*** `db_diff_test`.`table-dash`
+--- `db_diff_test`.`table-dash`
+***************
+*** 1,4 ****
+  CREATE TABLE `table-dash` (
+    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
+--- 1,4 ----
+  CREATE TABLE `table-dash` (
+    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+! ) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
+# #endif
 
 
 # Database consistency check failed.
@@ -2062,7 +2242,7 @@ Test case 26b - Changes for server2 --difftype=context (skipping table options).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    SKIP    SKIP   
+# TABLE     table-dash                              pass    SKIP    SKIP    
 
 # Databases are consistent given skip options specified.
 #
@@ -2096,7 +2276,7 @@ Test case 27b - Changes for server1 --difftype=sql (skipping table options).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    SKIP    SKIP   
+# TABLE     table-dash                              pass    SKIP    SKIP    
 
 # Databases are consistent given skip options specified.
 #
@@ -2130,7 +2310,7 @@ Test case 28b - Changes for server2 --difftype=sql (skipping table options).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    SKIP    SKIP   
+# TABLE     table-dash                              pass    SKIP    SKIP    
 
 # Databases are consistent given skip options specified.
 #
@@ -2141,8 +2321,8 @@ Test case 29 - Use  -t --difftype=unified --format=grid --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2160,7 +2340,7 @@ Test case 29 - Use  -t --difftype=unified --format=grid --compact
  +-------+----------------------+
  | code  | name                 |
  +-------+----------------------+
--| 4     | None                 |
+-| 4     | NULL                 |
 -| 2     | Never Enough Inc.    |
 +| 4     | Acme Corporation     |
 +| 2     | Wesayso Corporation  |
@@ -2171,7 +2351,7 @@ Test case 29 - Use  -t --difftype=unified --format=grid --compact
 | code  | name               |
 +-------+--------------------+
 | 6     |                    |
-| 5     | None               |
+| 5     | NULL               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -2185,11 +2365,11 @@ Test case 29 - Use  -t --difftype=unified --format=grid --compact
  +---------------+-----------------+------+--------+------------+--------+-----------+
  | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
  +---------------+-----------------+------+--------+------------+--------+-----------+
--| 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 -| 11186         | Plastic polish  | 1    | 9.99   | polishing  |        | 1         |
+-| 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 -| 11040         | Leather care    | 1    | 9.99   | other      |        | 1         |
-+| 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 +| 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
++| 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 +| 11040         | Leather care    | 1    | 10.00  | other      |        | 1         |
  +---------------+-----------------+------+--------+------------+--------+-----------+
 
@@ -2197,12 +2377,12 @@ Test case 29 - Use  -t --difftype=unified --format=grid --compact
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
-| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
-| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
-| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
 | 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
@@ -2210,8 +2390,8 @@ Test case 29 - Use  -t --difftype=unified --format=grid --compact
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
-| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 | 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
@@ -2224,8 +2404,8 @@ Test case 30 - Use  -t --difftype=unified --format=csv --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2241,7 +2421,7 @@ Test case 30 - Use  -t --difftype=unified --format=csv --compact
 #
 # Data differences found among rows:
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -2249,7 +2429,7 @@ Test case 30 - Use  -t --difftype=unified --format=csv --compact
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -2260,27 +2440,27 @@ code,name
 #
 # Data differences found among rows:
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -2292,8 +2472,8 @@ Test case 31 - Use  -t --difftype=unified --format=tab --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2309,7 +2489,7 @@ Test case 31 - Use  -t --difftype=unified --format=tab --compact
 #
 # Data differences found among rows:
  code	name
--4	
+-4	NULL
 -2	Never Enough Inc.
 +4	Acme Corporation
 +2	Wesayso Corporation
@@ -2317,7 +2497,7 @@ Test case 31 - Use  -t --difftype=unified --format=tab --compact
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
 6	
-5	
+5	NULL
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -2328,27 +2508,27 @@ code	name
 #
 # Data differences found among rows:
  stock_number	description	qty	cost	type	notes	supplier
--11146	Speed shine	1	9.99	repair		1
 -11186	Plastic polish	1	9.99	polishing		1
+-11146	Speed shine	1	9.99	repair		1
 -11040	Leather care	1	9.99	other		1
-+11146	Speed shine	1	10.00	repair		1
 +11186	Plastic polish	1	10.00	polishing		1
++11146	Speed shine	1	10.00	repair		1
 +11040	Leather care	1	10.00	other		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
-11270	Carpet cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
 11136	Rubber cleaner	1	9.99	cleaning		1
-11104	Interior cleaner	1	9.99	cleaning		1
-11173	Vinyl and rubber dressing	1	9.99	cleaning		1
 11106	Wheel cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11104	Interior cleaner	1	9.99	cleaning		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
 11116	Microfiber wax removal towel	3	16.99	waxing		1
-10665	Glass polish pad	3	10.00	polishing		1
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+10665	Glass polish pad	3	10.00	polishing		1
 
 
 # Database consistency check failed.
@@ -2360,8 +2540,8 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2378,7 +2558,7 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
 # Data differences found among rows:
  *************************       1. row *************************
   code: 4
-- name: None
+- name: NULL
 + name: Acme Corporation
  *************************       2. row *************************
   code: 2
@@ -2392,7 +2572,7 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
  name: 
 *************************       2. row *************************
  code: 5
- name: None
+ name: NULL
 *************************       3. row *************************
  code: 3
  name: Never Enough Inc.
@@ -2405,20 +2585,20 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
-  stock_number: 11146
-   description: Speed shine
-           qty: 1
--         cost: 9.99
-+         cost: 10.00
-          type: repair
-         notes:
-      supplier: 1
   stock_number: 11186
    description: Plastic polish
            qty: 1
 -         cost: 9.99
 +         cost: 10.00
           type: polishing
+         notes:
+      supplier: 1
+  stock_number: 11146
+   description: Speed shine
+           qty: 1
+-         cost: 9.99
++         cost: 10.00
+          type: repair
          notes:
       supplier: 1
   stock_number: 11040
@@ -2432,16 +2612,16 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 *************************       1. row *************************
- stock_number: 11270
-  description: Carpet cleaner
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
           qty: 1
          cost: 9.99
          type: cleaning
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 11056
-  description: Microfiber and foam pad cleaner
+ stock_number: 11270
+  description: Carpet cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -2456,8 +2636,8 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
         notes: 
      supplier: 1
 *************************       4. row *************************
- stock_number: 11104
-  description: Interior cleaner
+ stock_number: 11106
+  description: Wheel cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -2472,8 +2652,8 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
         notes: 
      supplier: 1
 *************************       6. row *************************
- stock_number: 11106
-  description: Wheel cleaner
+ stock_number: 11104
+  description: Interior cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -2491,19 +2671,19 @@ Test case 32 - Use  -t --difftype=unified --format=vertical --compact
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 10665
-  description: Glass polish pad
-          qty: 3
-         cost: 10.00
-         type: polishing
-        notes: 
-     supplier: 1
-*************************       3. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
           qty: 3
          cost: 16.99
          type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
         notes: 
      supplier: 1
 3 rows.
@@ -2518,8 +2698,8 @@ Test case 33 - Use  -t --difftype=context --format=grid --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2538,7 +2718,7 @@ Test case 33 - Use  -t --difftype=context --format=grid --compact
   +-------+----------------------+
   | code  | name                 |
   +-------+----------------------+
-! | 4     | None                 |
+! | 4     | NULL                 |
 ! | 2     | Never Enough Inc.    |
   +-------+----------------------+
 ---
@@ -2554,7 +2734,7 @@ Test case 33 - Use  -t --difftype=context --format=grid --compact
 | code  | name               |
 +-------+--------------------+
 | 6     |                    |
-| 5     | None               |
+| 5     | NULL               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -2569,16 +2749,16 @@ Test case 33 - Use  -t --difftype=context --format=grid --compact
   +---------------+-----------------+------+--------+------------+--------+-----------+
   | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
   +---------------+-----------------+------+--------+------------+--------+-----------+
-! | 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 ! | 11186         | Plastic polish  | 1    | 9.99   | polishing  |        | 1         |
+! | 11146         | Speed shine     | 1    | 9.99   | repair     |        | 1         |
 ! | 11040         | Leather care    | 1    | 9.99   | other      |        | 1         |
   +---------------+-----------------+------+--------+------------+--------+-----------+
 ---
   +---------------+-----------------+------+--------+------------+--------+-----------+
   | stock_number  | description     | qty  | cost   | type       | notes  | supplier  |
   +---------------+-----------------+------+--------+------------+--------+-----------+
-! | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 ! | 11186         | Plastic polish  | 1    | 10.00  | polishing  |        | 1         |
+! | 11146         | Speed shine     | 1    | 10.00  | repair     |        | 1         |
 ! | 11040         | Leather care    | 1    | 10.00  | other      |        | 1         |
   +---------------+-----------------+------+--------+------------+--------+-----------+
 
@@ -2586,12 +2766,12 @@ Test case 33 - Use  -t --difftype=context --format=grid --compact
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 | stock_number  | description                      | qty  | cost  | type      | notes  | supplier  |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
-| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11056         | Microfiber and foam pad cleaner  | 1    | 9.99  | cleaning  |        | 1         |
+| 11270         | Carpet cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
 | 11136         | Rubber cleaner                   | 1    | 9.99  | cleaning  |        | 1         |
-| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
-| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
 | 11106         | Wheel cleaner                    | 1    | 9.99  | cleaning  |        | 1         |
+| 11173         | Vinyl and rubber dressing        | 1    | 9.99  | cleaning  |        | 1         |
+| 11104         | Interior cleaner                 | 1    | 9.99  | cleaning  |        | 1         |
 +---------------+----------------------------------+------+-------+-----------+--------+-----------+
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
@@ -2599,8 +2779,8 @@ Test case 33 - Use  -t --difftype=context --format=grid --compact
 | stock_number  | description                         | qty  | cost   | type       | notes  | supplier  |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 | 11116         | Microfiber wax removal towel        | 3    | 16.99  | waxing     |        | 1         |
-| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 | 11269         | Microfiber spray on car wash towel  | 3    | 16.99  | cleaning   |        | 1         |
+| 10665         | Glass polish pad                    | 3    | 10.00  | polishing  |        | 1         |
 +---------------+-------------------------------------+------+--------+------------+--------+-----------+
 
 
@@ -2613,8 +2793,8 @@ Test case 34 - Use  -t --difftype=context --format=csv --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2631,7 +2811,7 @@ Test case 34 - Use  -t --difftype=context --format=csv --compact
 # Data differences found among rows:
 ***
   code,name
-! '4',NULL
+! '4','NULL'
 ! '2','Never Enough Inc.'
 ---
   code,name
@@ -2641,7 +2821,7 @@ Test case 34 - Use  -t --difftype=context --format=csv --compact
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -2653,29 +2833,29 @@ code,name
 # Data differences found among rows:
 ***
   stock_number,description,qty,cost,type,notes,supplier
-! '11146','Speed shine','1','9.99','repair','','1'
 ! '11186','Plastic polish','1','9.99','polishing','','1'
+! '11146','Speed shine','1','9.99','repair','','1'
 ! '11040','Leather care','1','9.99','other','','1'
 ---
   stock_number,description,qty,cost,type,notes,supplier
-! '11146','Speed shine','1','10.00','repair','','1'
 ! '11186','Plastic polish','1','10.00','polishing','','1'
+! '11146','Speed shine','1','10.00','repair','','1'
 ! '11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 
 # Database consistency check failed.
@@ -2687,8 +2867,8 @@ Test case 35 - Use  -t --difftype=context --format=tab --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2705,7 +2885,7 @@ Test case 35 - Use  -t --difftype=context --format=tab --compact
 # Data differences found among rows:
 ***
   code	name
-! 4	
+! 4	NULL
 ! 2	Never Enough Inc.
 ---
   code	name
@@ -2715,7 +2895,7 @@ Test case 35 - Use  -t --difftype=context --format=tab --compact
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
 6	
-5	
+5	NULL
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -2727,29 +2907,29 @@ code	name
 # Data differences found among rows:
 ***
   stock_number	description	qty	cost	type	notes	supplier
-! 11146	Speed shine	1	9.99	repair		1
 ! 11186	Plastic polish	1	9.99	polishing		1
+! 11146	Speed shine	1	9.99	repair		1
 ! 11040	Leather care	1	9.99	other		1
 ---
   stock_number	description	qty	cost	type	notes	supplier
-! 11146	Speed shine	1	10.00	repair		1
 ! 11186	Plastic polish	1	10.00	polishing		1
+! 11146	Speed shine	1	10.00	repair		1
 ! 11040	Leather care	1	10.00	other		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
-11270	Carpet cleaner	1	9.99	cleaning		1
 11056	Microfiber and foam pad cleaner	1	9.99	cleaning		1
+11270	Carpet cleaner	1	9.99	cleaning		1
 11136	Rubber cleaner	1	9.99	cleaning		1
-11104	Interior cleaner	1	9.99	cleaning		1
-11173	Vinyl and rubber dressing	1	9.99	cleaning		1
 11106	Wheel cleaner	1	9.99	cleaning		1
+11173	Vinyl and rubber dressing	1	9.99	cleaning		1
+11104	Interior cleaner	1	9.99	cleaning		1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number	description	qty	cost	type	notes	supplier
 11116	Microfiber wax removal towel	3	16.99	waxing		1
-10665	Glass polish pad	3	10.00	polishing		1
 11269	Microfiber spray on car wash towel	3	16.99	cleaning		1
+10665	Glass polish pad	3	10.00	polishing		1
 
 
 # Database consistency check failed.
@@ -2761,8 +2941,8 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
@@ -2780,7 +2960,7 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
 ***
   *************************       1. row *************************
    code: 4
-!  name: None
+!  name: NULL
   *************************       2. row *************************
    code: 2
 !  name: Never Enough Inc.
@@ -2800,7 +2980,7 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
  name: 
 *************************       2. row *************************
  code: 5
- name: None
+ name: NULL
 *************************       3. row *************************
  code: 3
  name: Never Enough Inc.
@@ -2814,35 +2994,35 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
 #
 # Data differences found among rows:
 ***
-   stock_number: 11146
-    description: Speed shine
+   stock_number: 11186
+    description: Plastic polish
             qty: 1
 !          cost: 9.99
-           type: repair
+           type: polishing
           notes:
        supplier: 1
 ---
-   stock_number: 11146
-    description: Speed shine
+   stock_number: 11186
+    description: Plastic polish
             qty: 1
 !          cost: 10.00
-           type: repair
+           type: polishing
           notes:
        supplier: 1
 ***
-   stock_number: 11186
-    description: Plastic polish
+   stock_number: 11146
+    description: Speed shine
             qty: 1
 !          cost: 9.99
-           type: polishing
+           type: repair
           notes:
        supplier: 1
 ---
-   stock_number: 11186
-    description: Plastic polish
+   stock_number: 11146
+    description: Speed shine
             qty: 1
 !          cost: 10.00
-           type: polishing
+           type: repair
           notes:
        supplier: 1
 ***
@@ -2864,16 +3044,16 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 *************************       1. row *************************
- stock_number: 11270
-  description: Carpet cleaner
+ stock_number: 11056
+  description: Microfiber and foam pad cleaner
           qty: 1
          cost: 9.99
          type: cleaning
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 11056
-  description: Microfiber and foam pad cleaner
+ stock_number: 11270
+  description: Carpet cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -2888,8 +3068,8 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
         notes: 
      supplier: 1
 *************************       4. row *************************
- stock_number: 11104
-  description: Interior cleaner
+ stock_number: 11106
+  description: Wheel cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -2904,8 +3084,8 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
         notes: 
      supplier: 1
 *************************       6. row *************************
- stock_number: 11106
-  description: Wheel cleaner
+ stock_number: 11104
+  description: Interior cleaner
           qty: 1
          cost: 9.99
          type: cleaning
@@ -2923,19 +3103,19 @@ Test case 36 - Use  -t --difftype=context --format=vertical --compact
         notes: 
      supplier: 1
 *************************       2. row *************************
- stock_number: 10665
-  description: Glass polish pad
-          qty: 3
-         cost: 10.00
-         type: polishing
-        notes: 
-     supplier: 1
-*************************       3. row *************************
  stock_number: 11269
   description: Microfiber spray on car wash towel
           qty: 3
          cost: 16.99
          type: cleaning
+        notes: 
+     supplier: 1
+*************************       3. row *************************
+ stock_number: 10665
+  description: Glass polish pad
+          qty: 3
+         cost: 10.00
+         type: polishing
         notes: 
      supplier: 1
 3 rows.

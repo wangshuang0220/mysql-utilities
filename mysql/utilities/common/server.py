@@ -42,64 +42,15 @@ from mysql.utilities.exception import (ConnectionValuesError, UtilError,
                                        UtilDBError, UtilRplError)
 from mysql.utilities.common.user import User
 from mysql.utilities.common.tools import (delete_directory, execute_script,
-                                          ping_host)
+                                          ping_host, tostr, tobytearray)
 from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip,
                                               clean_IPv6, format_IPv6)
 from mysql.utilities.common.messages import MSG_MYSQL_VERSION
-
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = {0}"
 _AUTOCOMMIT_SET = "SET AUTOCOMMIT = {0}"
 _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
                "feature support. Errors:")
-
-
-def tostr(value):
-    """Cast value to str except when None
-
-    value[in]          Value to be cast to str
-
-    Returns value as str instance or None.
-    """
-    #print("tostr(",value,"), type:",type(value))
-    if isinstance(value,bytes) or isinstance(value,bytearray):
-        value = str(value,'utf-8')
-    elif isinstance(value,list):
-        newval = []
-        for v in value:
-            newval.append(tostr(v))
-        value = newval
-    elif isinstance(value, tuple):
-        newval = []
-        for v in value:
-            newval.append(tostr(v))
-        value = tuple(newval)
-    #print("    result: ",value)
-    #print("    returning: ",value,"  type:",type(value))
-    return value
-
-def tobytearray(value):
-    """ cat value to bytearray
-    value[in]
-    returns value as a bytearray or None.
-    """
-    if isinstance(value,str):
-        value = bytearray(value,'utf-8')
-    elif isinstance(value,bytes):
-        value = bytearray(value)
-    elif isinstance(value,list):
-        newval = []
-        for v in value:
-            newval.append(tobytearray(v))
-        value = newval
-    elif isinstance(value, tuple):
-        newval = []
-        for v in value:
-            newval.append(tobytearray(v))
-        value = tuple(newval)
-    #print("    result: ",value)
-    return value
-    
     
 
 class MySQLUtilsCursorRaw(mysql.connector.cursor.MySQLCursorRaw):
@@ -824,7 +775,10 @@ class Server(object):
             self.user = conn_values["user"]
             self.passwd = conn_values.get("passwd", None)
             self.socket = conn_values.get("unix_socket",None)
-            self.port = int(conn_values.get("port",3306))
+            if conn_values.get("port",3306) is None:
+                self.port = 3306
+            else:
+                self.port = int(conn_values.get("port",3306))
             self.charset = options.get("charset",
                                        conn_values.get("charset", None))
             # Optional values
@@ -1230,6 +1184,7 @@ class Server(object):
 
             db_conn = mysql.connector.connect(**parameters)
             # Return MySQL connection object.
+            #db_conn.cmd_debug()
             return db_conn
         except mysql.connector.Error as err:
             raise UtilError(err.msg, err.errno)
@@ -1377,7 +1332,7 @@ class Server(object):
 
         Returns result set or cursor
         """
-        #print("exec_query('",query_str,"'")
+        #print("exec_query('",query_str,"' port:",self.port)
         if options is None:
             options = {}
         params = options.get('params', ())
@@ -1432,7 +1387,8 @@ class Server(object):
                 self.db_conn.reconnect()
                 raise UtilError("Timeout executing query", err.errno)
             else:
-                raise UtilDBError("Query failed. {0}".format(err))
+                msg="Query failed. {0}: {1}".format(err,query_str)
+                raise UtilDBError(msg)
         except Exception:
             cur.close()
             raise UtilError("Unknown error. Command: {0}".format(query_str))
@@ -1443,6 +1399,7 @@ class Server(object):
 
         # Fetch rows (only if available or fetch = True).
         # pylint: disable=R0101
+        #print("cur.with_rows: ",cur.with_rows," fetch:", fetch, "columns:",columns)
         if cur.with_rows:
             if fetch or columns:
                 try:
@@ -1462,6 +1419,7 @@ class Server(object):
                                       "{0}".format(err))
                 finally:
                     cur.close()
+                #print("results: ",results)
                 return results
             else:
                 # Return cursor to fetch rows elsewhere (fetch = false).

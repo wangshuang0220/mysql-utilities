@@ -62,9 +62,9 @@ class test(mutlib.System_test):
         # Check if the required tools are accessible
         self.check_mylogin_requisites()
 
-        self.servers.spawn_new_servers(2)
-        self.server1 = self.servers.get_server(0)
-        self.server2 = self.servers.get_server(1)
+        self.servers.spawn_new_servers(3)
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
         server1_socket = self.server1.show_server_variable('socket')
         try:
             self.server1.exec_query("DROP USER 'root_me'@'localhost'")

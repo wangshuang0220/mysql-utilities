@@ -53,8 +53,13 @@ Test case 12 - No pri key
 --- `inventory`
 +++ "inventory"
 @@ -1 +1 @@
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 -CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
 +CREATE DATABASE "inventory" /*!40100 DEFAULT CHARACTER SET latin1 */
+# #else
+-CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */
++CREATE DATABASE "inventory" /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */
+# #endif
 
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
@@ -69,11 +74,19 @@ Test case 12 - No pri key
 --- `inventory`.`box`
 +++ "inventory"."box"
 @@ -1,3 +1,3 @@
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 -CREATE TABLE `box` (
 -  `a` int(11) DEFAULT NULL
 +CREATE TABLE "box" (
 +  "a" int(11) DEFAULT NULL
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+-CREATE TABLE `box` (
+-  `a` int DEFAULT NULL
++CREATE TABLE "box" (
++  "a" int DEFAULT NULL
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+# #endif
 # The table box does not have an usable Index or primary key.
 
 # TABLE     box_2                                   FAIL    pass    -       
@@ -86,6 +99,7 @@ Test case 12 - No pri key
 --- `inventory`.`box_2`
 +++ "inventory"."box_2"
 @@ -1,5 +1,5 @@
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 -CREATE TABLE `box_2` (
 -  `a` int(11) DEFAULT NULL,
 -  `b` int(11) DEFAULT NULL,
@@ -95,6 +109,17 @@ Test case 12 - No pri key
 +  "b" int(11) DEFAULT NULL,
 +  KEY "ix_nullable" ("a")
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+-CREATE TABLE `box_2` (
+-  `a` int DEFAULT NULL,
+-  `b` int DEFAULT NULL,
+-  KEY `ix_nullable` (`a`)
++CREATE TABLE "box_2" (
++  "a" int DEFAULT NULL,
++  "b" int DEFAULT NULL,
++  KEY "ix_nullable" ("a")
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+# #endif
 # The table box_2 does not have an usable Index or primary key.
 
 
@@ -234,8 +259,13 @@ Test case 12 - No pri key
 --- "inventory"
 +++ `inventory`
 @@ -1 +1 @@
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 -CREATE DATABASE "inventory" /*!40100 DEFAULT CHARACTER SET latin1 */
 +CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
+# #else
+-CREATE DATABASE "inventory" /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */
++CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */
+# #endif
 
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
@@ -250,11 +280,19 @@ Test case 12 - No pri key
 --- "inventory"."box"
 +++ `inventory`.`box`
 @@ -1,3 +1,3 @@
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 -CREATE TABLE "box" (
 -  "a" int(11) DEFAULT NULL
 +CREATE TABLE `box` (
 +  `a` int(11) DEFAULT NULL
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+-CREATE TABLE "box" (
+-  "a" int DEFAULT NULL
++CREATE TABLE `box` (
++  `a` int DEFAULT NULL
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+# #endif
 # The table box does not have an usable Index or primary key.
 
 # TABLE     box_2                                   FAIL    pass    -       
@@ -267,6 +305,7 @@ Test case 12 - No pri key
 --- "inventory"."box_2"
 +++ `inventory`.`box_2`
 @@ -1,5 +1,5 @@
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 -CREATE TABLE "box_2" (
 -  "a" int(11) DEFAULT NULL,
 -  "b" int(11) DEFAULT NULL,
@@ -276,6 +315,17 @@ Test case 12 - No pri key
 +  `b` int(11) DEFAULT NULL,
 +  KEY `ix_nullable` (`a`)
  ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+-CREATE TABLE "box_2" (
+-  "a" int DEFAULT NULL,
+-  "b" int DEFAULT NULL,
+-  KEY "ix_nullable" ("a")
++CREATE TABLE `box_2` (
++  `a` int DEFAULT NULL,
++  `b` int DEFAULT NULL,
++  KEY `ix_nullable` (`a`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+# #endif
 # The table box_2 does not have an usable Index or primary key.
 
 

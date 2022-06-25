@@ -32,6 +32,7 @@ import subprocess
 import difflib
 import itertools
 import os
+import time
 import sys
 import platform
 import re
@@ -46,7 +47,7 @@ from mysql.utilities.common.database import Database
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.server import stop_running_server, Server
 from mysql.utilities.common.table import quote_with_backticks
-from mysql.utilities.common.tools import get_tool_path, check_port_in_use
+from mysql.utilities.common.tools import get_tool_path, check_port_in_use, tostr
 from mysql.utilities.command.serverclone import clone_server
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
@@ -157,7 +158,7 @@ def _exec_util(cmd, file_out, utildir, debug=False, abspath=False,
 
         if file_in:
             try:
-                proc.communicate(''.join(file_in))
+                proc.communicate(b''.join(file_in))
             except AttributeError:
                 raise MUTLibError("file_in parameter must be "
                                   "a file-like object")
@@ -405,7 +406,7 @@ class ServerList(object):
             "host": self.cloning_host,
             "port": port,
         }
-
+        
         server_options = {
             'conn_info': conn,
             'role': role or 'server_{0}'.format(port),
@@ -794,6 +795,7 @@ class System_test(with_metaclass(ABCMeta, object)):
         self.verbose = verbose      # Option for verbosity
         self.debug = debug          # Option for diagnostic work
         self.mask_global = True     # Apply global masks to all tests
+        self.delay = None           # delay to test for race conditons
 
     def __del__(self):
         """Destructor
@@ -884,9 +886,11 @@ class System_test(with_metaclass(ABCMeta, object)):
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, _ = proc.communicate()
+        out = tostr(out)
         if out:
-            match = re.search(r'mysql_config_editor(?:\.exe)? ver \d+\.\d+ '
-                              r'distrib (\d+\.\d+\.\d+)', out, re.IGNORECASE)
+            match = re.search(
+                r'mysql_config_editor(?:\.exe)?\s+ver\s+(\d+\.\d+\.\d+) ',
+                out, re.IGNORECASE)
             if match:
                 version = [int(token) for token in match.group(1).split('.')]
                 assert len(version) == len(minimum_version), \
@@ -909,6 +913,13 @@ class System_test(with_metaclass(ABCMeta, object)):
                 cmd.append("--socket={0}".format(socket))
             if port:
                 cmd.append("--port={0}".format(port))
+        else:
+            if port:
+                cmd.append("--port={0}".format(port))
+            elif socket:
+                cmd.append("--socket={0}".format(socket))
+                
+            
         # Create a temporary file to redirect stdout
         out_file = tempfile.TemporaryFile()
 
@@ -916,7 +927,7 @@ class System_test(with_metaclass(ABCMeta, object)):
         proc = subprocess.Popen(cmd, stdout=out_file,
                                 stdin=subprocess.PIPE)
         # Overwrite login-path if already exists (i.e. answer 'y' to question)
-        proc.communicate('y')
+        proc.communicate(b'y')
 
     def remove_login_path_data(self, login_path):
         """Remove the specified login-path data from .mylogin.cnf.
@@ -958,6 +969,8 @@ class System_test(with_metaclass(ABCMeta, object)):
 
         Returns return value of process run.
         """
+        if self.delay is not None and self.delay > 0:
+            time.sleep(self.delay)
         return _exec_util(cmd, file_out, self.utildir, self.debug,
                           abspath, file_in)
 
@@ -1288,7 +1301,36 @@ class System_test(with_metaclass(ABCMeta, object)):
         # Must remove lines in reverse order
         for linenum in range(len(linenums) - 1, - 1, - 1):
             self.results.pop(linenums[linenum])
-
+            
+    def remove_result_until_match(self,prefix,endprefix,n=1):
+        """ Remove result lines, starting with the line matching the prefix
+        and ending with the 'n'th occurance of endprefix
+        """
+        linenums = []
+        linenum = 0
+        del_n = 0
+        del_range = False
+        for line in self.results:
+            if not del_range:
+                index = line.find(prefix)
+                if index == 0:
+                    linenums.append(int(linenum))
+                    del_range = True
+                    del_n = n
+            else:
+                index = line.find(endprefix)
+                if index == 0:
+                    del_n -= 1
+                    if del_n <= 0:
+                        del_range = False
+                linenums.append(int(linenum))
+            linenum += 1
+            
+        # Must remove lines in reverse order
+        for linenum in range(len(linenums) - 1, - 1, - 1):
+            self.results.pop(linenums[linenum])
+        
+            
     def replace_substring(self, target, replacement):
         """Replace a target substring in the entire result file.
 
@@ -1436,6 +1478,12 @@ class System_test(with_metaclass(ABCMeta, object)):
 
         Returns string
         """
+
+        # make sure we have the FRESHEST info from server
+        if server.db_conn is not None and server.db_conn.is_connected():
+            server.disconnect()
+        server.connect()
+
         db_source = Database(server, db)
         db_source.init()
         res = db_source.get_db_objects("TABLE")

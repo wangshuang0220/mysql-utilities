@@ -48,20 +48,20 @@ class test(copy_db.test):
         self.server2 = None
         self.server3 = None
         self.need_server = False
-        if not self.check_num_servers(3):
+        if not self.check_num_servers(4):
             self.need_server = True
         return self.check_num_servers(1)
 
     def setup(self, spawn_servers=True):
-        self.server1 = self.servers.get_server(0)
         if self.need_server:
             try:
-                self.servers.spawn_new_servers(3)
+                self.servers.spawn_new_servers(4)
             except MUTLibError as err:
                 raise MUTLibError("Cannot spawn needed "
                                   "servers: {0}".format(err.errmsg))
-        self.server2 = self.servers.get_server(1)
-        self.server3 = self.servers.get_server(2)
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
+        self.server3 = self.servers.get_server(3)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:

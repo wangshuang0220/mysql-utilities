@@ -57,13 +57,19 @@ MYSQLD_SSL = (
     '--bind-address=:: --master-info-repository=table {ssl_opts} "'
 ).format(ssl_opts=SSL_OPTS)
 
-CREATE_SSL_USER = ("GRANT ALL PRIVILEGES ON *.* TO '{0}'@'localhost' "
+CREATE_SSL_USER = ("CREATE USER `{0}`@`localhost` "
                    "IDENTIFIED BY '{1}' REQUIRE SSL".format(ssl_user,
-                                                            ssl_pass))
+                                                            ssl_pass),
+                   "GRANT ALL PRIVILEGES ON *.* "
+                   "TO '{0}'@'localhost' ".format(ssl_user),
+                   )
 
-CREATE_SSL_USER_2 = ("GRANT ALL PRIVILEGES ON *.* TO '{0}'@'127.0.0.1' "
+CREATE_SSL_USER_2 = ("CREATE USER `{0}`@`127.0.0.1` "
                      "IDENTIFIED BY '{1}' REQUIRE SSL".format(ssl_user,
-                                                              ssl_pass))
+                                                              ssl_pass),
+                     "GRANT ALL PRIVILEGES ON *.* "
+                     "TO '{0}'@'127.0.0.1' ".format(ssl_user),
+                     )
 
 
 def ssl_server_opts(std_data_path=STD_DATA_PATH):
@@ -132,14 +138,20 @@ MYSQLD_SSL_B = (
 ).format(ssl_opts=SSL_OPTS_B)
 
 CREATE_SSL_USER_B = (
-    "GRANT ALL PRIVILEGES ON *.* TO '{0}'@'localhost' "
-    "IDENTIFIED BY '{1}' REQUIRE SSL"
-).format(ssl_user_b, ssl_pass_b)
+    "CREATE USER `{0}`@`localhost` "
+    "IDENTIFIED BY '{1}' REQUIRE SSL".format(ssl_user_b, ssl_pass_b),
+
+    "GRANT ALL PRIVILEGES ON *.* "
+    "TO '{0}'@'localhost' ".format(ssl_user_b),
+    )
 
 CREATE_SSL_USER_2_B = (
-    "GRANT ALL PRIVILEGES ON *.* TO '{0}'@'127.0.0.1' "
-    "IDENTIFIED BY '{1}' REQUIRE SSL"
-).format(ssl_user_b, ssl_pass_b)
+    "CREATE USER `{0}`@`127.0.0.1` "
+    "IDENTIFIED BY '[1]' REQUIRE SSL".format(ssl_user_b,
+                                             ssl_pass_b),
+    "GRANT ALL PRIVILEGES ON *.* "
+    "TO '{0}'@'127.0.0.1' ".format(ssl_user_b),
+    )
 
 
 def ssl_server_opts_b(std_data_path=STD_DATA_PATH):

@@ -40,7 +40,7 @@ class test(clone_db.test):
         return clone_db.test.setup(self)
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
+        self.server1 = self.servers.get_server(1)
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(
@@ -80,9 +80,15 @@ class test(clone_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         try:
+            self.server1.exec_query("CREATE USER 'joe'@'%'")
+        except UtilDBError as err:
+            raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
+
+        try:
             self.server1.exec_query("CREATE USER 'joe'@'localhost'")
         except UtilDBError as err:
             raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
+
 
         if os.name == "posix" and self.server1.socket is not None:
             from_conn = "--source=joe@localhost:{0}:{1}".format(
@@ -92,6 +98,14 @@ class test(clone_db.test):
 
         cmd_str = "mysqldbcopy.py --skip-gtid {0} {1} ".format(from_conn,
                                                                to_conn)
+
+        try:
+            self.server1.exec_query("GRANT SELECT ON util_test.* "
+                                    "TO  'joe'@'%'")
+        except UtilDBError as err:
+            raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
+
+
         cmd_opts = "util_test:util_db_clone --drop-first"
         test_num += 1
         comment = ("Test case {0} - error: user with % - not "
@@ -101,10 +115,6 @@ class test(clone_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         try:
-            self.server1.exec_query("CREATE USER 'joe'@'%'")
-        except UtilDBError as err:
-            raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
-        try:
             self.server1.exec_query("GRANT ALL ON util_test.* TO 'joe'@'%'")
         except UtilDBError as err:
             raise MUTLibError("{0}: failed1: {1}".format(comment, err.errmsg))
@@ -112,11 +122,16 @@ class test(clone_db.test):
             self.server1.exec_query("GRANT SELECT ON mysql.* TO 'joe'@'%'")
         except UtilDBError as err:
             raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
+        try:
+            self.server1.exec_query("GRANT SHOW_ROUTINE ON *.* TO 'joe'@'localhost'")
+        except UtilDBError as err:
+            raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
 
         test_num += 1
         comment = ("Test case {0} - No error: user with % "
                    "- has permissions".format(test_num))
-        res = self.run_test_case(0, cmd_str + cmd_opts, comment)
+        res = self.run_test_case(0, cmd_str + cmd_opts + ' --ignore-definer'
+                                 , comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -197,7 +212,8 @@ class test(clone_db.test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

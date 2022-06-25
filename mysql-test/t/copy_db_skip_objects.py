@@ -41,7 +41,6 @@ class test(copy_db.test):
         return copy_db.test.setup(self)
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(

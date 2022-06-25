@@ -31,8 +31,8 @@ from mysql.utilities.common.format import (format_tabular_list,
                                            format_vertical_list)
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.replication import negotiate_rpl_connection
-from mysql.utilities.common.server import (connect_servers, Server,
-                                           tostr, tobytearray)
+from mysql.utilities.common.server import connect_servers, Server
+from mysql.utilities.common.tools import tostr, tobytearray
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.table import Table
 from mysql.utilities.exception import UtilError, UtilDBError
@@ -744,19 +744,18 @@ def get_copy_lock(server, db_list, options, include_mysql=False,
         # Now add mysql tables
         if include_mysql:
             mysql_db = Database(server, 'mysql')
-            tables = source_db.get_db_objects("TABLE")
+            tables = mysql_db.get_db_objects("TABLE")
             for table in tables:
                 # Don't lock proc tables if no procs of funcs are being read
-                if table == 'proc' or table == 'proc_priv':
+                if table[0] == 'proc' or table[0] == 'procs_priv':
                     if not options.get('skip_procs', False) and \
                        not options.get('skip_funcs', False):
-                        table_lock_list.append(("mysql.{0}".format(table[0]),
-                                                                   'READ'))
-                        
-                # Don't lock event table if events are skipped
-                if table == 'event' and not options.get('skip_events', False):
-                    table_lock_list.append(("mysql.event", 'READ'))
+                        table_lock_list.append(("mysql.{0}".format(table[0]),'READ'))
                     
+                    # Don't lock event table if events are skipped
+                if table[0] == 'event' and not options.get('skip_events', False):
+                    table_lock_list.append(("mysql.event", 'READ'))
+
         lock = Lock(server, table_lock_list, options)
 
     # Use default or no locking option

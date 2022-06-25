@@ -139,6 +139,7 @@ WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Including all databases.
+# Copying database wesaysocorp 
 # Copying database util_test 
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
@@ -151,7 +152,6 @@ WARNING: Using a password on the command line interface can be insecure.
 # Copying VIEW util_test.v2
 # Copying VIEW util_test.v1
 # Copying GRANTS from util_test
-# Copying database wesaysocorp 
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.

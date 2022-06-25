@@ -45,20 +45,20 @@ class test(mutlib.System_test):
         self.server1 = None
         self.server2 = None
         self.need_server = False
-        if not self.check_num_servers(2):
+        if not self.check_num_servers(3):
             self.need_server = True
         return self.check_num_servers(1)
 
     def setup(self):
         self.res_fname = "result.txt"
-        self.server1 = self.servers.get_server(0)
         if self.need_server:
             try:
-                self.servers.spawn_new_servers(2)
+                self.servers.spawn_new_servers(3)
             except MUTLibError as err:
                 raise MUTLibError("Cannot spawn needed servers: "
                                   "{0}".format(err.errmsg))
-        self.server2 = self.servers.get_server(1)
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:

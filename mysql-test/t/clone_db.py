@@ -37,10 +37,16 @@ class test(mutlib.System_test):
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
-        return self.check_num_servers(1)
+        try:
+            self.servers.spawn_new_servers(2)
+        except MUTLibError as err:
+            raise MUTLibError("Cannot spawn needed servers: {0}"
+                              "".format(err.errmsg))
+
+        return self.check_num_servers(2)
 
     def setup(self):
-        self.server1 = self.servers.get_server(0)
+        self.server1 = self.servers.get_server(1)
         data_file = os.path.normpath("./std_data/basic_data.sql")
         self.drop_all()
         try:
@@ -71,7 +77,6 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(

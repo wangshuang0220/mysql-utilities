@@ -220,7 +220,7 @@ def _check_objects(server1, server2, db1, db2,
         print("Looking for object types table, view, trigger, procedure," + \
               " function, and event.")
         print("Object types found common to both databases:")
-        for obj in objects:
+        for obj in sorted(objects, key=objects.get):
             print(" {0:>12} : {1}".format(obj, objects[obj]))
 
     return (in_both, differs)
@@ -554,10 +554,10 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
     get_dbs_query = """
         SELECT SCHEMA_NAME
         FROM INFORMATION_SCHEMA.SCHEMATA
-        WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
-        AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
-        AND SCHEMA_NAME != 'mysql'
-        AND SCHEMA_NAME != 'sys'
+        WHERE ucase(SCHEMA_NAME) != 'INFORMATION_SCHEMA'
+        AND ucase(SCHEMA_NAME) != 'PERFORMANCE_SCHEMA'
+        AND ucase(SCHEMA_NAME) != 'MYSQL'
+        AND ucase(SCHEMA_NAME) != 'SYS'
         {0}"""
     conditions = ""
     if exclude_list:
@@ -589,7 +589,7 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
                 print("# {0}".format(msg))
 
     # Compare databases in common
-    common_dbs = server1_dbs.intersection(server2_dbs)
+    common_dbs = sorted(server1_dbs.intersection(server2_dbs))
     if common_dbs:
         if not quiet:
             print("# Comparing databases: {0}".format(", ".join(common_dbs)))

@@ -318,7 +318,8 @@ class test(compare_db.test):
                             "values invalid",
                             "mysqldbcompare: error: Server2 connection "
                             "values invalid\n")
-
+        self.replace_substring(" /*!80016 DEFAULT ENCRYPTION='N' */","")
+        
         self.replace_substring("on [::1]", "on localhost")
 
         return True

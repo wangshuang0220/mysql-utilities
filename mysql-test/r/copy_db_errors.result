@@ -24,60 +24,41 @@ ERROR: Can't connect to XXXX
 Test case 7 - users with minimal privileges
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
-# Copying database util_test renamed as util_db_clone
-# Copying TABLE util_test.t1
-# Copying TABLE util_test.t2
-# Copying TABLE util_test.t3
-# Copying TABLE util_test.t4
-# Copying TABLE util_test.t5
-# Copying FUNCTION util_test.f1
-# Copying FUNCTION util_test.f2
-# Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v2
-# Copying VIEW util_test.v1
-# Copying GRANTS from util_test
-# Copying data for TABLE util_test.t1
-# Copying data for TABLE util_test.t2
-# Copying data for TABLE util_test.t3
-# Copying data for TABLE util_test.t4
-# Copying data for TABLE util_test.t5
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
-#...done.
+ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
 Test case 8 - source user not enough privileges needed
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
-ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
+ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs EVENT privilege on util_test.
 Test case 9 - source user has some privileges needed
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
-ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
+ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs EVENT privilege on util_test.
 Test case 10 - source user has some privileges needed
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
-ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs SHOW VIEW privilege on util_test.
+ERROR: User sam on the Source server does not have permissions to read all objects in util_test. User needs EVENT privilege on util_test.
 Test case 11 - source user has privileges needed
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
+# Copying GRANTS from util_test
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
+# Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
-# Copying PROCEDURE util_test.p1
 # Copying VIEW util_test.v2
 # Copying VIEW util_test.v1
-# Copying GRANTS from util_test
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
 #...done.
 Test case 12 - dest user not enough privileges needed
 # Source on XXXX-XXXX: ... connected.
@@ -86,33 +67,33 @@ ERROR: User sam on the Destination server does not have permissions to create al
 Test case 13 - dest user has some privileges needed
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
-ERROR: User sam on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
+ERROR: User sam on the Destination server does not have permissions to create all objects in util_db_clone. User needs CREATE privilege on util_db_clone.
 Test case 14 - dest user has some privileges needed
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
-ERROR: User sam on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
+ERROR: User sam on the Destination server does not have permissions to create all objects in util_db_clone. User needs CREATE privilege on util_db_clone.
 Test case 15 - dest user has privileges needed
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
+# Copying GRANTS from util_test
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
+# Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
-# Copying PROCEDURE util_test.p1
 # Copying VIEW util_test.v2
 # Copying VIEW util_test.v1
-# Copying GRANTS from util_test
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
 #...done.
 Test case 16 - cannot parse --source
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
@@ -135,48 +116,48 @@ Test case 20 - new storage engine missing
 # Destination on XXXX-XXXX: ... connected.
 WARNING: New storage engine NOTTHERE is not supported on the server.
 # Copying database util_test renamed as util_db_clone
+# Copying GRANTS from util_test
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
+# Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
-# Copying PROCEDURE util_test.p1
 # Copying VIEW util_test.v2
 # Copying VIEW util_test.v1
-# Copying GRANTS from util_test
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
 #...done.
 Test case 21 - default storage engine missing
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 WARNING: Default storage engine NOPENOTHERE is not supported on the server.
 # Copying database util_test renamed as util_db_clone
+# Copying GRANTS from util_test
 # Copying TABLE util_test.t1
 # Copying TABLE util_test.t2
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
+# Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
-# Copying PROCEDURE util_test.p1
 # Copying VIEW util_test.v2
 # Copying VIEW util_test.v1
-# Copying GRANTS from util_test
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
 #...done.
 Test case 22 - database listed and --all
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
@@ -200,7 +181,11 @@ mysqldbcopy: error: Number of processes '-1' must be greater or equal than zero.
 Test case 27 - error: dest user is missing SUPER privilege
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
-ERROR: User joe on the Destination server does not have permissions to create all objects in *. User needs SUPER privilege on *.
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
+ERROR: User joe on the Destination server does not have permissions to create all objects in util_db_clone. User needs SUPER privilege on util_db_clone.
+# #else
+ERROR: User joe on the Destination server does not have permissions to create all objects in util_db_clone. User needs SET_USER_ID privilege on util_db_clone.
+# #endif
 Test case 28 - error: dest user is missing CREATE VIEW privilege
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -226,18 +211,18 @@ Test case 32 - dest user has privileges needed
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
+# Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
-# Copying PROCEDURE util_test.p1
 # Copying VIEW util_test.v2
 # Copying VIEW util_test.v1
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
 #...done.
 Test case 33 - blobs with not null
 ERROR: The following tables have blob fields set to NOT NULL. The copy operation cannot proceed unless the blob fields permit NULL values. To copy data with NOT NULL blob fields, first remove the NOT NULL restriction, copy the data, then add the NOT NULL restriction using ALTER TABLE statements.
@@ -256,17 +241,17 @@ WARNING: The following tables have blob fields set to NOT NULL.
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
+# Copying PROCEDURE util_test.p1
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
-# Copying PROCEDURE util_test.p1
 # Copying VIEW util_test.v2
 # Copying VIEW util_test.v1
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
 # Copying data for TABLE util_test.b1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying TRIGGER util_test.trg
-# Copying EVENT util_test.e1
 #...done.

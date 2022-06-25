@@ -44,6 +44,55 @@ from mysql.utilities import (PYTHON_MIN_VERSION, PYTHON_MAX_VERSION,
 from mysql.utilities.exception import UtilError
 
 
+
+def tostr(value, charset='latin-1'):
+    """Cast value to str except when None
+
+    value[in]          Value to be cast to str
+    charset[in]        encoding to use
+
+    Returns value as str instance or None.
+    """
+    #print("tostr(",value,"), type:",type(value))
+    if isinstance(value,bytes) or isinstance(value,bytearray):
+        value = str(value,charset)
+    elif isinstance(value,list):
+        newval = []
+        for v in value:
+            newval.append(tostr(v,charset))
+        value = newval
+    elif isinstance(value, tuple):
+        newval = []
+        for v in value:
+            newval.append(tostr(v,charset))
+        value = tuple(newval)
+    #print("    result: ",value)
+    #print("    returning: ",value,"  type:",type(value))
+    return value
+
+def tobytearray(value, charset="latin-1"):
+    """ cat value to bytearray
+    value[in]
+    returns value as a bytearray or None.
+    """
+    if isinstance(value,str):
+        value = bytearray(value,charset)
+    elif isinstance(value,bytes):
+        value = bytearray(value)
+    elif isinstance(value,list):
+        newval = []
+        for v in value:
+            newval.append(tobytearray(v))
+        value = newval
+    elif isinstance(value, tuple):
+        newval = []
+        for v in value:
+            newval.append(tobytearray(v))
+        value = tuple(newval)
+    #print("    result: ",value)
+    return value
+    
+
 def _add_basedir(search_paths, path_str):
     """Add a basedir and all known sub directories
 

@@ -44,23 +44,19 @@ class test(mutlib.System_test):
         # Need at least one server.
         self.server1 = None
         self.server2 = None
-        self.need_server = False
-        if not self.check_num_servers(2):
-            self.need_server = True
-        return self.check_num_servers(1)
+        try:
+            self.servers.spawn_new_servers(3)
+        except MUTLibError as err:
+            raise MUTLibError("Cannot spawn needed servers: {0}"
+                              "".format(err.errmsg))
+
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
+        
+        return self.server1 and self.server2
 
     # pylint: disable=W0221
     def setup(self, spawn_servers=True):
-        if spawn_servers:
-            self.server1 = self.servers.get_server(0)
-            if self.need_server:
-                try:
-                    self.servers.spawn_new_servers(2)
-                except MUTLibError as err:
-                    raise MUTLibError("Cannot spawn needed servers: {0}"
-                                      "".format(err.errmsg))
-        if self.server2 is None:
-            self.server2 = self.servers.get_server(1)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
@@ -255,7 +251,7 @@ class test(mutlib.System_test):
         test_num += 1
         try:
             # Grant ALL on `util_test` for user 'joe'@'localhost' on source
-            self.server1.exec_query("GRANT ALL ON `util_test`.* "
+            self.server1.exec_query("GRANT ALL PRIVILEGES ON `util_test`.* "
                                     "TO 'joe'@'localhost'")
 
             # Revoke all privileges to 'joe'@'localhost' in destination
@@ -269,24 +265,34 @@ class test(mutlib.System_test):
                                     "REFERENCES, CREATE VIEW ON "
                                     "`util_db_privileges`.* TO "
                                     "'joe'@'localhost'")
-
+            
             # Change DEFINER in procedures and functions on the source server
-            if self.server1.has_mysqlproc():
-                self.server1.exec_query("UPDATE mysql.proc SET "
-                                        "DEFINER='joe@localhost' WHERE "
-                                        "DB='util_test'")
-            else:
-                self.server1.exec_query("UPDATE information_schema.routines SET "
-                                        "DEFINER='joe@localhost' WHERE "
-                                        "ROUTINE_SCHEMA='util_test'")
-                
-            self.server1.exec_query("UPDATE mysql.event SET "
-                                    "DEFINER='joe@localhost' WHERE "
-                                    "DB='util_test'")
+            # for mysql 8.0 cannot alter/update DEFINER, have to re-define (ugh)
+            self.server1.exec_query("DROP PROCEDURE util_test.p1")
+            self.server1.exec_query("CREATE DEFINER=`joe`@`localhost` "
+                                    "PROCEDURE util_test.p1(p1 CHAR(20)) "
+                                    'INSERT INTO util_test.t1 VALUES ("50")')
+            self.server1.exec_query("DROP FUNCTION util_test.f1")
+            self.server1.exec_query("CREATE DEFINER=`joe`@`localhost` "
+                                    "FUNCTION util_test.f1() "
+                                    "RETURNS INT DETERMINISTIC RETURN (SELECT 1)")
+            self.server1.exec_query("DROP FUNCTION util_test.f2")
+            self.server1.exec_query("CREATE DEFINER=`joe`@`localhost` "
+                                    "FUNCTION util_test.f2(base_price DECIMAL(20,2) UNSIGNED, "
+                                    "tax_percentage DECIMAL(3,0) UNSIGNED) "
+                                    "RETURNS DECIMAL (21,2) UNSIGNED DETERMINISTIC "
+                                    "RETURN base_price + base_price*(tax_percentage/100)")
+                                
+            self.server1.exec_query("DROP EVENT util_test.e1")
+            self.server1.exec_query("CREATE DEFINER=`joe`@`localhost` "
+                                    "EVENT util_test.e1 "
+                                    "ON SCHEDULE EVERY 1 YEAR DISABLE "
+                                    'DO DELETE FROM util_test.t1 WHERE a = "not there"')
+
 
             # Change DEFINER in the views on the source server
             query = """
-                SELECT CONCAT("ALTER DEFINER='joe'@'localhost' VIEW ",
+                SELECT CONCAT("ALTER DEFINER=`joe`@`localhost` VIEW ",
                 table_schema, ".", table_name, " AS ", view_definition)
                 FROM information_schema.views WHERE
                 table_schema='util_test'
@@ -297,7 +303,7 @@ class test(mutlib.System_test):
 
             # Change DEFINER in the triggers on the source server
             self.server1.exec_query("DROP TRIGGER util_test.trg")
-            self.server1.exec_query("CREATE DEFINER='joe'@'localhost' "
+            self.server1.exec_query("CREATE DEFINER=`joe`@`localhost` "
                                     "TRIGGER util_test.trg AFTER INSERT ON "
                                     "util_test.t1 FOR EACH ROW INSERT INTO "
                                     "util_test.t2 "
@@ -306,6 +312,9 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
 
+
+        self.server2.exec_query("SET GLOBAL log_bin_trust_function_creators=1")
+        
         to_conn = "--destination=joe@localhost:{0}".format(self.server2.port)
         comment = ("Test case {0} - copy using a user without SUPER privilege"
                    "").format(test_num)
@@ -317,6 +326,9 @@ class test(mutlib.System_test):
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
 
+        self.server2.exec_query("SET GLOBAL log_bin_trust_function_creators=1")
+
+        
         test_num += 1
         # Change SQL_MODE to 'NO_BACKSLASH_ESCAPES' in the destination server
         try:
@@ -452,6 +464,12 @@ class test(mutlib.System_test):
                                    "{0}.{1}, got {2} expected "
                                    "{3}.".format(cmp_data[1][i], table,
                                                  tbl_checksum, base_checksum))
+                        res1=self.server1.exec_query("SELECT * FROM {0}".format(table))
+                        print(" ")
+                        print("base:\n",res1)
+                        res2=self.server2.exec_query("SELECT * FROM {0}.{1}".format(cmp_data[1][i],table))
+                        print("mod:\n",res2)
+                                                     
 
         # Check attributes (character set and collation).
         qry_db = ("SELECT {0} FROM INFORMATION_SCHEMA.SCHEMATA "

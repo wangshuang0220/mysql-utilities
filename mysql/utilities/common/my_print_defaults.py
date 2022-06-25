@@ -27,7 +27,7 @@ import re
 import subprocess
 import tempfile
 
-from mysql.utilities.common.tools import get_tool_path
+from mysql.utilities.common.tools import get_tool_path, tostr
 from mysql.utilities.exception import UtilError
 
 
@@ -267,6 +267,7 @@ class MyDefaultsReader(object):
         out_file.seek(0)
         results = []
         for line in out_file:
+            line = tostr(line)
             # Parse option value; ignore starting "--"
             key_value = line[2:].split("=", 1)
             if len(key_value) == 2:

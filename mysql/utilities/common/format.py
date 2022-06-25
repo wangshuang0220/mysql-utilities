@@ -35,12 +35,11 @@ import csv
 import os
 import textwrap
 import io
-#try:
-#    import io as StringIO
-#except ImportError:
-#    import io
 
+from mysql.connector.conversion import MySQLConverter
 from mysql.utilities.common.sql_transform import to_sql
+from mysql.utilities.common.server import (tostr, tobytearray)
+from mysql.utilities.common.sql_transform import convert_special_characters
 
 
 _MAX_WIDTH = 78
@@ -72,7 +71,7 @@ class UnicodeWriter(object):
         """
         self.writer.writerow(str(val) for val in row)
         data = self.queue.getvalue()
-        self.stream.write(data)
+        self.stream.write(tobytearray(data))
         self.queue.seek(0,0)
         self.queue.truncate(0)
 
@@ -82,7 +81,7 @@ class UnicodeWriter(object):
         rows[in]     list of row objects
         """
         for row in rows:
-            self.writerow(row)
+            self.writerow(tobytearray(row))
 
 
 def _format_col_separator(f_out, columns, col_widths, quiet=False):
@@ -98,8 +97,8 @@ def _format_col_separator(f_out, columns, col_widths, quiet=False):
     stop = len(columns)
     for i in range(0, stop):
         width = int(col_widths[i] + 2)
-        f_out.write('{0}{1:{1}<{2}}'.format("+", "-", width))
-    f_out.write("+\n")
+        f_out.write(tobytearray('{0}{1:{1}<{2}}'.format("+", "-", width)))
+    f_out.write(tobytearray("+\n"))
 
 
 def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
@@ -113,21 +112,26 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
     """
     i = 0
     if len(columns) == 1 and row != columns:
-        row = list(row)
+        if not isinstance(row,list):
+            row = list(row)
     for i, _ in enumerate(columns):
+        if i >= len(row):
+            r = 'NULL'
+        else:
+            r = row[i]
         if not quiet:
-            f_out.write("| ")
-        val = row[i] if isinstance(row[i], str) \
-            else str(row[i])
+            f_out.write(tobytearray("| "))
+        val = r if isinstance(r, str) \
+            else str(r)
         if isinstance(val, str):
             val = u"{0:<{1}}".format(val, col_widths[i] + 1)
-            f_out.write(val)
+            f_out.write(tobytearray(val))
         else:
-            f_out.write("{0:<{1}} ".format("%s" % str(val,'utf-8'), col_widths[i]))
+            f_out.write(tobytearray("{0:<{1}} ".format("%s" % str(val,'utf-8'), col_widths[i])))
 
     if not quiet:
-        f_out.write("|")
-    f_out.write("\n")
+        f_out.write(tobytearray("|"))
+    f_out.write(tobytearray("\n"))
 
 
 def get_col_widths(columns, rows):
@@ -147,20 +151,71 @@ def get_col_widths(columns, rows):
         row = [val if isinstance(val, str)
                else str(val) for val in row]
         # if there is one column, just use row.
-        if stop == 1:
-            col_size = len(row[0]
-                           if isinstance(row[0], str) else str(row[0]))
+        for i in range(0,len(row)):
+            if i >= stop:
+                break
+            col_size = len(row[i]
+                           if isinstance(row[i], str) else str(row[i]))
             col_size += 1
-            if col_size > col_widths[0]:
-                col_widths[0] = col_size
-        else:
-            for i in range(0, stop):
-                col_size = len(row[i]
-                               if isinstance(row[i], str) else str(row[i]))
-                col_size += 1
-                if col_size > col_widths[i]:
-                    col_widths[i] = col_size
+            if col_size > col_widths[i]:
+                col_widths[i] = col_size
     return col_widths
+
+def make_printable(val, charset="latin-1", doquotes=False):
+    """
+    make sure text is printable, not weird binary crap
+    and return as a str
+    """
+    if val is None:
+        return None
+    if isinstance(val,list):
+        newval = []
+        for v in val:
+            newval.append(make_printable(v))
+        return newval
+    elif isinstance(val,tuple):
+        newval = []
+        for v in val:
+            newval.append(make_printable(v))
+        return tuple(newval)
+    elif isinstance(val,dict):
+        newval = {}
+        for key, value in val.items():
+            key = make_printable(key)
+            value = make_printable(value)
+            newval[key] = value
+        return newval
+
+
+    needBinary = False
+    val = tobytearray(val,charset)
+    for i in range(0,len(val)):
+        v = val[i]
+        if v >= 0x08 and v <= 0x0d:
+            pass
+        elif v == 0 or v == 26:
+            pass
+        elif v < 0x20 or v > 0x7e:
+            needBinary = True
+            break
+        
+    if needBinary:
+        if len(val) == 1:
+            val = "{0:d}".format(tostr(val))
+        else:
+            newval = "0x"
+            for j in range(0,len(val)):
+                newval = newval + "{0:02x}".format(val[j])
+            val = newval
+    else:
+        val = convert_special_characters(tostr(val))
+        if doquotes:
+            val = tostr(MySQLConverter().quote(tobytearray(val)))
+
+    return tostr(val)
+
+    
+
 
 
 def format_tabular_list(f_out, columns, rows, options=None):
@@ -270,9 +325,9 @@ def format_vertical_list(f_out, columns, rows, options=None):
     row_num = 0
     for row in rows:
         row_num += 1
-        f_out.write('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
+        f_out.write(tobytearray('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
                                                                        row_num,
-                                                                       ' ', 8))
+                                                                       ' ', 8)))
         if none_to_null:
             # Convert None values to 'NULL'
             row = ['NULL' if not val else val for val in row]
@@ -282,11 +337,11 @@ def format_vertical_list(f_out, columns, rows, options=None):
             val = row[i] \
                 if isinstance(row[i], str) else row[i]
             out = u"{0:>{1}}: {2}\n".format(col, max_colwidth, val)
-            f_out.write(out)
+            f_out.write(tobytearray(out))
 
     if row_num > 0:
         row_str = 'rows' if row_num > 1 else 'row'
-        f_out.write("{0} {1}.\n".format(row_num, row_str))
+        f_out.write(tobytearray("{0} {1}.\n".format(row_num, row_str)))
 
 
 def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False,
@@ -315,6 +370,9 @@ def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False,
         'to_sql': to_sql,
         'col_widths': col_widths,
     }
+    
+
+            
     if fmt == "vertical":
         format_vertical_list(f_out, columns, rows)
     elif fmt == "tab":

@@ -34,7 +34,8 @@ from mysql.connector.conversion import MySQLConverter
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.pattern_matching import parse_object_name
-from mysql.utilities.common.server import (Server, tostr, tobytearray)
+from mysql.utilities.common.server import Server
+from mysql.utilities.common.tools import tostr, tobytearray
 from mysql.utilities.common.sql_transform import (convert_special_characters,
                                                   quote_with_backticks,
                                                   remove_backtick_quoting,
@@ -598,11 +599,16 @@ class Table(object):
         if 'blob' in ctype:
             needbinary = False
             for j in range(0,len(val)):
-                if val[j] >= 0x08 and val[j] <= 0x0d:
+                v = val[j]
+                if isinstance(v, str):
+                    v = bytearray(v,'latin-1')[0]
+                elif isinstance(v,bytearray):
+                    v = v[0]
+                if v >= 0x08 and v <= 0x0d:
                     pass
-                elif val[j] == 0 or val[j] == 26:
+                elif v == 0 or v == 26:
                     pass
-                elif val[j] < 0x20 or val[j] > 0x7e:
+                elif v < 0x20 or v > 0x7e:
                     needbinary = True
                     break
                     
@@ -802,6 +808,7 @@ class Table(object):
                 else:
                     insert_str = self._insert % (new_db, self.q_tbl_name)
                 if val_str:
+                    val_str.replace("'NULL'","NULL")
                     row_count += 1
                     insert_str += val_str
                 data_size = len(insert_str)
@@ -1124,20 +1131,30 @@ class Table(object):
                 row = cur.fetchone()
                 if row is None:
                     raise StopIteration()
+#                row = tuple(('NULL' if val is None else val for val in row))
                 rows.append(row)
             elif num_conn == 1:
-                rows = cur.fetchall()
+                rows = []
+                origrows = cur.fetchall()
+                for row in origrows:
+#                    row = tuple(('NULL' if val is None else val for val in row))
+                    rows.append(row)
                 yield rows
                 raise StopIteration()
             else:
-                rows = cur.fetchmany(segment_size)
-                if not rows:
+                origrows = cur.fetchmany(segment_size)
+                if not origrows:
                     raise StopIteration()
+                rows = []
+                for row in origrows:
+ #                   row = tuple(('NULL' if val is None else val for val in row))
+                    rows.append(row)
             if rows is None:
                 raise StopIteration()
             yield rows
         cur.close()
 
+        
     def get_dest_values(self, destination=None):
         """Get the destination connection values if not already set.
 

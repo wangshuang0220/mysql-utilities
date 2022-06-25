@@ -154,7 +154,8 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         ssl_server = self.check_connect(port2, "cloned_server_basedir")
-        ssl_server.exec_query(CREATE_SSL_USER_2)
+        for createcmd in CREATE_SSL_USER_2:
+            ssl_server.exec_query(createcmd)
 
         test_num += 1
         comment = ("Test case {0} - clone a running server with SSL "
@@ -185,7 +186,9 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         new_server = self.check_connect(port3)
-        new_server.exec_query(CREATE_SSL_USER_2)
+        for createcmd in CREATE_SSL_USER_2:
+            new_server.exec_query(createcmd)
+
 
         conn_ssl = {
             "user": "root_ssl",

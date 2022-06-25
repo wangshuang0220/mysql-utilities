@@ -42,6 +42,16 @@ from mysql.utilities.common.server import (connect_servers,
                                            get_local_servers,
                                            Server, test_connect)
 
+# NOTE: this is from the size of a char array in struct sockaddr_un,
+# and could be as small as 92-1 on some systems as claimed on internet.
+# There doesn't seem to be a good way to retrieve the size
+# limit dynamically in python.
+# two things you can try:
+#   grep 'sun_path\[' -r /usr/include/
+#   grep UNIX_PATH_MAX -r /usr/include/
+# we want len(sun_path)-1  (leave space for null byte)
+MAX_SOCKET_PATH_SIZE = 107
+
 log_file_tuple = namedtuple('log_file_tuple',
                             "log_name log_file log_file_size")
 
@@ -407,6 +417,14 @@ def _start_server(server_val, basedir, datadir, options=None):
     # not sure how windoze handles this...
         
     if socket is not None:
+        if len(socket) > MAX_SOCKET_PATH_SIZE:
+            socket2 = os.path.join(tempfile.mkdtemp(), 'mysql.sock')
+            if not quiet:
+                print("# WARNING: The socket file path '{0}' is too long (>{1}), "
+                      "using '{2}' instead".format(socket,
+                                                   MAX_SOCKET_PATH_SIZE, socket2))
+            socket = socket2
+        
         args.append("--socket={0}".format(socket))
         server_val["unix_socket"] = "{0}".format(socket)
     else:

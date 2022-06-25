@@ -149,9 +149,16 @@ if __name__ == '__main__':
                       "after the copy. May cause indexes to be rebuilt if "
                       "the affected blob fields are used in indexes.")
 
+    # Ignore DEFINER clauses (to copy without big privs)
+    parser.add_option("--ignore-definer", action="store_true",
+                      dest="ignore_definer", default=False,
+                      help="Drops all DEFINER clauses to copy with less "
+                      "required privs, which resets DEFINER to destination "
+                      "user")
+
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
-
+    
     # Check security settings
     check_password_security(opt, args)
 
@@ -236,6 +243,7 @@ if __name__ == '__main__':
         "multiprocess": num_cpu if opt.multiprocess == 0 else opt.multiprocess,
         "before_alter": [],
         "after_alter": [],
+        "ignore_definer": opt.ignore_definer,
     }
 
     options.update(get_ssl_dict(opt))
@@ -312,6 +320,7 @@ if __name__ == '__main__':
     for db in args:
         # Split the database names considering backtick quotes
         grp = arg_regexp.match(db)
+        #print("parsing db: ",db," grp:",grp)
         if not grp:
             parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
                                                   db1_label='orig_db',

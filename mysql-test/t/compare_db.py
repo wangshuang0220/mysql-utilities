@@ -392,7 +392,7 @@ class test(mutlib.System_test):
         cmd_arg = ('--all --exclude=inventory --exclude=db% '
                    '--exclude=%quotes% --exclude=___________keys')
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
-        res = self.run_test_case(1, cmd, comment)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -407,7 +407,7 @@ class test(mutlib.System_test):
                            '--exclude="k.ys$"')
         cmd_arg = '--all --exclude=inventory {0} --regexp'.format(exclude_arg)
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
-        res = self.run_test_case(1, cmd, comment)
+        res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -415,7 +415,7 @@ class test(mutlib.System_test):
         # nullable and not nullable columns
 
         # Test automatically pick up the not nullable unique indexes.
-        # Note: All previews test had primary keys. Skip checksum table
+        # Note: All previous tests had primary keys. Skip checksum table
         # otherwise no indexes are used if there are no differences.
         cmd_arg = "no_primary_keys -t --skip-checksum-table"
         test_num += 1
@@ -644,7 +644,8 @@ class test(mutlib.System_test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, self.server2)
 
     def do_replacements(self):
         """Do replacements in the result.
@@ -665,6 +666,14 @@ class test(mutlib.System_test):
 
         self.replace_substring("on [::1]", "on localhost")
 
+        # stuff in performance_schema, since it doesn't have consistent
+        # prefixes or data
+        self.remove_result_until_match("# Rows in `performance_schema`.",
+                                       "+-------",3)
+        self.remove_result_until_match("--- `performance_schema`.`events"," +---",3)
+
+        
+        
     def record(self):
         return self.save_result_file(__name__, self.results)
 

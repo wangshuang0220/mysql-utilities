@@ -27,6 +27,7 @@ import mutlib
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.database import UtilDBError
+from mysql.utilities.common.tools import get_tool_path, tobytearray
 
 
 class test(mutlib.System_test):
@@ -44,10 +45,57 @@ class test(mutlib.System_test):
     server2 = None
     db_test_name = None
     setup_temp_file = None
+    data_file = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
-        self.server1 = self.servers.get_server(0)
+        self.data_file = os.path.normpath("./std_data/world_innodb.sql")
+        if not os.path.exists(self.data_file):
+            print()
+            print("ERROR: input file ./std_data/world_innodb.sql not found!")
+            print("fetch from  https://downloads.mysql.com/docs/world-db.tar.gz")
+            return False
+        return True
+
+    
+    def setup(self):
+        if not self.check_num_servers(3):
+            try:
+                self.servers.spawn_new_servers(3)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers: {0}"
+                                  "".format(err.errmsg))
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
+
+        # to load the 'world' database, need to use mysql client
+        # with input from file, rather than the 'read sql commands
+        # from file' routine.
+        rows = self.server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
+        if rows:
+            basedir = rows[0][1]
+        else:
+            raise MUTLibError("Unable to determine basedir of running "
+                              "server.")
+
+        self.setup_temp_file = "setup.tmp"
+        
+        conn1_val = self.get_connection_values(self.server1)
+        mysqlclient = get_tool_path(basedir,"mysql",quote=True)
+        proto = None
+        if os.name == "posix":
+            proto = '--protocol=tcp'
+        setupcmd = "{0} {1} -u{2} -p{3} -h{4} --port={5} <{6}".format(
+            mysqlclient, proto,
+            conn1_val[0], conn1_val[1],
+            conn1_val[2], conn1_val[3],
+            self.data_file)
+        res = self.exec_util(setupcmd,self.setup_temp_file,
+                             abspath=True)
+        if res != 0:    
+            raise MUTLibError("Failed to read commands from file"
+                              " {0}: {1}".format(data_file, err.errmsg))
+
         self.db_test_name = "world"
         rows = []
         engine = ""
@@ -57,32 +105,20 @@ class test(mutlib.System_test):
             if len(rows) > 0:
                 self.server1.exec_query("USE {0}".format(self.db_test_name))
                 res = self.server1.exec_query("SHOW TABLE STATUS  LIKE '{0}'"
-                                              "".format("City"))
+                                              "".format("city"))
                 if res:
                     engine = res[0][1]
         except MUTLibError as err:
-            print("Error checking prerequisites: {0}".format(err))
+            print("Error with world db setup {0}".format(err))
         if engine.upper() != "INNODB" or len(rows) == 0:
             raise MUTLibError("Need {0} ({1}) database loaded on {2}"
                               "".format(self.db_test_name, "world_innodb.sql",
-                                        self.server1.role))
-
-        return self.check_num_servers(1)
-
-    def setup(self):
-        if not self.check_num_servers(2):
-            try:
-                self.servers.spawn_new_servers(2)
-            except MUTLibError as err:
-                raise MUTLibError("Cannot spawn needed servers: {0}"
-                                  "".format(err.errmsg))
-        self.server2 = self.servers.get_server(1)
-
-        self.setup_temp_file = "setup.tmp"
+                                        self.server1.role))        
 
         s1_conn = self.build_connection_string(self.server1)
-        source_conn = "--source={0}".format(s1_conn)
         s2_conn = self.build_connection_string(self.server2)
+
+        source_conn = "--source={0}".format(s1_conn)
         dest_conn = "--destination={0}".format(s2_conn)
         copy_cmd = ("mysqldbcopy.py {0} {1} {2}:{3} --drop-first --skip-gtid"
                     "".format(source_conn, dest_conn, self.db_test_name,

@@ -96,7 +96,7 @@ class test(mutlib.System_test):
             except UtilDBError as err:
                 # Check if the reason the deletion failed was because of FK
                 # constraints
-                i = err[0].find("Cannot delete or update a parent row: a "
+                i = err.errmsg.find("Cannot delete or update a parent row: a "
                                 "foreign")
                 if i != -1:
                     return True, None

@@ -160,8 +160,13 @@ ALTER TABLE util_db_clone.t4 add CONSTRAINT `ref_t3`
 FOREIGN KEY (`c`)
 REFERENCES `util_db_clone`.`t3`
 (`a`)
+# #if (server1 == 'MySQL') and (int(version1) < 80000)
 ON UPDATE RESTRICT
 ON DELETE RESTRICT
+# #else
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
+# #endif
 
 # Dropping new object TABLE util_db_clone.`t5`
 # WARNING: Unable to drop `t5` from source database (object may not exist): DROP TABLE `util_db_clone`.`t5`
@@ -170,9 +175,15 @@ CREATE TABLE `util_db_clone`.`t5` LIKE `util_test`.`t5`
 # Dropping new object FUNCTION util_db_clone.`f1`
 # WARNING: Unable to drop `f1` from source database (object may not exist): DROP FUNCTION `util_db_clone`.`f1`
 # Copying FUNCTION util_test.f1
+# #if (server1 == 'MySQL') and (int(version1) < 80000)
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1)
+# #else
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int
+    DETERMINISTIC
+RETURN (SELECT 1)
+# #endif
 # Dropping new object FUNCTION util_db_clone.`f2`
 # WARNING: Unable to drop `f2` from source database (object may not exist): DROP FUNCTION `util_db_clone`.`f2`
 # Copying FUNCTION util_test.f2
@@ -234,8 +245,13 @@ ALTER TABLE util_db_clone.t4 add CONSTRAINT `ref_t3`
 FOREIGN KEY (`c`)
 REFERENCES `util_db_clone`.`t3`
 (`a`)
+# #if (server1 == 'MySQL') and (int(version1) < 80000)
 ON UPDATE RESTRICT
 ON DELETE RESTRICT
+# #else
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
+# #endif
 
 # Copying data for TABLE util_test.t1
 INSERT INTO `util_db_clone`.`t1` SELECT * FROM `util_test`.`t1`
@@ -250,7 +266,11 @@ INSERT INTO `util_db_clone`.`t5` SELECT * FROM `util_test`.`t5`
 # Dropping new object TRIGGER util_db_clone.`trg`
 # WARNING: Unable to drop `trg` from source database (object may not exist): DROP TRIGGER `util_db_clone`.`trg`
 # Copying TRIGGER util_test.trg
+# #if (server1 == 'MySQL') and (int(version1) < 80000)
 CREATE DEFINER=`root`@`localhost` TRIGGER util_db_clone.trg AFTER INSERT ON util_db_clone.t1 FOR EACH ROW INSERT INTO util_db_clone.t2 VALUES('Test objects count')
+# #else
+CREATE DEFINER=`root`@`localhost` TRIGGER `trg` AFTER INSERT ON `t1` FOR EACH ROW INSERT INTO util_db_clone.t2 VALUES('Test objects count')
+# #endif
 # Dropping new object EVENT util_db_clone.`e1`
 # WARNING: Unable to drop `e1` from source database (object may not exist): DROP EVENT `util_db_clone`.`e1`
 # Copying EVENT util_test.e1

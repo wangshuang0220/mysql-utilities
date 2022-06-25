@@ -366,7 +366,7 @@ def clone_server(conn_val, options):
         'basedir': '--basedir={0}'.format(mysql_basedir),
         'socket': '--socket={0}'.format(socket_path),
     }
-    if user:
+    if user and os.getlogin() == "root":
         cmd.update({'user': '--user={0}'.format(user)})
     if mysqld_options:
         if isinstance(mysqld_options, (list, tuple)):

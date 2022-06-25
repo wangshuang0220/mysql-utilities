@@ -7,7 +7,7 @@ Test case 1 - no differences.
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     t1                                      pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Databases are consistent.
 #
@@ -27,7 +27,7 @@ Test case 2a - difference: PROCEDURE with ';' (get diff SQL).
 
 DROP PROCEDURE IF EXISTS `util_test_mysql_client`.`p1`;
 DELIMITER //
-CREATE DEFINER=`root`@`localhost` PROCEDURE `util_test_mysql_client`.`p1` (OUT param1 INT) CONTAINS SQL SQL SECURITY DEFINER BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `util_test_mysql_client`.`p1` (OUT param1 int) CONTAINS SQL SQL SECURITY DEFINER BEGIN
   
   SELECT COUNT(*) INTO param1 FROM mysql.user;
 END//
@@ -36,7 +36,7 @@ DELIMITER ;
 
 
 # TABLE     t1                                      pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Database consistency check failed.
 #
@@ -51,7 +51,7 @@ Test case 2b - difference: PROCEDURE with ';' (compare).
 # ------------------------------------------------------------------------- 
 # PROCEDURE p1                                      pass    -       -       
 # TABLE     t1                                      pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Databases are consistent.
 #
@@ -71,7 +71,7 @@ Test case 3a - difference: PROCEDURE DEFINER with wildcard (%) (get diff SQL).
 
 DROP PROCEDURE IF EXISTS `util_test_mysql_client`.`p1`;
 DELIMITER //
-CREATE DEFINER=`root`@`%` PROCEDURE `util_test_mysql_client`.`p1` (OUT param1 INT) CONTAINS SQL SQL SECURITY DEFINER BEGIN
+CREATE DEFINER=`root`@`%` PROCEDURE `util_test_mysql_client`.`p1` (OUT param1 int) CONTAINS SQL SQL SECURITY DEFINER BEGIN
   
   SELECT COUNT(*) INTO param1 FROM mysql.user;
 END//
@@ -80,7 +80,7 @@ DELIMITER ;
 
 
 # TABLE     t1                                      pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Database consistency check failed.
 #
@@ -95,7 +95,7 @@ Test case 3b - difference: PROCEDURE DEFINER with wildcard (%) (compare).
 # ------------------------------------------------------------------------- 
 # PROCEDURE p1                                      pass    -       -       
 # TABLE     t1                                      pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Databases are consistent.
 #

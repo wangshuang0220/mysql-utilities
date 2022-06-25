@@ -30,6 +30,7 @@ import sys
 from collections import deque
 
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.tools import tostr
 from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.options import obj2sql
 from mysql.utilities.common.server import connect_servers, Server
@@ -110,12 +111,14 @@ _COLUMN_QUERY = """
 
 _FK_CONSTRAINT_QUERY = """
 SELECT TABLE_NAME, CONSTRAINT_NAME, COLUMN_NAME, REFERENCED_TABLE_SCHEMA,
-REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, UPDATE_RULE, DELETE_RULE
+REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, UPDATE_RULE, DELETE_RULE,
+ORDINAL_POSITION
 FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
 JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE
 USING (CONSTRAINT_SCHEMA, CONSTRAINT_NAME, TABLE_NAME, REFERENCED_TABLE_NAME)
 WHERE CONSTRAINT_SCHEMA = '{DATABASE!s}'
 AND TABLE_NAME = '{TABLE!s}'
+ORDER BY ORDINAL_POSITION
 """
 
 _ALTER_TABLE_ADD_FK_CONSTRAINT = """
@@ -389,7 +392,7 @@ class Database(object):
 
         return True
 
-    def __make_create_statement(self, obj_type, obj):
+    def __make_create_statement(self, obj_type, obj, ignore_definer=False):
         """Construct a CREATE statement for a database object.
 
         This method will get the CREATE statement from the method
@@ -399,6 +402,7 @@ class Database(object):
         obj_type[in]       Object type (string) e.g. DATABASE
         obj[in]            A row from the get_db_objects() method
                            that contains the elements of the object
+        ignore_definer     drop any DEFINER clause
 
         Note: This does not work for tables.
 
@@ -414,15 +418,40 @@ class Database(object):
             return None
         # Grants are a different animal!
         if obj_type == _GRANT:
-            if obj[3]:
-                create_str = "GRANT %s ON %s.%s TO %s" % \
-                             (obj[1], self.q_new_db, obj[3], obj[0])
+            guser = obj[0]
+            priv = obj[1]
+            if priv.upper() == "USAGE":  # the 'no priv' priv
+                return None
+            db = obj[2]
+            if db is None or db != self.db_name:
+                return None
             else:
-                create_str = "GRANT %s ON %s.* TO %s" % \
-                             (obj[1], self.q_new_db, obj[0])
+                db = self.q_new_db
+            tabl = obj[3]
+            colm = obj[4]
+            routine = obj[5]
+            is_grantable = obj[6]
+            if routine:
+                create_str = "GRANT {0} ON ROUTINE {1}.{2} TO {3}".format(
+                    priv, db, routine, guser)
+            else:
+                if tabl is None:
+                    tabl = '*'
+
+                if colm:
+                    priv += "(" + colm + ")"
+                
+                create_str = "GRANT {0} ON {1}.{2} TO {3}".format(
+                    priv, db, tabl, guser)
+
+            if is_grantable:  
+                create_str += " WITH GRANT OPTION"
         else:
             create_str = self.get_create_statement(self.db_name,
-                                                   obj[0], obj_type)
+                                                   obj[0], obj_type,
+                                                   ignore_definer=ignore_definer)
+            if create_str is None:
+                return None
             if self.new_db != self.db_name:
                 # Replace the occurrences of the old database name (quoted with
                 # backticks) with the new one when preceded by: a whitespace
@@ -441,6 +470,8 @@ class Database(object):
                     r"\1\2\3{0}\4.".format(self.new_db),
                     create_str
                 )
+
+
         return create_str
 
     def _get_views_sorted_by_dependencies(self, views, columns,
@@ -570,6 +601,7 @@ class Database(object):
               guard is in place to ensure this.
         """
         self.init_called = True
+        self.objects = [] 
         # Get tables
         if not self.skip_tables:
             self.__add_db_objects(_TABLE)
@@ -628,7 +660,8 @@ class Database(object):
                                                                drop_str))
 
     def __create_object(self, obj_type, obj, show_grant_msg,
-                        quiet=True, new_engine=None, def_engine=None):
+                        quiet=True, new_engine=None, def_engine=None,
+                        ignore_definer=False):
         """Create a database object.
 
         obj_type[in]       Object type (string) e.g. DATABASE
@@ -639,6 +672,7 @@ class Database(object):
         new_engine[in]     Use this engine if not None for object
         def_engine[in]     If target storage engine doesn't exist, use
                            this engine.
+        ignore_definer[in] drop any DEFINER clause
 
         Note: will handle exception and print error if query fails
         """
@@ -653,7 +687,8 @@ class Database(object):
                 "".format(q_new_db, obj_name, q_db_name)
             ]
         else:
-            create_list = [self.__make_create_statement(obj_type, obj)]
+            create_list = [self.__make_create_statement(obj_type, obj,
+                                                        ignore_definer=ignore_definer)]
         if obj_type == _TABLE:
             may_skip_fk = False  # Check possible issues with FK Constraints
             obj_name = quote_with_backticks(obj[0], dest_sql_mode)
@@ -691,7 +726,7 @@ class Database(object):
             else:
                 print("%s %s %s.%s" % \
                       (string, obj_type, self.db_name, obj[0]))
-            if self.verbose:
+            if self.verbose and create_list[0] is not None:
                 print("; ".join(create_list))
 
         try:
@@ -705,7 +740,8 @@ class Database(object):
                     user = User(self.destination, obj[0])
                     if not user.exists():
                         user.create()
-                self.destination.exec_query(stm, self.query_options)
+                if stm is not None:
+                    self.destination.exec_query(stm, self.query_options)
             except UtilDBError as e:
                 raise UtilDBError("Cannot operate on {0} object."
                                   " Error: {1}".format(obj_type, e.errmsg),
@@ -747,8 +783,8 @@ class Database(object):
                     # is composite, just update the columns names and
                     # referenced column fields
                     if params:
-                        params['COLUMN_NAMES'].append(fkey[2])
-                        params['REFERENCED_COLUMNS'].append(fkey[5])
+                        constr_dict[fkey[1]]['COLUMN_NAMES'].append(fkey[2])
+                        constr_dict[fkey[1]]['REFERENCED_COLUMNS'].append(fkey[5])
                     else:  # else create a new entry
                         constr_lst.append(fkey[1])
                         constr_dict[fkey[1]] = {
@@ -762,6 +798,7 @@ class Database(object):
                             'UPDATE_RULE': fkey[6],
                             'DELETE_RULE': fkey[7],
                         }
+                    
                 # Iterate all the constraints and get the necessary parameters
                 # to create the query
                 for constr in constr_lst:
@@ -789,6 +826,8 @@ class Database(object):
                                                params['TABLE'],
                                                params['REFERENCED_DATABASE'],
                                                params['REFERENCED_TABLE']))
+
+                            
                         query = _ALTER_TABLE_ADD_FK_CONSTRAINT.format(**params)
 
                         # Store constraint query for later execution
@@ -820,7 +859,7 @@ class Database(object):
         # RESTRICT referential actions with NO ACTION
         query_opts = {'fetch': False, 'commit': False}
         self.destination.exec_query("SET FOREIGN_KEY_CHECKS=1", query_opts)
-
+        
         # while constraint queue is not empty
         while self.constraints:
             try:
@@ -869,7 +908,8 @@ class Database(object):
                                  "db.copy_objects()."
 
         grant_msg_displayed = False
-
+        ignore_definer = options.get('ignore_definer',False)
+        
         # Get sql_mode in new_server
         sql_mode = new_server.select_variable("SQL_MODE")
 
@@ -928,50 +968,78 @@ class Database(object):
         # Create the objects in the new database
         # Save any views that fail due to dependencies
         dependent_views = []
+
+
+        # order copying to avoid dependency problems
+        object_set = set()
         for obj in self.objects:
-            # Drop object if --drop-first specified and database not dropped
-            # Grants do not need to be dropped for overwriting
-            if options.get("do_drop", False) and obj[0] != _GRANT:
-                obj_name = quote_with_backticks(obj[1][0], dest_sql_mode)
-                self.__drop_object(obj[0], obj_name)
+            object_set.add(obj[0])
 
-            # Attempt to create the object.
-            try:
-                # Create the object
-                self.__create_object(obj[0], obj[1], not grant_msg_displayed,
-                                     options.get("quiet", False),
-                                     options.get("new_engine", None),
-                                     options.get("def_engine", None))
-            except UtilDBError as err:
-                # If this is a view and it fails dependency checking, save
-                # it and retry the view later, but only if we're not skipping
-                # tables.
-                if (obj[0] == _VIEW and "doesn't exist" in err.errmsg and
+        object_list = []
+        if _GRANT in object_set:
+            object_list.append(_GRANT)
+        if _TABLE in object_set: 
+            object_list.append(_TABLE)
+        if _PROC in object_set: 
+            object_list.append(_PROC)
+        if _FUNC in object_set: 
+            object_list.append(_FUNC)
+        if _VIEW in object_set: 
+            object_list.append(_VIEW)
+        if _TRIG in object_set: 
+            object_list.append(_TRIG)
+        if _EVENT in object_set:
+            object_list.append(_EVENT)
+
+        for objtype in object_list:
+            for obj in self.objects:
+                if obj[0] != objtype:
+                    continue
+                # Drop object if --drop-first specified and database not dropped
+                # Grants do not need to be dropped for overwriting
+                if options.get("do_drop", False) and obj[0] != _GRANT:
+                    obj_name = quote_with_backticks(obj[1][0], dest_sql_mode)
+                    self.__drop_object(obj[0], obj_name)
+
+                # Attempt to create the object.
+                try:
+                    # Create the object
+                    self.__create_object(obj[0], obj[1], not grant_msg_displayed,
+                                         options.get("quiet", False),
+                                         options.get("new_engine", None),
+                                         options.get("def_engine", None),
+                                         ignore_definer=ignore_definer)
+                except UtilDBError as err:
+                    # If this is a view and it fails dependency checking, save
+                    # it and retry the view later, but only if we're not skipping
+                    # tables.
+                    if (obj[0] == _VIEW and "doesn't exist" in err.errmsg and
                         not self.skip_tables):
-                    dependent_views.append(obj)
-                else:
-                    raise err
+                        dependent_views.append(obj)
+                    else:
+                        raise err
 
-            if obj[0] == _GRANT and not grant_msg_displayed:
-                grant_msg_displayed = True
+                if obj[0] == _GRANT and not grant_msg_displayed:
+                    grant_msg_displayed = True
 
-        # Now retry the views
-        if self.verbose and len(dependent_views) > 0:
-            print("# Attempting to create views that failed dependency "
-                  "checks on first pass.")
-        for obj in dependent_views:
-            # Drop object if --drop-first specified and database not dropped
-            if self.verbose:
-                print("#  Retrying view {0}".format(obj[1]))
-            if options.get("do_drop", False):
-                obj_name = quote_with_backticks(obj[1][0], dest_sql_mode)
-                self.__drop_object(obj[0], obj_name)
+                # Now retry the views
+                if self.verbose and len(dependent_views) > 0:
+                    print("# Attempting to create views that failed dependency "
+                          "checks on first pass.")
+                for obj in dependent_views:
+                    # Drop object if --drop-first specified and database not dropped
+                    if self.verbose:
+                        print("#  Retrying view {0}".format(obj[1]))
+                    if options.get("do_drop", False):
+                        obj_name = quote_with_backticks(obj[1][0], dest_sql_mode)
+                        self.__drop_object(obj[0], obj_name)
 
-            # Create the object
-            self.__create_object(obj[0], obj[1], not grant_msg_displayed,
-                                 options.get("quiet", False),
-                                 options.get("new_engine", None),
-                                 options.get("def_engine", None))
+                    # Create the object
+                    self.__create_object(obj[0], obj[1], not grant_msg_displayed,
+                                         options.get("quiet", False),
+                                         options.get("new_engine", None),
+                                         options.get("def_engine", None),
+                                         ignore_definer=ignore_definer)
 
         # After object creation, add the constraints
         if self.constraints:
@@ -1053,13 +1121,14 @@ class Database(object):
             # Wait for all task to be completed by workers.
             workers_pool.join()
 
-    def get_create_statement(self, db, name, obj_type):
+    def get_create_statement(self, db, name, obj_type, ignore_definer=False):
         """Return the create statement for the object
 
         db[in]             Database name
         name[in]           Name of the object
         obj_type[in]       Object type (string) e.g. DATABASE
                            Note: this is used to form the correct SHOW command
+        ignore_definer     cut out any DEFINER=... clause 
 
         Returns create statement
         """
@@ -1119,6 +1188,14 @@ class Database(object):
             else:
                 create_statement = row[0][2]
 
+
+        # remove any DEFINER=... from the CREATE statement (if requested).
+        if ignore_definer:
+            match = re.match('^CREATE DEFINER=[^ ]+ ((?s:.*))', create_statement)
+            if match:
+                #print("match.group() = ",match.group())
+                create_statement = "CREATE "+match.group(1)
+        
         # Remove all table options from the CREATE statement (if requested).
         if self.skip_table_opts and obj_type == _TABLE:
             # First, get partition options.
@@ -1134,7 +1211,7 @@ class Database(object):
             # Reconstruct CREATE statement without table options.
             create_statement = "{0}{1}{2}".format(create_tbl, sep, part_opts)
 
-        return create_statement
+        return tostr(create_statement)
 
     def get_create_table(self, db, table):
         """Return the create table statement for the given table.
@@ -1291,14 +1368,28 @@ class Database(object):
             condition = "TRIGGER_SCHEMA = '%s' AND TRIGGER_NAME = '%s'" % \
                         (db, name)
         elif obj_type == _PROC or obj_type == _FUNC:
-            columns = 'ROUTINE_SCHEMA, ROUTINE_NAME, ROUTINE_DEFINITION, ' + \
-                      'ROUTINES.SQL_DATA_ACCESS, ROUTINES.SECURITY_TYPE, ' + \
-                      'ROUTINE_COMMENT, ROUTINES.DEFINER, param_list, ' + \
-                      'DTD_IDENTIFIER, ROUTINES.IS_DETERMINISTIC'
-            from_name = 'ROUTINES JOIN mysql.proc ON ' + \
-                        'ROUTINES.ROUTINE_SCHEMA = proc.db AND ' + \
-                        'ROUTINES.ROUTINE_NAME = proc.name AND ' + \
-                        'ROUTINES.ROUTINE_TYPE = proc.type '
+            if self.source.has_mysqlproc():
+                columns = 'ROUTINE_SCHEMA, ROUTINE_NAME, ROUTINE_DEFINITION, ' + \
+                    'ROUTINES.SQL_DATA_ACCESS, ROUTINES.SECURITY_TYPE, ' + \
+                    'ROUTINE_COMMENT, ROUTINES.DEFINER, param_list, ' + \
+                    'DTD_IDENTIFIER, ROUTINES.IS_DETERMINISTIC'
+                from_name = 'ROUTINES JOIN mysql.proc ON ' + \
+                    'ROUTINES.ROUTINE_SCHEMA = proc.db AND ' + \
+                    'ROUTINES.ROUTINE_NAME = proc.name AND ' + \
+                    'ROUTINES.ROUTINE_TYPE = proc.type '
+            else:
+                columns = 'ROUTINE_SCHEMA, ROUTINE_NAME, ROUTINE_DEFINITION, ' + \
+                    'ROUTINES.SQL_DATA_ACCESS, ROUTINES.SECURITY_TYPE, ' + \
+                    'ROUTINE_COMMENT, ROUTINES.DEFINER,  ' + \
+                    "(SELECT GROUP_CONCAT(" +\
+                    "IF(PARAMETER_MODE='IN','',CONCAT(PARAMETER_MODE,' '))," +\
+                    "PARAMETER_NAME,' ',DTD_IDENTIFIER) " + \
+                    'FROM information_schema.parameters p ' + \
+                    'WHERE p.SPECIFIC_NAME = ROUTINE_NAME ' + \
+                    'AND ORDINAL_POSITION > 0) AS PARAM_LIST, ' + \
+                    'DTD_IDENTIFIER, ROUTINES.IS_DETERMINISTIC'
+                from_name = 'ROUTINES'
+                
             condition = "ROUTINE_SCHEMA = '%s' AND ROUTINE_NAME = '%s'" % \
                         (db, name)
             if obj_type == _PROC:
@@ -1544,8 +1635,9 @@ class Database(object):
             WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLE_TYPE <> 'VIEW' %s
             """
             _ORDER_BY_DEFAULT = """
-            ORDER BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
-                     COLUMNS.ORDINAL_POSITION
+            ORDER BY TABLES.TABLE_CATALOG, TABLES.TABLE_SCHEMA, 
+            TABLES.TABLE_NAME,
+            COLUMNS.ORDINAL_POSITION
             """
             _ORDER_BY_NAME = """
             ORDER BY TABLES.TABLE_NAME
@@ -1575,8 +1667,10 @@ class Database(object):
             FROM INFORMATION_SCHEMA.VIEWS
             WHERE TABLE_SCHEMA = '%s' %s
             """
-            _ORDER_BY_DEFAULT = ""
-            _ORDER_BY_NAME = ""
+            _ORDER_BY_DEFAULT = """
+            ORDER BY VIEWS.TABLE_CATALOG, VIEWS.TABLE_SCHEMA, VIEWS.TABLE_NAME
+            """
+            _ORDER_BY_NAME = "ORDER BY VIEWS.TABLE_NAME"
             exclude_param = "VIEWS.TABLE_NAME"
         elif obj_type == _TRIG:
             _NAMES = """
@@ -1611,8 +1705,10 @@ class Database(object):
             FROM INFORMATION_SCHEMA.TRIGGERS
             WHERE TRIGGER_SCHEMA = '%s' %s
             """
-            _ORDER_BY_DEFAULT = ""
-            _ORDER_BY_NAME = ""
+            _ORDER_BY_DEFAULT = """
+            ORDER BY TRIGGER_CATALOG, TRIGGER_SCHEMA, TRIGGER_NAME
+            """
+            _ORDER_BY_NAME = "ORDER BY TRIGGER_NAME"
             exclude_param = "TRIGGERS.TRIGGER_NAME"
         elif obj_type == _PROC:
             # mysql >= 8.0 information_schema.ROUTINES            
@@ -1654,7 +1750,9 @@ class Database(object):
                 ROUTINE_TYPE AS TYPE, SPECIFIC_NAME,
                 EXTERNAL_LANGUAGE AS LANGUAGE, 
                 SQL_DATA_ACCESS, IS_DETERMINISTIC, SECURITY_TYPE,
-                (SELECT GROUP_CONCAT(PARAMETER_NAME,' ',DTD_IDENTIFIER)  
+                (SELECT GROUP_CONCAT(
+                IF(PARAMETER_MODE='IN','',CONCAT(PARAMETER_MODE,' '),
+                PARAMETER_NAME,' ',DTD_IDENTIFIER)  
                   FROM information_schema.parameters p
                   WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
                   AND ordinal_position > 0) AS PARAM_LIST,
@@ -1686,7 +1784,7 @@ class Database(object):
                 minimal_pos_to_quote = (0,)
                 minimal_pos_split_quote = ()
                 _OBJECT_QUERY = """
-                FROM information_schema.routines
+                FROM INFORMATION_SCHEMA.ROUTINES
                 WHERE ROUTINE_SCHEMA = '%s' and ROUTINE_TYPE = 'PROCEDURE' %s
                 """
                 exclude_param = "ROUTINE_NAME"
@@ -1838,30 +1936,35 @@ class Database(object):
                 _ORDER_BY_DEFAULT = ""
                 _ORDER_BY_NAME = ""
                 exclude_param = "EVENT_NAME"            
-        elif obj_type == _GRANT:
+        elif obj_type == _GRANT:  
             _OBJECT_QUERY = """
             (
-                SELECT GRANTEE, PRIVILEGE_TYPE, TABLE_SCHEMA,
-                       NULL as TABLE_NAME, NULL AS COLUMN_NAME,
-                       NULL AS ROUTINE_NAME
-                FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES
-                WHERE table_schema = '%s'
+                    SELECT GRANTEE, PRIVILEGE_TYPE, TABLE_SCHEMA,
+                    NULL as TABLE_NAME, NULL AS COLUMN_NAME,
+                    NULL AS ROUTINE_NAME, IS_GRANTABLE
+                    FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES
+                    WHERE table_schema = '{db}'
             ) UNION (
-                SELECT grantee, privilege_type, table_schema, table_name,
-                       NULL, NULL
-                FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES
-                WHERE table_schema = '%s'
+                    SELECT grantee, privilege_type, table_schema, table_name,
+                    NULL, NULL, IS_GRANTABLE
+                    FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES
+                    WHERE table_schema = '{db}'
             ) UNION (
-                SELECT grantee, privilege_type, table_schema, table_name,
-                       column_name, NULL
-                FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES
-                WHERE table_schema = '%s'
+                    SELECT grantee, privilege_type, table_schema, table_name,
+                    column_name, NULL, IS_GRANTABLE
+                    FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES
+                    WHERE table_schema = '{db}'
             ) UNION (
-                SELECT CONCAT('''', User, '''@''', Host, ''''),  Proc_priv, Db,
-                       Routine_name, NULL, Routine_type
-                FROM mysql.procs_priv WHERE Db = '%s'
+                    SELECT GRANTEE, PRIVILEGE_TYPE, NULL, NULL,
+                    NULL, NULL, IS_GRANTABLE
+                    FROM INFORMATION_SCHEMA.USER_PRIVILEGES
+            ) UNION (
+                    SELECT CONCAT('''', User, '''@''', Host, ''''),  
+                    Proc_priv, Db, NULL, NULL, 
+                    Routine_name, Proc_priv = 'GRANT'
+                    FROM mysql.procs_priv WHERE Db = '{db}'
             ) ORDER BY GRANTEE ASC, PRIVILEGE_TYPE ASC, TABLE_SCHEMA ASC,
-                       TABLE_NAME ASC, COLUMN_NAME ASC, ROUTINE_NAME ASC
+                TABLE_NAME ASC, COLUMN_NAME ASC, ROUTINE_NAME ASC
             """
         else:
             return None
@@ -1873,8 +1976,7 @@ class Database(object):
         pos_split_quote = ()
         # pylint: disable=R0101
         if obj_type == _GRANT:
-            query = _OBJECT_QUERY % (self.db_name, self.db_name,
-                                     self.db_name, self.db_name)
+            query = _OBJECT_QUERY.format(db = self.db_name)
             return self.source.exec_query(query, col_options)
         else:
             if columns == "names":
@@ -1900,7 +2002,10 @@ class Database(object):
                 exclude_str = self.__build_exclude_patterns(exclude_param)
             query = (prefix + _OBJECT_QUERY + sufix) % (self.db_name,
                                                         exclude_str)
+            #print(obj_type," query: ",query)
+            #print("source: ",self.source.port)
             res = self.source.exec_query(query, col_options)
+            #print("     result: ",res)
 
             # Quote required identifiers with backticks
             if need_backtick:
@@ -1941,11 +2046,24 @@ class Database(object):
         uname[in]          user name to check
         host[in]           host name of connection
         access[in]         privilege to check (e.g. "SELECT")
+           access[0] = db
+           access[1] = priv
+           access[2] = GRANT OPTION 
 
         Returns True if user has permission, False if not
         """
-        user = User(self.source, uname + '@' + host)
-        result = user.has_privilege(access[0], '*', access[1])
+        if host is None:
+            host = '%'
+        if uname is None:
+            uname = '%'
+        user = User(self.source, "{0}@{1}".format(uname,host))
+        grant_opt = False
+        if len(access) > 2 and access[2] is not None:
+            grant_opt = access[2]
+        result = user.has_privilege(access[0], '*', access[1],
+                                    grant_opt=grant_opt)
+        #print("check user db=",access[0]," priv=",access[1],
+        #      "grant opt=",grant_opt," result=",result)
         return result
 
     def check_read_access(self, user, host, options):
@@ -1979,6 +2097,15 @@ class Database(object):
         if not options.get('skip_views', False):
             priv_tuple = (self.db_name, "SHOW VIEW")
             source_privs.append(priv_tuple)
+        # if procs or funcs, need SHOW_ROUTINE to get routine body
+        # for MySQL >= 8.0.20
+        if not options.get('skip_procs',False) or \
+           not options.get('skip_funcs',False):
+            if self.source.get_server_type() == 'MySQL' and \
+               self.source.check_version_compat(8,0,20):
+                priv_tuple = ("*.*","SHOW_ROUTINE")
+                source_privs.append(priv_tuple)
+            
         # if procs, funcs, events or grants are included, we need read on
         # mysql db
         if not options.get('skip_procs', False) or \
@@ -2025,9 +2152,14 @@ class Database(object):
             skip_func      True = no functions processed
             skip_grants    True = no grants processed
             skip_events    True = no events processed
+            ignore_definer True = ignore DEFINER in objects
         source_objects[in] Dictionary containing the list of objects from
                            source database
         do_drop[in]        True if the user is using --drop-first option
+
+
+        NB: MySQL 8.0 deprecated the SUPER privilege (in favor of 
+        SET_USER_ID and SYSTEM_USER)   Still need SUPER for functions.
 
         Returns True if user has permissions and raises a UtilDBError if the
                      user does not have permission with a message that includes
@@ -2048,8 +2180,17 @@ class Database(object):
             dest_privs.append((self.db_name, "DROP"))
 
         extra_privs = []
+        definer_users = set()
+        set_user_id_needed = False
+        system_user_needed = False
+        check_bin_trust = False
         super_needed = False
-
+        newprivs = False
+        if self.source.check_version_compat(8,0,0) and \
+           self.source.get_server_type() == "MySQL":
+            newprivs = True
+        ignoredefiner = options.get("ignore_definer",False)
+            
         try:
             res = self.source.exec_query("SELECT CURRENT_USER()")
             dest_user = res[0][0]
@@ -2064,24 +2205,27 @@ class Database(object):
                 extra_privs.append("CREATE VIEW")
                 for item in views:
                     # Test if DEFINER is equal to the current user
-                    if item[6] != dest_user:
-                        super_needed = True
-                        break
+                    if not ignoredefiner and item[6] != dest_user:
+                        set_user_id_needed = True
+                        definer_users.add(item[6])
 
         # CREATE ROUTINE and EXECUTE are needed for procedures
         if not options.get("skip_procs", False):
             procs = source_objects.get("procs", None)
             if procs:
-                extra_privs.append("CREATE ROUTINE")
-                extra_privs.append("EXECUTE")
-                if not super_needed:
-                    for item in procs:
-                        # Test if DEFINER is equal to the current user
-                        if item[11] != dest_user:
-                            super_needed = True
-                            break
+                if "CREATE ROUTINE" not in extra_privs:
+                    extra_privs.append("CREATE ROUTINE")
+                if "EXECUTE" not in extra_privs:
+                    extra_privs.append("EXECUTE")
+                for item in procs:
+                    # Test if DEFINER is equal to the current user
+                    if not ignoredefiner and item[11] != dest_user:
+                        set_user_id_needed = True
+                        check_bin_trust = True
+                        definer_users.add(item[11])
 
         # CREATE ROUTINE and EXECUTE are needed for functions
+        # and SUPER when binlog and not trusted
         # pylint: disable=R0101
         if not options.get("skip_funcs", False):
             funcs = source_objects.get("funcs", None)
@@ -2090,75 +2234,118 @@ class Database(object):
                     extra_privs.append("CREATE ROUTINE")
                 if "EXECUTE" not in extra_privs:
                     extra_privs.append("EXECUTE")
-                if not super_needed:
-                    trust_function_creators = False
-                    try:
-                        res = self.source.show_server_variable(
-                            "log_bin_trust_function_creators"
-                        )
-                        if res and isinstance(res, list) and \
-                                res[0][1] in ("ON", "1"):
-                            trust_function_creators = True
-                        # If binary log is enabled and
-                        # log_bin_trust_function_creators is 0, we need
-                        # SUPER privilege
-                        super_needed = self.source.binlog_enabled() and \
-                            not trust_function_creators
-                    except UtilError as err:
-                        raise UtilDBError("ERROR: {0}".format(err.errmsg))
-
-                    if not super_needed:
-                        for item in funcs:
-                            # Test if DEFINER is equal to the current user
-                            if item[11] != dest_user:
-                                super_needed = True
-                                break
-
+                for item in funcs:
+                    # Test if DEFINER is equal to the current user
+                    if not ignoredefiner and item[11] != dest_user:
+                        set_user_id_needed = True
+                        check_bin_trust = True
+                        definer_users.add(item[11])
+                                                
         # EVENT is needed for events
         if not options.get("skip_events", False):
             events = source_objects.get("events", None)
             if events:
                 extra_privs.append("EVENT")
-                if not super_needed:
-                    for item in events:
-                        # Test if DEFINER is equal to the current user
-                        if item[3] != dest_user:
-                            super_needed = True
-                            break
+                for item in events:
+                    # Test if DEFINER is equal to the current user
+                    if not ignoredefiner and item[3] != dest_user:
+                        set_user_id_needed = True
+                        definer_users.add(item[3])
 
         # TRIGGER is needed for events
         if not options.get("skip_triggers", False):
             triggers = source_objects.get("triggers", None)
             if triggers:
                 extra_privs.append("TRIGGER")
-                if not super_needed:
-                    for item in triggers:
-                        # Test if DEFINER is equal to the current user
-                        if item[18] != dest_user:
-                            super_needed = True
-                            break
+                for item in triggers:
+                    # Test if DEFINER is equal to the current user
+                    if not ignoredefiner and item[18] != dest_user:
+                        set_user_id_needed = True
+                        definer_users.add(item[18])
+                        
+        # need GRANT ... with GRANT OPTION, maybe SUPER/SYSTEM_USER for grants
+        if not options.get('skip_grants', False):
+            grants = source_objects.get("grants",None)
+            if grants:
+                for item in grants:
+                    if item[2] is None or item[2] == '*':
+                        next
+                    if item[0] != dest_user:
+                        definer_users.add(item[0])
+                    priv = item[1]
+                    db = item[2]
+                    tab = item[3]
+                    col = item[4]
+                    routine = item[5]
+                    
+                    priv_tuple = (self.db_name, priv, True)
+                    dest_privs.append(priv_tuple)
+                        
+        if check_bin_trust and not ignoredefiner:
+            # If binary log is enabled and
+            # log_bin_trust_function_creators is 0, we need
+            # SET_USER_ID privilege
+            trust_function_creators = False
+            try:
+                res = self.source.show_server_variable(
+                    "log_bin_trust_function_creators"
+                )
+            except UtilError as err:
+                raise UtilDBError("ERROR: {0}".format(err.errmsg))
+            if res and isinstance(res, list) and \
+               res[0][1] in ("ON", "1"):
+                trust_function_creators = True
 
-        # Add SUPER privilege if needed
+            super_needed = self.source.binlog_enabled() and \
+                not trust_function_creators
+                
+        # Add SET_USER_ID privilege if needed (MySQL >= 8.0)
+        if set_user_id_needed:
+            if newprivs:
+                dest_privs.append((self.db_name, "SET_USER_ID"))
+            else:
+                super_needed = True
+
+        if definer_users:
+            for newuser in definer_users:
+                if newprivs:
+                    if self._check_user_permissions(newuser, host,
+                                                    (self.db_name,'SYSTEM_USER')):
+                        system_user_needed = True
+                else:
+                    super_needed = True
+                break
+
+        if system_user_needed:
+            if newprivs:
+                dest_privs.append((self.db_name,"SYSTEM_USER"))
+            else:
+                super_needed = True
+                
         if super_needed:
-            dest_privs.append(("*", "SUPER"))
-
+                dest_privs.append((self.db_name,"SUPER"))
+                
         # Add extra privileges needed
         for priv in extra_privs:
             dest_privs.append((self.db_name, priv))
 
-        if not options.get('skip_grants', False):
-            priv_tuple = (self.db_name, "GRANT OPTION")
-            dest_privs.append(priv_tuple)
 
         # Check privileges on destination
+        #print("dest_privs: ",dest_privs)
         for priv in dest_privs:
             if not self._check_user_permissions(user, host, priv):
+                if priv[1] == 'SYSTEM_USER':
+                    if self._check_user_permissions(user,host,
+                                                    (self.db_name,'SUPER')):
+                        continue
+                    
                 raise UtilDBError("User %s on the %s server does not "
                                   "have permissions to create all objects "
                                   "in %s. User needs %s privilege on %s." %
                                   (user, self.source.role, priv[0], priv[1],
                                    priv[0]), -1, priv[0])
 
+        
         return True
 
     def check_auto_increment(self, tbl=None):

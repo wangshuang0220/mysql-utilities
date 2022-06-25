@@ -32,7 +32,8 @@ from mysql.utilities.exception import UtilError
 
 
 _DEFAULT_MYSQL_OPTS = ('"--report-host=localhost --report-port={0} '
-                       '--bind-address=:: --sql-mode=ANSI_QUOTES"')
+                       '--bind-address=:: --sql-mode=ANSI_QUOTES '
+                       '--disable-log-bin"')
 
 
 class test(copy_db.test):
@@ -46,6 +47,11 @@ class test(copy_db.test):
     need_server = False
     prev_sql_mode = "''"
 
+    # don't use check_prequisites from copy_db
+    def check_prerequisites(self):
+        return True
+
+
     def setup(self, spawn_servers=True):
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server1 = self.servers.spawn_server("compare_db_srv1_ansi_quotes",
@@ -53,7 +59,9 @@ class test(copy_db.test):
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server2 = self.servers.spawn_server("compare_db_srv2_ansi_quotes",
                                                  mysqld, True)
-
+        #self.debug = True
+        self.delay = 0
+        
         self.drop_all()
 
         std_data = "./std_data/{0}"
@@ -270,20 +278,39 @@ class test(copy_db.test):
             # Change DEFINER in procedures and functions on the source server
             if self.server1.has_mysqlproc():
                 self.server1.exec_query("UPDATE mysql.proc SET "
-                                        "DEFINER='joe@localhost' WHERE "
+                                        "DEFINER='joe'@'localhost' WHERE "
+                                        "DB='util_test'")
+                self.server1.exec_query("UPDATE mysql.event SET "
+                                        "DEFINER='joe'@'localhost' WHERE "
                                         "DB='util_test'")
             else:
-                self.server1.exec_query("UPDATE information_schema.routines SET "
-                                        "DEFINER='joe@localhost' WHERE "
-                                        "ROUTINE_SCHEMA='util_test'")
+                # MySQL >8.0 can't alter DEFINER, have to drop and recreate
+                self.server1.exec_query("DROP PROCEDURE `util_test`.`p1`")
+                self.server1.exec_query("DROP FUNCTION `util_test`.`f1`")
+                self.server1.exec_query("DROP FUNCTION `util_test`.`f2`")
+                self.server1.exec_query("CREATE DEFINER='joe'@'localhost' "
+                                        "PROCEDURE util_test.p1(p1 CHAR(20)) "
+                                        "INSERT INTO util_test.t1 "
+                                        "VALUES ('50')")
+                self.server1.exec_query("CREATE DEFINER='joe'@'localhost' "
+                                        "FUNCTION util_test.f1() "
+                                        "RETURNS INT DETERMINISTIC "
+                                        "RETURN (SELECT 1)")
+                self.server1.exec_query("CREATE DEFINER='joe'@'localhost' "
+                                        "FUNCTION "
+                                        "util_test.f2(base_price DECIMAL(20,2) "
+                                        "UNSIGNED, tax_percentage DECIMAL(3,0) "
+                                        "UNSIGNED) RETURNS DECIMAL (21,2) "
+                                        "UNSIGNED DETERMINISTIC "
+                                        "RETURN base_price + "
+                                        "base_price*(tax_percentage/100)")
+                
+                
 
-            self.server1.exec_query("UPDATE mysql.event SET "
-                                    "DEFINER='joe@localhost' WHERE "
-                                    "DB='util_test'")
 
             # Change DEFINER in the views on the source server
             query = """
-                SELECT CONCAT("ALTER DEFINER='joe'@'localhost' VIEW ",
+                SELECT CONCAT("ALTER DEFINER=`joe`@`localhost` VIEW ",
                 table_schema, ".", table_name, " AS ", view_definition)
                 FROM information_schema.views WHERE
                 table_schema='util_test'
@@ -296,7 +323,7 @@ class test(copy_db.test):
 
             # Change DEFINER in the triggers on the source server
             self.server1.exec_query("DROP TRIGGER util_test.trg")
-            self.server1.exec_query("CREATE DEFINER='joe'@'localhost' "
+            self.server1.exec_query("CREATE DEFINER='joe@localhost' "
                                     "TRIGGER util_test.trg AFTER INSERT ON "
                                     "util_test.t1 FOR EACH ROW INSERT INTO "
                                     "util_test.t2 "
@@ -308,7 +335,8 @@ class test(copy_db.test):
         to_conn = "--destination=joe@localhost:{0}".format(self.server2.port)
         comment = ("Test case {0} - copy using a user without SUPER privilege"
                    "").format(test_num)
-        cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first {0} "
+        cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first "
+               "--ignore-definer {0} "
                "{1} util_test:util_db_privileges".format(from_conn, to_conn))
 
         res = self.exec_util(cmd, self.res_fname)
@@ -348,7 +376,11 @@ class test(copy_db.test):
         # Database and table with single double quotes (") on identifier
         test_num += 1
         comment = "Test case {0} - copydb single double quote".format(test_num)
-        dbs = '\\"util\\"\\"test\\":\\"util\\"\\"test_copy\\"'
+        if os.name == 'posix':
+            dbs = '\'"util""test":"util""test_copy"\''
+        else:
+            dbs = '\\"util\\"\\"test\\":\\"util\\"\\"test_copy\\"'
+            
         cmd = ("mysqldbcopy.py --skip-gtid {0} {1} {2} -vv"
                "".format(from_conn, to_conn, dbs))
         res = self.run_test_case(0, cmd, comment)
@@ -459,6 +491,15 @@ class test(copy_db.test):
                                    "{0}.{1}, got {2} expected "
                                    "{3}.".format(cmp_data[1][i], table,
                                                  tbl_checksum, base_checksum))
+                        res = self.server1.exec_query(
+                            "SELECT * FROM {0}.{1}".format(
+                            cmp_data[0],table))
+                        print("server1: ",res)
+                        res = self.server2.exec_query(
+                            "SELECT * FROM {0}.{1}".format(
+                            cmp_data[1][i],table))
+                        print("server2: ",res)
+                                                 
 
         # Check attributes (character set and collation).
         qry_db = ("SELECT {0} FROM INFORMATION_SCHEMA.SCHEMATA "

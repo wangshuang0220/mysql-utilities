@@ -28,7 +28,9 @@ from builtins import object
 import re
 
 from mysql.utilities.exception import UtilError, UtilDBError
+from mysql.utilities.common.tools import tostr, tobytearray
 from mysql.connector.conversion import MySQLConverter
+
 
 
 _IGNORE_COLUMN = -1  # Ignore column in comparisons and transformations
@@ -91,8 +93,9 @@ def to_sql(obj):
     #if obj is not None and not isinstance(obj,str):
     #    obj = str(obj,'utf-8') 
     to_sql.__dict__.setdefault('converter', MySQLConverter())
-    obj = to_sql.converter.escape(obj)  # pylint: disable=E1101
-    return str(to_sql.converter.quote(bytes(obj,'utf-8')),'utf-8')  # pylint: disable=E1101
+    obj = to_sql.converter.escape(tobytearray(obj))  # pylint: disable=E1101
+    obj = to_sql.converter.quote(tobytearray(obj))
+    return tostr(obj)  
 
 
 def quote_with_backticks(identifier, sql_mode=''):
@@ -1328,7 +1331,7 @@ class SQLTransformer(object):
             {'fmt': " %s %s.%s", 'col': _IGNORE_COLUMN,
              'val': (self.obj_type.upper(), q_dest_db, q_dest_routine)},
             # parameters
-            {'fmt': " %s", 'col': _IGNORE_COLUMN, 'val': ""},
+            {'fmt': "%s", 'col': _IGNORE_COLUMN, 'val': ""},
             # returns (Functions only)
             {'fmt': " RETURNS %s", 'col': _IGNORE_COLUMN, 'val': ""},
             # access method
@@ -1353,8 +1356,11 @@ class SQLTransformer(object):
 
         # Add parameters and DEFINER if CREATE statement.
         if do_create:
+            params = self.source[_ROUTINE_PARAMS]
+            if params is None:
+                params = ''
             statement_parts[4]['val'] = \
-                '({0})'.format(self.source[_ROUTINE_PARAMS])
+                '({0})'.format(params)
 
             # Quote DEFINER with backticks
             statement_parts[2]['val'] = \

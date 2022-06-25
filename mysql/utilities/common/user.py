@@ -348,12 +348,12 @@ class User(object):
             grant_tpl = User._parse_grant_statement(grant[0], sql_mode)
             # Ignore PROXY privilege, it is not yet supported
             if verbosity > 0:
-                if 'PROXY' in grant_tpl:
+                if grant_tpl.proxy_user is not None:
                     print("#WARNING: PROXY privilege will be ignored.")
-            grant_tpl.privileges.discard('PROXY')
             if grant_tpl.privileges:
-                grant_dict[grant_tpl.db][grant_tpl.object].update(
-                    grant_tpl.privileges)
+                privs = grant_tpl.privileges
+                grant_dict[grant_tpl.db][grant_tpl.object].update(privs)
+                    
         return grant_dict
 
     def get_grants(self, globals_privs=False, as_dict=False, refresh=False):
@@ -495,7 +495,7 @@ class User(object):
         return grants
 
     def has_privilege(self, db, obj, access, allow_skip_grant_tables=True,
-                      globals_privs=True):
+                      globals_privs=True, grant_opt=False):
         """Check to see user has a specific access to a db.object.
 
         db[in]             Name of database
@@ -506,6 +506,8 @@ class User(object):
                            --skip-grant-tables. Default=True
         globals_privs[in]  Include global privileges in clone (i.e. user@%)
                            Default is True
+        grant_opt[in]      require GRANT OPTION on the priv
+                           Default is False
 
         Returns True if user has access, False if not
         """
@@ -540,20 +542,29 @@ class User(object):
         # Even if we have ALL PRIVILEGES grant, we might not have WITH GRANT
         # OPTION privilege.
         # Check server wide grants.
-        elif (access in grant_dict['*']['*'] or
-              "ALL PRIVILEGES" in grant_dict['*']['*'] and
-              access != "GRANT OPTION"):
-            return True
+        
+        elif (access in grant_dict['*']['*'] or 
+              "ALL PRIVILEGES" in grant_dict['*']['*'] ):
+            if not grant_opt:
+                return True
+            else:
+                return 'GRANT OPTION' in grant_dict['*']['*']
+            
         # Check database level grants.
         elif (access in grant_dict[db]['*'] or
-              "ALL PRIVILEGES" in grant_dict[db]['*'] and
-              access != "GRANT OPTION"):
-            return True
+              "ALL PRIVILEGES" in grant_dict[db]['*'] ):
+              if not grant_opt:
+                  return True
+              else:
+                  return 'GRANT OPTION' in grant_dict[db]['*']
+
         # Check object level grants.
         elif (access in grant_dict[db][obj] or
-              "ALL PRIVILEGES" in grant_dict[db][obj] and
-              access != "GRANT OPTION"):
-            return True
+              "ALL PRIVILEGES" in grant_dict[db][obj] ):
+              if not grant_opt:
+                  return True
+              else:
+                  return 'GRANT OPTION' in grant_dict[db][obj]
         else:
             return False
 
@@ -743,12 +754,17 @@ class User(object):
             $ # End of grant statement
             """, re.VERBOSE)
 
-        grant_tpl_factory = namedtuple("grant_info", "privileges proxy_user "
-                                                     "db object user")
+        grant_tpl_factory = namedtuple("grant_privs", "privileges user "
+                                       "db object proxy_user")
         match = re.match(grant_parse_re, statement)
 
+        #print("parse_grant: ",statement)
+        #print("match: ",match.groups())
+        
         if match:
             # quote database name and object name with backticks
+            proxy_user = None
+            group_opt = False
             if match.group(1).upper() != 'PROXY':
                 db = match.group(2)
                 if not is_quoted_with_backticks(db, sql_mode) and db != '*':
@@ -758,16 +774,17 @@ class User(object):
                     obj = quote_with_backticks(obj, sql_mode)
             else:  # if it is a proxy grant
                 db = obj = None
+                proxy_user = match.group(2)
             grants = grant_tpl_factory(
                 # privileges
                 set([priv.strip() for priv in match.group(1).split(",")]),
-                match.group(4),  # proxied user
+                match.group(4),  # user
                 db,  # database
                 obj,  # object
-                match.group(5),  # user
+                proxy_user, # proxy user
             )
             # If user has grant option, add it to the list of privileges
-            if match.group(6) is not None:
+            if match.group(7) is not None:
                 grants.privileges.add("GRANT OPTION")
         else:
             raise UtilError("Unable to parse grant statement "

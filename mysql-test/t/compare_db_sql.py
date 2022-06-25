@@ -39,7 +39,6 @@ class test(compare_db.test):
         return compare_db.test.setup(self)
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         s1_conn = "--server1=" + self.build_connection_string(self.server1)

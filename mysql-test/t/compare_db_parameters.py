@@ -44,7 +44,6 @@ class test(compare_db.test):
         return compare_db.test.setup(self)
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         s1_conn = "--server1={0}".format(
@@ -220,7 +219,8 @@ class test(compare_db.test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, self.server2)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

@@ -45,7 +45,6 @@ class test(clone_db.test):
 
     def run(self):
         self.mask_global = False  # Turn off global masks
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(
@@ -140,7 +139,7 @@ class test(clone_db.test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results, self.server1)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

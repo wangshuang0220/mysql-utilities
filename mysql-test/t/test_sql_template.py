@@ -157,23 +157,21 @@ class test(mutlib.System_test):
         self.server1 = None
         self.server2 = None
         self.need_server = False
-        if not self.check_num_servers(2):
+        if not self.check_num_servers(3):
             self.need_server = True
-        return self.check_num_servers(1)
+        return True
 
     # pylint: disable=W0221
     def setup(self, spawn_servers=True):
         self.res_fname = "result.txt"
-        if spawn_servers:
-            self.server1 = self.servers.get_server(0)
-            if self.need_server:
-                try:
-                    self.servers.spawn_new_servers(2)
-                except MUTLibError as err:
-                    raise MUTLibError("Cannot spawn needed servers:"
-                                      " {0}".format(err.errmsg))
-        if self.server2 is None:
-            self.server2 = self.servers.get_server(1)
+        if self.need_server:
+            try:
+                self.servers.spawn_new_servers(3)
+            except MUTLibError as err:
+                raise MUTLibError("Cannot spawn needed servers:"
+                                  " {0}".format(err.errmsg))
+        self.server1 = self.servers.get_server(1)
+        self.server2 = self.servers.get_server(2)
 
         s1_conn = "--server1={0}".format(
             self.build_connection_string(self.server1))

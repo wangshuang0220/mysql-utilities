@@ -13,7 +13,7 @@ Test case 1 - check a sample database
 #           - Compare table checksum                                pass    
 # VIEW      cleaning                                pass    -       -       
 # VIEW      finishing_up                            pass    -       -       
-# VIEW      tools                                   pass    -       -      
+# VIEW      tools                                   pass    -       -       
 
 # Databases are consistent.
 #
@@ -36,7 +36,7 @@ Test case 2 - check database with known differences (extra table)
 #           - Compare table checksum                                pass    
 # VIEW      cleaning                                pass    -       -       
 # VIEW      finishing_up                            pass    -       -       
-# VIEW      tools                                   pass    -       -      
+# VIEW      tools                                   pass    -       -       
 
 # Database consistency check failed.
 #
@@ -50,8 +50,8 @@ Test case 4 - check database with known differences direction = server1 (default
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
@@ -67,7 +67,7 @@ Test case 4 - check database with known differences direction = server1 (default
 +++ "inventory"."supplier"
 @@ -1,3 +1,3 @@
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -75,7 +75,7 @@ Test case 4 - check database with known differences direction = server1 (default
 # Rows in "inventory"."supplier" not in "inventory"."supplier"
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -89,27 +89,27 @@ code,name
 +++ "inventory"."supplies"
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 # VIEW      tools                                   FAIL    -       -       
 #
@@ -133,8 +133,8 @@ Test case 5 - check database with known differences direction = server2
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
@@ -152,13 +152,13 @@ Test case 5 - check database with known differences direction = server2
  code,name
 -'4','Acme Corporation'
 -'2','Wesayso Corporation'
-+'4',NULL
++'4','NULL'
 +'2','Never Enough Inc.'
 
 # Rows in "inventory"."supplier" not in "inventory"."supplier"
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -172,27 +172,27 @@ code,name
 +++ "inventory"."supplies"
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','10.00','repair','','1'
 -'11186','Plastic polish','1','10.00','polishing','','1'
+-'11146','Speed shine','1','10.00','repair','','1'
 -'11040','Leather care','1','10.00','other','','1'
-+'11146','Speed shine','1','9.99','repair','','1'
 +'11186','Plastic polish','1','9.99','polishing','','1'
++'11146','Speed shine','1','9.99','repair','','1'
 +'11040','Leather care','1','9.99','other','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # VIEW      tools                                   FAIL    -       -       
 #
@@ -216,8 +216,8 @@ Test case 6 - check database with known differences direction = server1 and reve
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
@@ -233,7 +233,7 @@ Test case 6 - check database with known differences direction = server1 and reve
 +++ "inventory"."supplier"
 @@ -1,3 +1,3 @@
  code,name
--'4',NULL
+-'4','NULL'
 -'2','Never Enough Inc.'
 +'4','Acme Corporation'
 +'2','Wesayso Corporation'
@@ -241,7 +241,7 @@ Test case 6 - check database with known differences direction = server1 and reve
 # Rows in "inventory"."supplier" not in "inventory"."supplier"
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # # Data differences found among rows:
@@ -251,13 +251,13 @@ code,name
 #  code,name
 # -'4','Acme Corporation'
 # -'2','Wesayso Corporation'
-# +'4',NULL
+# +'4','NULL'
 # +'2','Never Enough Inc.'
 # 
 # Rows in "inventory"."supplier" not in "inventory"."supplier"
 # code,name
 # '6',''
-# '5',NULL
+# '5','NULL'
 # '3','Never Enough Inc.'
 #
 
@@ -273,54 +273,54 @@ code,name
 +++ "inventory"."supplies"
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','9.99','repair','','1'
 -'11186','Plastic polish','1','9.99','polishing','','1'
+-'11146','Speed shine','1','9.99','repair','','1'
 -'11040','Leather care','1','9.99','other','','1'
-+'11146','Speed shine','1','10.00','repair','','1'
 +'11186','Plastic polish','1','10.00','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
 +'11040','Leather care','1','10.00','other','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 # # Data differences found among rows:
 # --- "inventory"."supplies"
 # +++ "inventory"."supplies"
 # @@ -1,4 +1,4 @@
 #  stock_number,description,qty,cost,type,notes,supplier
-# -'11146','Speed shine','1','10.00','repair','','1'
 # -'11186','Plastic polish','1','10.00','polishing','','1'
+# -'11146','Speed shine','1','10.00','repair','','1'
 # -'11040','Leather care','1','10.00','other','','1'
-# +'11146','Speed shine','1','9.99','repair','','1'
 # +'11186','Plastic polish','1','9.99','polishing','','1'
+# +'11146','Speed shine','1','9.99','repair','','1'
 # +'11040','Leather care','1','9.99','other','','1'
 # 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 # stock_number,description,qty,cost,type,notes,supplier
 # '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-# '10665','Glass polish pad','3','10.00','polishing','','1'
 # '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+# '10665','Glass polish pad','3','10.00','polishing','','1'
 # 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 # stock_number,description,qty,cost,type,notes,supplier
-# '11270','Carpet cleaner','1','9.99','cleaning','','1'
 # '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+# '11270','Carpet cleaner','1','9.99','cleaning','','1'
 # '11136','Rubber cleaner','1','9.99','cleaning','','1'
-# '11104','Interior cleaner','1','9.99','cleaning','','1'
-# '11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 # '11106','Wheel cleaner','1','9.99','cleaning','','1'
+# '11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+# '11104','Interior cleaner','1','9.99','cleaning','','1'
 #
 
 
@@ -357,8 +357,8 @@ Test case 7 - check database with known differences direction = server2 and reve
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
-#         VIEW: finishing_up
 #         VIEW: cleaning
+#         VIEW: finishing_up
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
@@ -376,13 +376,13 @@ Test case 7 - check database with known differences direction = server2 and reve
  code,name
 -'4','Acme Corporation'
 -'2','Wesayso Corporation'
-+'4',NULL
++'4','NULL'
 +'2','Never Enough Inc.'
 
 # Rows in "inventory"."supplier" not in "inventory"."supplier"
 code,name
 '6',''
-'5',NULL
+'5','NULL'
 '3','Never Enough Inc.'
 
 # # Data differences found among rows:
@@ -390,7 +390,7 @@ code,name
 # +++ "inventory"."supplier"
 # @@ -1,3 +1,3 @@
 #  code,name
-# -'4',NULL
+# -'4','NULL'
 # -'2','Never Enough Inc.'
 # +'4','Acme Corporation'
 # +'2','Wesayso Corporation'
@@ -398,7 +398,7 @@ code,name
 # Rows in "inventory"."supplier" not in "inventory"."supplier"
 # code,name
 # '6',''
-# '5',NULL
+# '5','NULL'
 # '3','Never Enough Inc.'
 #
 
@@ -414,54 +414,54 @@ code,name
 +++ "inventory"."supplies"
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--'11146','Speed shine','1','10.00','repair','','1'
 -'11186','Plastic polish','1','10.00','polishing','','1'
+-'11146','Speed shine','1','10.00','repair','','1'
 -'11040','Leather care','1','10.00','other','','1'
-+'11146','Speed shine','1','9.99','repair','','1'
 +'11186','Plastic polish','1','9.99','polishing','','1'
++'11146','Speed shine','1','9.99','repair','','1'
 +'11040','Leather care','1','9.99','other','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
 '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-'10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 stock_number,description,qty,cost,type,notes,supplier
-'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
 '11136','Rubber cleaner','1','9.99','cleaning','','1'
-'11104','Interior cleaner','1','9.99','cleaning','','1'
-'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 '11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
 
 # # Data differences found among rows:
 # --- "inventory"."supplies"
 # +++ "inventory"."supplies"
 # @@ -1,4 +1,4 @@
 #  stock_number,description,qty,cost,type,notes,supplier
-# -'11146','Speed shine','1','9.99','repair','','1'
 # -'11186','Plastic polish','1','9.99','polishing','','1'
+# -'11146','Speed shine','1','9.99','repair','','1'
 # -'11040','Leather care','1','9.99','other','','1'
-# +'11146','Speed shine','1','10.00','repair','','1'
 # +'11186','Plastic polish','1','10.00','polishing','','1'
+# +'11146','Speed shine','1','10.00','repair','','1'
 # +'11040','Leather care','1','10.00','other','','1'
 # 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 # stock_number,description,qty,cost,type,notes,supplier
-# '11270','Carpet cleaner','1','9.99','cleaning','','1'
 # '11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+# '11270','Carpet cleaner','1','9.99','cleaning','','1'
 # '11136','Rubber cleaner','1','9.99','cleaning','','1'
-# '11104','Interior cleaner','1','9.99','cleaning','','1'
-# '11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
 # '11106','Wheel cleaner','1','9.99','cleaning','','1'
+# '11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+# '11104','Interior cleaner','1','9.99','cleaning','','1'
 # 
 # Rows in "inventory"."supplies" not in "inventory"."supplies"
 # stock_number,description,qty,cost,type,notes,supplier
 # '11116','Microfiber wax removal towel','3','16.99','waxing','','1'
-# '10665','Glass polish pad','3','10.00','polishing','','1'
 # '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
+# '10665','Glass polish pad','3','10.00','polishing','','1'
 #
 
 
@@ -498,15 +498,15 @@ Test case 8 - compare two databases on same server w/server2
 # Checking databases inventory on server1 and inventory2 on server2
 #
 # WARNING: Objects in server1.inventory but not in server1.inventory2:
-#         VIEW: finishing_up
 #        TABLE: supplier
 #        TABLE: supplies
-#         VIEW: tools
 #         VIEW: cleaning
+#         VIEW: finishing_up
+#         VIEW: tools
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------- 
 
 # Database consistency check failed.
 #
@@ -517,15 +517,15 @@ Test case 9 - compare two databases on same server
 # Checking databases inventory and inventory2 on server1
 #
 # WARNING: Objects in server1.inventory but not in server1.inventory2:
-#         VIEW: finishing_up
 #        TABLE: supplier
 #        TABLE: supplies
-#         VIEW: tools
 #         VIEW: cleaning
+#         VIEW: finishing_up
+#         VIEW: tools
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------- 
 
 # Database consistency check failed.
 #
@@ -543,7 +543,7 @@ Test case 10 - compare a database with weird names (backticks)
 #           - Compare table checksum                                pass    
 # TABLE     `t`export_1                             pass    pass    -       
 #           - Compare table checksum                                pass    
-# VIEW      `v`export_1                             pass    -       -      
+# VIEW      `v`export_1                             pass    -       -       
 
 # Databases are consistent.
 #
@@ -556,7 +556,7 @@ Test case 11 - compare two empty databases
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
-# -------------------------------------------------------------------------
+# ------------------------------------------------------------------------- 
 
 # Databases are consistent.
 #
@@ -579,7 +579,7 @@ Test case 12 - compare a sample database containing tables with weird names (no 
 +++ "db_diff_test"."table-dash"
 @@ -1,4 +1,4 @@
  CREATE TABLE "table-dash" (
-   "id" bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+   "id" bigint unsigned NOT NULL AUTO_INCREMENT,
    PRIMARY KEY ("id")
 -) ENGINE=InnoDB AUTO_INCREMENT=50000010 DEFAULT CHARSET=latin1
 +) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
@@ -597,7 +597,7 @@ Test case 13 - compare a sample database containing tables with weird names (no 
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     table-dash                              pass    SKIP    SKIP   
+# TABLE     table-dash                              pass    SKIP    SKIP    
 
 # Databases are consistent given skip options specified.
 #
@@ -616,7 +616,7 @@ Test case 14 - compare a database with objects of different types with the same 
 #           - Compare table checksum                                pass    
 # TABLE     `t`export_1                             pass    pass    -       
 #           - Compare table checksum                                pass    
-# VIEW      `v`export_1                             pass    -       -      
+# VIEW      `v`export_1                             pass    -       -       
 
 # Databases are consistent.
 #
@@ -646,7 +646,7 @@ Test case 15 - compare a database with objects of different types with the same 
 #           - Compare table checksum                                pass    
 # TABLE     `t`export_1                             pass    pass    -       
 #           - Compare table checksum                                pass    
-# VIEW      `v`export_1                             pass    -       -      
+# VIEW      `v`export_1                             pass    -       -       
 
 # Database consistency check failed.
 #
@@ -656,14 +656,26 @@ Test case 16 - compare all databases
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # The database inventory2 on server1 does not exist on server2.
-# Comparing databases: empty_db, compare_db_quotes_1, compare_db_quotes_2, no_primary_keys, compare_db_pkeys_db1, compare_db_pkeys_db2, inventory, db_diff_test, db.`:db, multi_span_row
+# Comparing databases: compare_db_pkeys_db1, compare_db_pkeys_db2, compare_db_quotes_1, compare_db_quotes_2, db.`:db, db_diff_test, empty_db, inventory, multi_span_row, no_primary_keys
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
-# Checking databases empty_db on server1 and empty_db on server2
+# Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db1 on server2
 #
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db2 on server1 and compare_db_pkeys_db2 on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -687,6 +699,48 @@ Test case 16 - compare all databases
 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
+# Checking databases db.`:db on server1 and db.`:db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# PROCEDURE `t`export_1                             FAIL    ERROR: The object definitions do not match.
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    ERROR: The object definitions do not match.
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases empty_db on server1 and empty_db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+ERROR: The list of objects differs among database inventory and inventory.
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases no_primary_keys on server1 and no_primary_keys on server2
 #
 #                                                   Defn    Row     Data   
@@ -703,60 +757,6 @@ Test case 16 - compare all databases
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
 #           - Compare table checksum                                pass    
 
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db1 on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-# TABLE     t                                       pass    pass    -       
-#           - Compare table checksum                                pass    
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases compare_db_pkeys_db2 on server1 and compare_db_pkeys_db2 on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-# TABLE     t                                       pass    pass    -       
-#           - Compare table checksum                                pass    
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases inventory on server1 and inventory on server2
-#
-ERROR: The list of objects differs among database inventory and inventory.
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases db_diff_test on server1 and db_diff_test on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-# TABLE     table-dash                              FAIL    ERROR: The object definitions do not match.
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases db.`:db on server1 and db.`:db on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-# PROCEDURE `t`export_1                             FAIL    ERROR: The object definitions do not match.
-
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases multi_span_row on server1 and multi_span_row on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-# TABLE     t                                       pass    pass    -       
-#           - Compare table checksum                                pass    
-
 
 # Database consistency check failed.
 #
@@ -766,15 +766,7 @@ Test case 17 - compare all databases with --exclude option and LIKE pattern
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # The database inventory2 on server1 does not exist on server2.
-# Comparing databases: empty_db, compare_db_pkeys_db1, compare_db_pkeys_db2, multi_span_row
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases empty_db on server1 and empty_db on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-
+# Comparing databases: compare_db_pkeys_db1, compare_db_pkeys_db2, empty_db, multi_span_row
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db1 on server2
@@ -794,6 +786,14 @@ Test case 17 - compare all databases with --exclude option and LIKE pattern
 # ------------------------------------------------------------------------- 
 # TABLE     t                                       pass    pass    -       
 #           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases empty_db on server1 and empty_db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -813,15 +813,7 @@ Test case 18 - compare all databases with --exclude option and REGEXP pattern
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
-# Comparing databases: empty_db, compare_db_pkeys_db1, compare_db_pkeys_db2, multi_span_row
-# server1 on localhost: ... connected.
-# server2 on localhost: ... connected.
-# Checking databases empty_db on server1 and empty_db on server2
-#
-#                                                   Defn    Row     Data   
-# Type      Object Name                             Diff    Count   Check  
-# ------------------------------------------------------------------------- 
-
+# Comparing databases: compare_db_pkeys_db1, compare_db_pkeys_db2, empty_db, multi_span_row
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db1 on server2
@@ -841,6 +833,14 @@ Test case 18 - compare all databases with --exclude option and REGEXP pattern
 # ------------------------------------------------------------------------- 
 # TABLE     t                                       pass    pass    -       
 #           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases empty_db on server1 and empty_db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -879,7 +879,7 @@ Test case 19 - Test automatically picks up the not nullable unique index (No dif
 #           - Find row differences                                  pass    
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Databases are consistent.
 #
@@ -907,7 +907,7 @@ Test case 20 - real not nullable unique index for a specific table using --use-i
 #           - Find row differences                                  pass    
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Databases are consistent.
 #
@@ -935,7 +935,7 @@ Test case 21 - compare using--use-indexes for two tables (No differences)
 #           - Find row differences                                  pass    
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Databases are consistent.
 #
@@ -963,7 +963,7 @@ Test case 22 - using --use-indexes for same table (No differences)
 #           - Find row differences                                  pass    
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Databases are consistent.
 #
@@ -976,20 +976,21 @@ Test case 23 - using --use-indexes for same table verbose unique index over prim
 #
 Looking for object types table, view, trigger, procedure, function, and event.
 Object types found common to both databases:
-     FUNCTION : 0
-      TRIGGER : 0
-        TABLE : 5
-        EVENT : 0
-    PROCEDURE : 0
          VIEW : 0
+      TRIGGER : 0
+    PROCEDURE : 0
+     FUNCTION : 0
+        EVENT : 0
+        TABLE : 5
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     nonix_1_nix_2                           pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_1_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1005,8 +1006,26 @@ CREATE TABLE "nonix_1_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_1_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1022,15 +1041,33 @@ CREATE TABLE "nonix_1_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_1_nix_2 the index "uk_nonulls" is used to compare.
 
 # TABLE     nonix_1_simple                          pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_1_simple:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_simple" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1041,8 +1078,21 @@ CREATE TABLE "nonix_1_simple" (
   UNIQUE KEY "uk_nonullclmns" ("c6"),
   KEY "ix_nonull" ("c4")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_simple" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonullclmns" ("c6"),
+  KEY "ix_nonull" ("c4")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_1_simple:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_simple" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1053,15 +1103,28 @@ CREATE TABLE "nonix_1_simple" (
   UNIQUE KEY "uk_nonullclmns" ("c6"),
   KEY "ix_nonull" ("c4")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_simple" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonullclmns" ("c6"),
+  KEY "ix_nonull" ("c4")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_1_simple the index uk_nonullclmns is used to compare.
 
 # TABLE     nonix_2_nix_2                           pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_2_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1079,8 +1142,28 @@ CREATE TABLE "nonix_2_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c3","c4"),
+  UNIQUE KEY "uk2_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c3","c4"),
+  KEY "ix_nonulls_2" ("c6","c2"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_2_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1098,15 +1181,35 @@ CREATE TABLE "nonix_2_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c3","c4"),
+  UNIQUE KEY "uk2_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c3","c4"),
+  KEY "ix_nonulls_2" ("c6","c2"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_2_nix_2 the index "uk2_nonulls" is used to compare.
 
 # TABLE     nonix_2_nix_2_pk                        pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_2_nix_2_pk:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2_pk" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1124,8 +1227,28 @@ CREATE TABLE "nonix_2_nix_2_pk" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2_pk" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  PRIMARY KEY ("c2","c6"),
+  UNIQUE KEY "uk_nonulls" ("c3","c2"),
+  UNIQUE KEY "uk2_nonulls" ("c4","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_2_nix_2_pk:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2_pk" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1143,15 +1266,35 @@ CREATE TABLE "nonix_2_nix_2_pk" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2_pk" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  PRIMARY KEY ("c2","c6"),
+  UNIQUE KEY "uk_nonulls" ("c3","c2"),
+  UNIQUE KEY "uk2_nonulls" ("c4","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_2_nix_2_pk the index "uk2_nonulls" is used to compare.
 
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_`2_nix_`2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_`2_nix_`2" (
   "c`1" int(11) DEFAULT NULL,
   "c`2" int(11) NOT NULL,
@@ -1168,8 +1311,27 @@ CREATE TABLE "nonix_`2_nix_`2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_`2_nix_`2" (
+  "c`1" int DEFAULT NULL,
+  "c`2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_no`nulls" ("c`2","c6"),
+  UNIQUE KEY "ix`_c" ("c`1","c`2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_no`nulls" ("c3","c4"),
+  KEY "ix_no`nulls_`2" ("c6","c`2"),
+  KEY "ix_nulls" ("c`1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_`2_nix_`2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_`2_nix_`2" (
   "c`1" int(11) DEFAULT NULL,
   "c`2" int(11) NOT NULL,
@@ -1186,6 +1348,24 @@ CREATE TABLE "nonix_`2_nix_`2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_`2_nix_`2" (
+  "c`1" int DEFAULT NULL,
+  "c`2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_no`nulls" ("c`2","c6"),
+  UNIQUE KEY "ix`_c" ("c`1","c`2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_no`nulls" ("c3","c4"),
+  KEY "ix_no`nulls_`2" ("c6","c`2"),
+  KEY "ix_nulls" ("c`1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_`2_nix_`2 the index uk_no`nulls is used to compare.
@@ -1202,20 +1382,21 @@ Test case 24 - using --use-indexes with backticks verbose (No differences)
 #
 Looking for object types table, view, trigger, procedure, function, and event.
 Object types found common to both databases:
-     FUNCTION : 0
-      TRIGGER : 0
-        TABLE : 5
-        EVENT : 0
-    PROCEDURE : 0
          VIEW : 0
+      TRIGGER : 0
+    PROCEDURE : 0
+     FUNCTION : 0
+        EVENT : 0
+        TABLE : 5
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     nonix_1_nix_2                           pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_1_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1231,8 +1412,26 @@ CREATE TABLE "nonix_1_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_1_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1248,15 +1447,33 @@ CREATE TABLE "nonix_1_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_1_nix_2 the index uk_nonulls is used to compare.
 
 # TABLE     nonix_1_simple                          pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_1_simple:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_simple" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1267,8 +1484,21 @@ CREATE TABLE "nonix_1_simple" (
   UNIQUE KEY "uk_nonullclmns" ("c6"),
   KEY "ix_nonull" ("c4")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_simple" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonullclmns" ("c6"),
+  KEY "ix_nonull" ("c4")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_1_simple:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_1_simple" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1279,15 +1509,28 @@ CREATE TABLE "nonix_1_simple" (
   UNIQUE KEY "uk_nonullclmns" ("c6"),
   KEY "ix_nonull" ("c4")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_1_simple" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonullclmns" ("c6"),
+  KEY "ix_nonull" ("c4")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_1_simple the index uk_nonullclmns is used to compare.
 
 # TABLE     nonix_2_nix_2                           pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_2_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1305,8 +1548,28 @@ CREATE TABLE "nonix_2_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c3","c4"),
+  UNIQUE KEY "uk2_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c3","c4"),
+  KEY "ix_nonulls_2" ("c6","c2"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_2_nix_2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1324,15 +1587,35 @@ CREATE TABLE "nonix_2_nix_2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_nonulls" ("c3","c4"),
+  UNIQUE KEY "uk2_nonulls" ("c2","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c3","c4"),
+  KEY "ix_nonulls_2" ("c6","c2"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_2_nix_2 the index uk_nonulls is used to compare.
 
 # TABLE     nonix_2_nix_2_pk                        pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_2_nix_2_pk:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2_pk" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1350,8 +1633,28 @@ CREATE TABLE "nonix_2_nix_2_pk" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2_pk" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  PRIMARY KEY ("c2","c6"),
+  UNIQUE KEY "uk_nonulls" ("c3","c2"),
+  UNIQUE KEY "uk2_nonulls" ("c4","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_2_nix_2_pk:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_2_nix_2_pk" (
   "c1" int(11) DEFAULT NULL,
   "c2" int(11) NOT NULL,
@@ -1369,15 +1672,35 @@ CREATE TABLE "nonix_2_nix_2_pk" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_2_nix_2_pk" (
+  "c1" int DEFAULT NULL,
+  "c2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  PRIMARY KEY ("c2","c6"),
+  UNIQUE KEY "uk_nonulls" ("c3","c2"),
+  UNIQUE KEY "uk2_nonulls" ("c4","c6"),
+  UNIQUE KEY "ix_c" ("c1","c2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_nonulls" ("c4","c3"),
+  KEY "ix_nulls" ("c1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_2_nix_2_pk the index PRIMARY is used to compare.
 
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
 #           - Compare table checksum                                SKIP    
-#           - Find row differences                                  pass   
+#           - Find row differences                                  pass    
 
 # Definition for object no_primary_keys.nonix_`2_nix_`2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_`2_nix_`2" (
   "c`1" int(11) DEFAULT NULL,
   "c`2" int(11) NOT NULL,
@@ -1394,8 +1717,27 @@ CREATE TABLE "nonix_`2_nix_`2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_`2_nix_`2" (
+  "c`1" int DEFAULT NULL,
+  "c`2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_no`nulls" ("c`2","c6"),
+  UNIQUE KEY "ix`_c" ("c`1","c`2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_no`nulls" ("c3","c4"),
+  KEY "ix_no`nulls_`2" ("c6","c`2"),
+  KEY "ix_nulls" ("c`1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 # Definition for object no_primary_keys.nonix_`2_nix_`2:
+# #if (server1 != 'MySQL') or (int(version1) < 80000)
 CREATE TABLE "nonix_`2_nix_`2" (
   "c`1" int(11) DEFAULT NULL,
   "c`2" int(11) NOT NULL,
@@ -1412,6 +1754,24 @@ CREATE TABLE "nonix_`2_nix_`2" (
   KEY "ix_nynulss" ("c6","c5"),
   KEY "ix_ynnull" ("c5","c6")
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #else
+CREATE TABLE "nonix_`2_nix_`2" (
+  "c`1" int DEFAULT NULL,
+  "c`2" int NOT NULL,
+  "c3" int NOT NULL,
+  "c4" int NOT NULL,
+  "c5" int DEFAULT NULL,
+  "c6" int NOT NULL,
+  UNIQUE KEY "uk_no`nulls" ("c`2","c6"),
+  UNIQUE KEY "ix`_c" ("c`1","c`2"),
+  UNIQUE KEY "ix_c2" ("c5","c6"),
+  KEY "ix_no`nulls" ("c3","c4"),
+  KEY "ix_no`nulls_`2" ("c6","c`2"),
+  KEY "ix_nulls" ("c`1","c5"),
+  KEY "ix_nynulss" ("c6","c5"),
+  KEY "ix_ynnull" ("c5","c6")
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+# #endif
 
 #
 # INFO: for table nonix_`2_nix_`2 the index "uk_no`nulls" is used to compare.
@@ -1438,20 +1798,20 @@ Test case 25 - using --use-indexes with backticks verbose (Differences)
 +-----+-----+------+-------+--------+---------+
 | c1  | c2  | c3   | c4    | c5     | c6      |
 +-----+-----+------+-------+--------+---------+
-| 13  | 43  | 303  | 3003  | 30013  | 300013  |
-| 11  | 21  | 101  | 1001  | 10011  | 100011  |
 | 14  | 54  | 404  | 4004  | 40014  | 400014  |
+| 13  | 43  | 303  | 3003  | 30013  | 300013  |
 | 12  | 32  | 202  | 2002  | 20012  | 200012  |
+| 11  | 21  | 101  | 1001  | 10011  | 100011  |
 +-----+-----+------+-------+--------+---------+
 
 # Rows in "no_primary_keys"."nonix_1_nix_2" not in "no_primary_keys"."nonix_1_nix_2"
 +-----+-----+------+-------+--------+---------+
 | c1  | c2  | c3   | c4    | c5     | c6      |
 +-----+-----+------+-------+--------+---------+
-| 3   | 33  | 303  | 3003  | 30003  | 300003  |
-| 4   | 44  | 404  | 4004  | 40004  | 400004  |
 | 2   | 22  | 202  | 2002  | 20002  | 200002  |
 | 1   | 11  | 101  | 1001  | 10001  | 100001  |
+| 3   | 33  | 303  | 3003  | 30003  | 300003  |
+| 4   | 44  | 404  | 4004  | 40004  | 400004  |
 +-----+-----+------+-------+--------+---------+
 
 # TABLE     nonix_1_simple                          pass    pass    -       
@@ -1465,14 +1825,14 @@ Test case 25 - using --use-indexes with backticks verbose (Differences)
  +-----+-----+------+-------+--------+---------+
  | c1  | c2  | c3   | c4    | c5     | c6      |
  +-----+-----+------+-------+--------+---------+
--| 12  | 32  | 212  | 2002  | 20012  | 200002  |
--| 11  | 21  | 111  | 1001  | 10011  | 100001  |
 -| 13  | 43  | 313  | 3003  | 30013  | 300003  |
+-| 12  | 32  | 212  | 2002  | 20012  | 200002  |
 -| 14  | 54  | 414  | 4004  | 40014  | 400004  |
-+| 2   | 22  | 202  | 2002  | 20002  | 200002  |
-+| 1   | 11  | 101  | 1001  | 10001  | 100001  |
+-| 11  | 21  | 111  | 1001  | 10011  | 100001  |
 +| 3   | 33  | 303  | 3003  | 30003  | 300003  |
++| 2   | 22  | 202  | 2002  | 20002  | 200002  |
 +| 4   | 44  | 404  | 4004  | 40004  | 400004  |
++| 1   | 11  | 101  | 1001  | 10001  | 100001  |
  +-----+-----+------+-------+--------+---------+
 
 # TABLE     nonix_2_nix_2                           pass    pass    -       
@@ -1486,24 +1846,24 @@ Test case 25 - using --use-indexes with backticks verbose (Differences)
 +-----+-----+------+-------+--------+---------+
 | c1  | c2  | c3   | c4    | c5     | c6      |
 +-----+-----+------+-------+--------+---------+
-| 13  | 43  | 303  | 3003  | 30013  | 300013  |
-| 11  | 21  | 101  | 1001  | 10011  | 100011  |
 | 14  | 54  | 404  | 4004  | 40014  | 400014  |
+| 13  | 43  | 303  | 3003  | 30013  | 300013  |
 | 12  | 32  | 202  | 2002  | 20012  | 200012  |
+| 11  | 21  | 101  | 1001  | 10011  | 100011  |
 +-----+-----+------+-------+--------+---------+
 
 # Rows in "no_primary_keys"."nonix_2_nix_2_pk" not in "no_primary_keys"."nonix_2_nix_2_pk"
 +-----+-----+------+-------+--------+---------+
 | c1  | c2  | c3   | c4    | c5     | c6      |
 +-----+-----+------+-------+--------+---------+
-| 3   | 33  | 303  | 3003  | 30003  | 300003  |
-| 4   | 44  | 404  | 4004  | 40004  | 400004  |
 | 2   | 22  | 202  | 2002  | 20002  | 200002  |
 | 1   | 11  | 101  | 1001  | 10001  | 100001  |
+| 3   | 33  | 303  | 3003  | 30003  | 300003  |
+| 4   | 44  | 404  | 4004  | 40004  | 400004  |
 +-----+-----+------+-------+--------+---------+
 
 # TABLE     nonix_`2_nix_`2                         pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Database consistency check failed.
 #
@@ -1525,7 +1885,7 @@ Test case 26 - compare two equal databases with different names (including VIEWS
 #           - Find row differences                                  pass    
 # VIEW      cleaning                                pass    -       -       
 # VIEW      finishing_up                            pass    -       -       
-# VIEW      tools                                   pass    -       -      
+# VIEW      tools                                   pass    -       -       
 
 # Databases are consistent.
 #
@@ -1540,7 +1900,7 @@ Test case 27 - data with multiple lines per span (no differences).
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     t                                       pass    pass    -       
-#           - Compare table checksum                                pass   
+#           - Compare table checksum                                pass    
 
 # Databases are consistent.
 #

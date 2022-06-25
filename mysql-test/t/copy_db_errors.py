@@ -21,6 +21,7 @@ copy_db_errors test.
 from __future__ import absolute_import
 
 import os
+import re
 
 import copy_db
 
@@ -41,9 +42,42 @@ class test(copy_db.test):
         if not res:
             return res
             # Create users for privilege testing
+
+        version_str = self.server1.get_version()
+        if version_str is not None:
+            match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', version_str.strip())
+            if match:
+                version = [int(x) for x in match.group(1).split('.')]
+                version = (version + [0])[:3]  # Ensure a 3 elements list
+                version_str = "{0:02d}{1:02d}{2:02d}".format(version[0],version[1],version[2])
+            else:
+                version_str = "000000"
+        else:
+            version_str = "000000"
+        self.server1.version = version_str
+        
+        version_str = self.server2.get_version()
+        if version_str is not None:
+            match = re.match(r'^(\d+\.\d+(\.\d+)*).*$', version_str.strip())
+            if match:
+                version = [int(x) for x in match.group(1).split('.')]
+                version = (version + [0])[:3]  # Ensure a 3 elements list
+                version_str = "{0:02d}{1:02d}{2:02d}".format(version[0],version[1],version[2])
+            else:
+                version_str = "000000"
+        else:
+            version_str = "000000"
+        self.server2.version = version_str
+
+        self.server1.server_type = self.server1.get_server_type()
+        self.server2.server_type = self.server2.get_server_type()
+
         self.drop_users()
         self.server1.exec_query("CREATE USER 'joe'@'localhost'")
         self.server1.exec_query("CREATE USER 'sam'@'localhost'")
+        self.server1.exec_query("GRANT SELECT on mysql.* TO 'sam'@'localhost'")
+        self.server1.exec_query("GRANT SELECT on util_test.* "
+                                "TO 'sam'@'localhost'")
         self.server1.exec_query("GRANT SELECT, EVENT, TRIGGER ON util_test.* "
                                 "TO 'joe'@'localhost'")
         self.server1.exec_query(
@@ -53,16 +87,26 @@ class test(copy_db.test):
 
         self.server2.exec_query("CREATE USER 'joe'@'localhost'")
         self.server2.exec_query("CREATE USER 'sam'@'localhost'")
-        self.server2.exec_query("GRANT ALL ON util_db_clone.* TO "
+        self.server2.exec_query("GRANT SELECT on mysql.* TO 'sam'@'localhost'")
+        self.server2.exec_query("GRANT ALL PRIVILEGES ON *.* TO "
                                 "'joe'@'localhost' WITH GRANT OPTION")
-        self.server2.exec_query("GRANT SUPER, CREATE USER ON *.* TO "
-                                "'joe'@'localhost'")
-        self.server2.exec_query(
-            "GRANT SELECT ON mysql.* TO 'joe'@'localhost'")
+        self.server2.exec_query("GRANT SUPER ON *.* TO 'joe'@'localhost'")
+        if self.server2.get_server_type() == 'MySQL' and \
+            self.server2.check_version_compat(8,0,0):
+            # because MySQL 8.0 devs are boneheads, need SYSTEM_USER for
+            # creating procedures with DEFINER, but need SUPER for creating
+            # functions with DEFINER. They call it 'not a bug'
+            self.server2.exec_query("GRANT SYSTEM_USER,SET_USER_ID ON *.* TO "
+                                    "'joe'@'localhost'")
+
+#        self.server2.exec_query("GRANT CREATE USER ON *.* TO "
+#                                "'joe'@'localhost'")
+
+#        self.server2.exec_query("GRANT SELECT ON *.* TO "
+#                                "'joe'@'localhost'")
         return True
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(
@@ -129,24 +173,26 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        from_conn = "--source=joe@localhost:{0}".format(self.server1.port)
+        from_conn = "--source=sam@localhost:{0}".format(self.server1.port)
         # Watchout for Windows: it doesn't use sockets!
         if os.name == "posix" and self.server2.socket is not None:
-            to_conn = ("--destination=joe@localhost:{0}:"
+            to_conn = ("--destination=sam@localhost:{0}:"
                        "{1}").format(self.server2.port, self.server2.socket)
         else:
-            to_conn = ("--destination=joe@localhost:"
+            to_conn = ("--destination=sam@localhost:"
                        "{0}").format(self.server2.port)
+
         cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
 
         test_num += 1
         comment = ("Test case {0} - users with minimal "
                    "privileges").format(test_num)
         cmd_str = "{0} util_test:util_db_clone".format(cmd)
-        res = self.run_test_case(0, cmd_str, comment)
+        res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        self.server1.exec_query("GRANT SELECT ON util_test.* TO 'sam'@'localhost'")
         from_conn = "--source=sam@localhost:{0}".format(self.server1.port)
         if os.name == "posix" and self.server2.socket is not None:
             to_conn = ("--destination=joe@localhost:{0}:"
@@ -155,6 +201,8 @@ class test(copy_db.test):
             to_conn = ("--destination=joe@localhost:"
                        "{0}").format(self.server2.port)
         cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
+
+        self.server1.exec_query("GRANT SHOW VIEW ON util_test.* TO 'sam'@'localhost'")
 
         test_num += 1
         comment = ("Test case {0} - source user not enough privileges "
@@ -165,8 +213,8 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Give Sam some privileges on source and retest until copy works
-        self.server1.exec_query("GRANT SELECT ON util_test.* TO "
-                                "'sam'@'localhost'")
+        self.server1.exec_query("GRANT SELECT ON "
+                                "*.* TO 'sam'@'localhost'")
 
         test_num += 1
         comment = ("Test case {0} - source user has some privileges "
@@ -175,7 +223,8 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.server1.exec_query("GRANT SELECT ON mysql.* TO 'sam'@'localhost'")
+        self.server1.exec_query("GRANT TRIGGER ON util_test.* "
+                                "TO 'sam'@'localhost'")
 
         test_num += 1
         comment = ("Test case {0} - source user has some privileges "
@@ -184,9 +233,9 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.server1.exec_query("GRANT SHOW VIEW, EVENT, TRIGGER ON "
-                                "util_test.* TO 'sam'@'localhost'")
-
+        self.server1.exec_query("GRANT EVENT ON util_test.* "
+                                "TO 'sam'@'localhost'")
+        
         test_num += 1
         comment = ("Test case {0} - source user has privileges "
                    "needed").format(test_num)
@@ -198,6 +247,8 @@ class test(copy_db.test):
                    "{0}").format(self.server2.port)
         cmd = "mysqldbcopy.py --skip-gtid {0} {1}".format(from_conn, to_conn)
 
+        self.server2.exec_query("GRANT SELECT ON *.* "
+                                "TO 'sam'@'localhost'")
         test_num += 1
         comment = ("Test case {0} - dest user not enough privileges "
                    "needed").format(test_num)
@@ -207,16 +258,6 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Give some privileges on source and retest until copy works
-        self.server2.exec_query("GRANT ALL ON util_db_clone.* TO "
-                                "'sam'@'localhost' WITH GRANT OPTION")
-
-        test_num += 1
-        comment = ("Test case {0} - dest user has some privileges "
-                   "needed").format(test_num)
-        res = self.run_test_case(1, cmd_str, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
-
         self.server2.exec_query("GRANT CREATE USER ON *.* TO "
                                 "'sam'@'localhost'")
 
@@ -227,8 +268,23 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        self.server2.exec_query("GRANT EVENT, TRIGGER ON *.* TO "
+                                "'sam'@'localhost' WITH GRANT OPTION")
+
+        test_num += 1
+        comment = ("Test case {0} - dest user has some privileges "
+                   "needed").format(test_num)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.server2.exec_query("GRANT ALL PRIVILEGES ON util_db_clone.* TO "
+                                "'sam'@'localhost' WITH GRANT OPTION")
         self.server2.exec_query("GRANT SUPER ON *.* TO 'sam'@'localhost'")
-        self.server2.exec_query("GRANT SELECT ON mysql.* TO 'sam'@'localhost'")
+        if self.server2.get_server_type() == 'MySQL' and \
+            self.server2.check_version_compat(8,0,0):
+            self.server2.exec_query("GRANT SET_USER_ID, SYSTEM_USER ON *.* "
+                                    "TO 'sam'@'localhost'")
 
         test_num += 1
         comment = ("Test case {0} - dest user has privileges "
@@ -344,6 +400,7 @@ class test(copy_db.test):
                                     "UPDATE, EXECUTE, DROP, REFERENCES, "
                                     "LOCK TABLES ON `util_db_clone`.* TO "
                                     "'joe'@'localhost'")
+            self.server1.exec_query("GRANT SELECT ON *.* TO 'joe'@'localhost'")
         except UtilError as err:
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
@@ -360,6 +417,11 @@ class test(copy_db.test):
         test_num += 1
         try:
             self.server2.exec_query("GRANT SUPER ON *.* TO 'joe'@'localhost'")
+            if self.server2.get_server_type() == 'MySQL' and \
+               self.server2.check_version_compat(8,0,0):
+                self.server2.exec_query("GRANT SYSTEM_USER,SET_USER_ID ON *.* "
+                                        "TO 'joe'@'localhost'")
+
         except UtilError as err:
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
@@ -417,6 +479,7 @@ class test(copy_db.test):
                               "{0}".format(err.errmsg))
         comment = ("Test case {0} - dest user has privileges "
                    "needed").format(test_num)
+        
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -425,11 +488,12 @@ class test(copy_db.test):
         try:
             self.server1.exec_query("CREATE TABLE util_test.b1 (a int not null"
                                     ", blobby tinytext not null)")
+            
         except UtilError as err:
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
         comment = "Test case {0} - blobs with not null".format(test_num)
-        res = self.run_test_case(1, cmd, comment)
+        res = self.run_test_case(1, cmd, comment) #
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -440,7 +504,7 @@ class test(copy_db.test):
         cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first {0} "
                "{1} util_test:util_db_clone --not".format(from_conn, to_conn))
         comment = "Test case {0} - allow blobs with not null".format(test_num)
-        res = self.run_test_case(0, cmd, comment)
+        res = self.run_test_case(0, cmd, comment)  
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -480,7 +544,8 @@ class test(copy_db.test):
         return True
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, self.server2)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

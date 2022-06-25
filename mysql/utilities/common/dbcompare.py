@@ -30,7 +30,8 @@ import tempfile
 import difflib
 
 from mysql.utilities.exception import UtilError, UtilDBError
-from mysql.utilities.common.format import print_list, get_col_widths
+from mysql.utilities.common.format import (print_list, get_col_widths,
+                                           make_printable)
 from mysql.utilities.common.pattern_matching import (
     parse_object_name,
     REGEXP_QUALIFIED_OBJ_NAME,
@@ -38,6 +39,7 @@ from mysql.utilities.common.pattern_matching import (
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.options import PARSE_ERR_OBJ_NAME_FORMAT
+from mysql.utilities.common.tools import tostr, tobytearray
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.table import Table
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
@@ -53,8 +55,62 @@ from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
 _COMPARE_TABLE_NAME = 'compare_{tbl}'
 
 _COMPARE_TABLE_DROP = """
-    DROP TABLE {db}.{compare_tbl};
+    DROP TABLE {compare_db}.{compare_tbl};
 """
+
+def _CompareTableName(server=None, db_name=None, tbl_name=None, sql_mode=None):
+    """Name for a 'compare' table, avoiding unusuable
+    databases and table names
+
+    server[in]        server instance
+    db_name[in]       database name
+    tbl_name[in]      table name
+    """
+
+    if server is None:
+        raise UtilError("ERROR: no server for _CompareTableName")
+
+    if sql_mode is None:
+        sql_mode = server.select_variable("SQL_MODE")
+
+    if db_name is None:
+        db_name = "mysql"
+    if is_quoted_with_backticks(db_name,sql_mode):
+        db_name = remove_backtick_quoting(db_name,sql_mode)
+        
+    if db_name == "information_schema" or \
+       db_name == "performance_schema":
+        db_name = "mysql"
+
+        
+    q_db_name = quote_with_backticks(db_name,sql_mode)
+    
+        
+    if tbl_name is None:
+        tbl_name = "NULL"
+    if is_quoted_with_backticks(tbl_name,sql_mode):
+        tbl_name = remove_backtick_quoting(tbl_name,sql_mode)
+    q_tbl_name = "compare_{0}".format(tbl_name)
+    
+    db_objects = _get_objects(server,db_name,{})
+    n = 1
+    check_tbl_name = tbl_name
+    conflict = True
+    while (conflict):
+        conflict = False
+        for item in db_objects:
+            if item[0] != 'TABLE':
+                pass
+            if item[1][0] == check_tbl_name:
+                check_tbl_name = "compare_{0}_{1}".format(tbl_name,n)
+                n += 1
+                conflict = True
+                break
+            
+        
+    q_tbl_name = quote_with_backticks(q_tbl_name,sql_mode)
+    return (q_db_name,q_tbl_name)
+
 
 # The Length of key for the span index has been increased from 4 to 8 allow
 # more accurate hits. This may slow the algorithm for big dbs, for future
@@ -68,7 +124,7 @@ MAX_SPAN_KEY_SIZE = 32
 # Note: Use a composed index (span, pk_hash) instead of only for column "span"
 # due to the "ORDER BY pk_hash" in the _COMPARE_DIFF query.
 _COMPARE_TABLE = """
-    CREATE TEMPORARY TABLE {db}.{compare_tbl} (
+    CREATE TEMPORARY TABLE {compare_db}.{compare_tbl} (
         compare_sign binary(16) NOT NULL,
         pk_hash binary(16) NOT NULL,
         {pkdef}
@@ -77,7 +133,7 @@ _COMPARE_TABLE = """
 """
 
 _COMPARE_INSERT = """
-    INSERT INTO {db}.{compare_tbl}
+    INSERT INTO {compare_db}.{compare_tbl}
         (compare_sign, pk_hash, {pkstr}, span)
     SELECT
         UNHEX(MD5(CONCAT_WS('/', {colstr}))),
@@ -93,7 +149,7 @@ _COMPARE_SUM = """
         SUM(CONV(SUBSTRING(HEX(compare_sign),9,8),16,10)),
         SUM(CONV(SUBSTRING(HEX(compare_sign),17,8),16,10)),
         SUM(CONV(SUBSTRING(HEX(compare_sign),25,8),16,10))) as sig
-    FROM {db}.{compare_tbl}
+    FROM {compare_db}.{compare_tbl}
     GROUP BY span
 """
 
@@ -102,7 +158,7 @@ _COMPARE_SUM = """
 # different for server without the binlog enable (--log-bin option) leading to
 # incorrect SQL diff statements (UPDATES).
 _COMPARE_DIFF = """
-    SELECT * FROM {db}.{compare_tbl}
+    SELECT * FROM {compare_db}.{compare_tbl}
     WHERE span = UNHEX('{span}') ORDER BY pk_hash
 """
 
@@ -168,7 +224,7 @@ def get_create_object(server, object_name, options, object_type):
 
     # Get the sql_mode set on server
     sql_mode = server.select_variable("SQL_MODE")
-
+    
     db_name, obj_name = parse_object_name(object_name, sql_mode)
     obj = [db_name]
 
@@ -189,13 +245,16 @@ def get_create_object(server, object_name, options, object_type):
     create_stmt = db.get_create_statement(obj[0], obj[1], object_type)
 
     if verbosity > 0 and not quiet:
+        nq_db = db_name
+        if is_quoted_with_backticks(nq_db,sql_mode):
+            nq_db = remove_backtick_quoting(db_name,sql_mode)
         if obj_name:
-            print("\n# Definition for object {0}.{1}:"
-                  "".format(remove_backtick_quoting(db_name, sql_mode),
-                            remove_backtick_quoting(obj_name, sql_mode)))
+            nq_obj = obj_name
+            if is_quoted_with_backticks(nq_obj,sql_mode):
+                nq_obj = remove_backtick_quoting(nq_obj,sql_mode)
+            print("\n# Definition for object {0}.{1}:".format(nq_db,nq_obj))
         else:
-            print("\n# Definition for object {0}:"
-                  "".format(remove_backtick_quoting(db_name, sql_mode)))
+            print("\n# Definition for object {0}:".format(nq_db))
         print(create_stmt)
 
     return create_stmt
@@ -216,7 +275,8 @@ def print_missing_list(item_list, first, second):
     if len(item_list) == 0:
         return False
     print("# WARNING: Objects in {0} but not in {1}:".format(first, second))
-    for item in item_list:
+    misslist = sorted(item_list,key=_ObjListKey)
+    for item in misslist:
         print("# {0:>12}: {1}".format(item[0], item[1][0]))
     return True
 
@@ -401,7 +461,8 @@ def _get_diff(list1, list2, object1, object2, difftype, compact=False):
 
 
 def _get_transform(server1, server2, object1, object2, options,
-                   object_type):
+                   object_type,
+                   create_object2 = None):
     """Get the transformation SQL statements
 
     This method generates the SQL statements to transform the destination
@@ -415,6 +476,8 @@ def _get_transform(server1, server2, object1, object2, options,
                        (quiet, etc.)
     object_type[in]    type of the objects to be compared (e.g., TABLE,
                        PROCEDURE, etc.).
+    create_object2[in] creation string for object2, for use when the definitions
+                       are the same, but creation differs (case? defaults?)
 
     Returns tuple - (bool - same db name?, list of transformation statements)
     """
@@ -445,14 +508,23 @@ def _get_transform(server1, server2, object1, object2, options,
     obj1 = db_1.get_object_definition(db1, name1, object_type)
     obj2 = db_2.get_object_definition(db2, name2, object_type)
 
-    # Get the transformation based on direction.
     transform_str = []
-    xform = SQLTransformer(db_1, db_2, obj1[0], obj2[0], object_type,
-                           options.get('verbosity', 0), options)
 
-    differences = xform.transform_definition()
-    if differences and len(differences) > 0:
-        transform_str.extend(differences)
+    if obj1[0] == obj2[0] and create_object2 is not None and options['force']:
+        q_name2 = name2
+        if not is_quoted_with_backticks(name2,db_2.sql_mode):
+            q_name2 = quote_with_backticks(name2, db_2.sql_mode)
+        transform_str.append("DROP {0} IF EXISTS {1}.{2};".format(
+            object_type.upper(), db_2.q_db_name, q_name2))
+        transform_str.append(create_object2)
+    else:
+        # Get the transformation based on direction.
+        xform = SQLTransformer(db_1, db_2, obj1[0], obj2[0], object_type,
+                               options.get('verbosity', 0), options)
+
+        differences = xform.transform_definition()
+        if differences and len(differences) > 0:
+            transform_str.extend(differences)
 
     return transform_str
 
@@ -663,9 +735,10 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
                                  compact=compact_diff)
         # If there is a difference. Check for SQL output
         if difftype == 'sql' and len(diff_server1) > 0:
+            options['force'] = True
             transform_server1 = _get_transform(server1, server2,
                                                object1, object2, options,
-                                               object_type)
+                                               object_type, object1_create)
 
     if direction == 'server2' or reverse:
         diff_server2 = _get_diff(object2_create_list,
@@ -674,9 +747,10 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
                                  compact=compact_diff)
         # If there is a difference. Check for SQL output
         if difftype == 'sql' and len(diff_server2) > 0:
+            options['force'] = True
             transform_server2 = _get_transform(server2, server1,
                                                object2, object1, options,
-                                               object_type)
+                                               object_type, object2_create)
 
     # Build diff list
     if direction == 'server1' or direction is None:
@@ -782,15 +856,16 @@ def _drop_compare_object(server, db_name, tbl_name):
     tbl_name[in]           table name
     """
     # Quote compare table appropriately with backticks
-    sql_mode = server.select_variable("SQL_MODE")
-    q_db_name = db_name if is_quoted_with_backticks(db_name, sql_mode) \
-        else quote_with_backticks(db_name, sql_mode)
-    if is_quoted_with_backticks(tbl_name, sql_mode):
-        q_tbl_name = remove_backtick_quoting(tbl_name, sql_mode)
-    else:
-        q_tbl_name = tbl_name
-    q_tbl_name = quote_with_backticks(
-        _COMPARE_TABLE_NAME.format(tbl=q_tbl_name), sql_mode)
+    #sql_mode = server.select_variable("SQL_MODE")
+    #q_db_name = db_name if is_quoted_with_backticks(db_name, sql_mode) \
+    #    else quote_with_backticks(db_name, sql_mode)
+    #if is_quoted_with_backticks(tbl_name, sql_mode):
+    #    q_tbl_name = remove_backtick_quoting(tbl_name, sql_mode)
+    #else:
+    #    q_tbl_name = tbl_name
+    q_db_name, q_tbl_name = _CompareTableName(server,db_name,tbl_name)
+#    q_tbl_name = quote_with_backticks(
+#        _COMPARE_TABLE_NAME.format(tbl=q_tbl_name), sql_mode)
 
     try:
         # set autocommit=1 if it is 0, because CREATE TEMPORARY TABLE and
@@ -799,7 +874,7 @@ def _drop_compare_object(server, db_name, tbl_name):
         toggle_server = not server.autocommit_set()
         if toggle_server:
             server.toggle_autocommit(enable=True)
-        server.exec_query(_COMPARE_TABLE_DROP.format(db=q_db_name,
+        server.exec_query(_COMPARE_TABLE_DROP.format(compare_db=q_db_name,
                                                      compare_tbl=q_tbl_name))
         if toggle_server:
             server.toggle_autocommit(enable=False)
@@ -838,11 +913,16 @@ def _get_compare_objects(index_cols, table1,
         raise UtilError("Cannot generate index definition")
     else:
         # Quote compare table appropriately with backticks
-        q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name), table1.sql_mode)
+        q_compare_db, q_compare_tbl = _CompareTableName(table1.server,
+                                                        table1.db_name,
+                                                        table1.tbl_name,
+                                                        table1.sql_mode)
+        #q_tbl_name = quote_with_backticks(
+        #    _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name), table1.sql_mode)
 
-        table = _COMPARE_TABLE.format(db=table1.q_db_name,
-                                      compare_tbl=q_tbl_name,
+        table = _COMPARE_TABLE.format(compare_db=q_compare_db,
+                                      compare_tbl=q_compare_tbl,
+                                      db = table1.q_db_name,
                                       pkdef=index_defn,
                                       span_key_size=old_div(span_key_size, 2))
 
@@ -1024,20 +1104,26 @@ def _make_sum_rows(table, idx_str, span_key_size=8):
     my_lock = Lock(table.server, tbl_lock_list)
 
     # Quote compare table appropriately with backticks
-    q_tbl_name = quote_with_backticks(
-        _COMPARE_TABLE_NAME.format(tbl=table.tbl_name),
-        table.sql_mode
-    )
+    q_compare_db, q_compare_tbl = _CompareTableName(table.server, table.db_name,
+                                                    table.tbl_name,
+                                                    table.sql_mode)
+#    q_tbl_name = quote_with_backticks(
+#        _COMPARE_TABLE_NAME.format(tbl=table.tbl_name),
+#        table.sql_mode
+#    )
 
     table.server.exec_query(
-        _COMPARE_INSERT.format(db=table.q_db_name, compare_tbl=q_tbl_name,
+        _COMPARE_INSERT.format(db=table.q_db_name,
+                               compare_db=q_compare_db,
+                               compare_tbl=q_compare_tbl,
                                colstr=col_str.strip(", "),
                                pkstr=idx_str.strip(", "),
                                table=table.q_tbl_name,
                                span_key_size=span_key_size))
 
     res = table.server.exec_query(
-        _COMPARE_SUM.format(db=table.q_db_name, compare_tbl=q_tbl_name))
+        _COMPARE_SUM.format(compare_db=q_compare_db,
+                            compare_tbl=q_compare_tbl))
 
     # Unlock table
     my_lock.unlock()
@@ -1061,33 +1147,56 @@ def _get_rows_span(table, span, index):
     Returns rows from original table
     """
     server = table.server
+    # Quote compare table appropriately with backticks
+    q_compare_db, q_compare_tbl = _CompareTableName(server,table.db_name,
+                                                    table.tbl_name,
+                                                    table.sql_mode)
     rows = []
     ukeys = [col[0] for col in index]
     # build WHERE clause
     for row in span:
-        # Quote compare table appropriately with backticks
-        q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table.tbl_name),
-            table.sql_mode
-        )
+        q = _COMPARE_DIFF.format(compare_db=q_compare_db,
+                                 compare_tbl=q_compare_tbl,
+                                 span=row)
+        
+        span_rows = server.exec_query(q)
 
-        span_rows = server.exec_query(
-            _COMPARE_DIFF.format(db=table.q_db_name, compare_tbl=q_tbl_name,
-                                 span=row))
+        #print("diff query: ",q," span_rows: ",make_printable(span_rows))
+        
         # Loop through multiple rows with the same span value.
         for res_row in span_rows:
             pk = res_row[2:-1]
             where_clause = ' AND '.join("{0} = '{1}'".
                                         format(key, col)
                                         for key, col in zip(ukeys, pk))
-            orig_rows = server.exec_query(
-                _COMPARE_SPAN_QUERY.format(db=table.q_db_name,
+
+            q = _COMPARE_SPAN_QUERY.format(db=table.q_db_name,
                                            table=table.q_tbl_name,
-                                           where=where_clause))
-            rows.append(orig_rows[0])
+                                           where=where_clause)
+
+            orig_rows = server.exec_query(q)
+            #print("span query: ",q," got orig_rows: ",make_printable(orig_rows))
+            if orig_rows is not None and len(orig_rows) > 0:
+                rows.append(orig_rows[0])
 
     return rows
 
+def _None_to_NULL(row):
+    if isinstance(row,(list, set, tuple)):
+        newrow = []
+        for x in row:
+            if isinstance(x,(list,set,tuple)):
+                x = _None_to_NULL(x)
+            newrow.append(x)
+        if isinstance(row,tuple):
+            newrow = tuple(newrow)
+        elif isinstance(row,set):
+            newrow = set(newrow)
+        return newrow
+    else:
+        if row is None:
+            row = 'NULL' 
+    return row
 
 def _get_changed_rows_span(table1, table2, span, index):
     """Get the original changed rows corresponding to a list of span values.
@@ -1116,15 +1225,15 @@ def _get_changed_rows_span(table1, table2, span, index):
     full_span_data_1 = []
     for row in span:
         # Quote compare table appropriately with backticks
-        q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name),
-            table1.sql_mode
-        )
-
+        q_compare_db, q_compare_tbl = _CompareTableName(server1,table1.db_name,
+                                                        table1.tbl_name,
+                                                        table1.sql_mode)
         span_rows = server1.exec_query(
-            _COMPARE_DIFF.format(db=table1.q_db_name, compare_tbl=q_tbl_name,
+            _COMPARE_DIFF.format(compare_db=q_compare_db,
+                                 compare_tbl=q_compare_tbl,
                                  span=row))
         # Auxiliary set with (compare_sign, pk_hash) tuples for table.
+        span_rows = _None_to_NULL(span_rows)
         cmp_signs = set([(row[0], row[1]) for row in span_rows])
         # Keep span rows and auxiliary data for table 1.
         full_span_data_1.append((span_rows, cmp_signs))
@@ -1134,14 +1243,14 @@ def _get_changed_rows_span(table1, table2, span, index):
     full_span_data_2 = []
     for row in span:
         # Quote compare table appropriately with backticks
-        q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table2.tbl_name),
-            table2.sql_mode
-        )
-
+        q_compare_db, q_compare_tbl = _CompareTableName(server2,table2.db_name,
+                                                        table2.tbl_name,
+                                                        table2.sql_mode)
         span_rows = server2.exec_query(
-            _COMPARE_DIFF.format(db=table2.q_db_name, compare_tbl=q_tbl_name,
+            _COMPARE_DIFF.format(compare_db=q_compare_db,
+                                 compare_tbl=q_compare_tbl,
                                  span=row))
+        span_rows = _None_to_NULL(span_rows)
         # Auxiliary set with (compare_sign, pk_hash) tuples for table.
         cmp_signs = set([(row[0], row[1]) for row in span_rows])
         # Keep span rows and auxiliary data for table 1.
@@ -1235,6 +1344,12 @@ def _get_formatted_rows(rows, table, fmt='GRID', col_widths=None):
     Returns list of formatted rows
     """
     result_rows = []
+    modrows = []
+    for row in rows:
+        row = tuple(('NULL' if val is None else val for val in row))
+        modrows.append(row)
+    rows = make_printable(modrows)
+        
     if not col_widths:
         col_widths = []
     outfile = tempfile.TemporaryFile()
@@ -1245,7 +1360,7 @@ def _get_formatted_rows(rows, table, fmt='GRID', col_widths=None):
                col_widths=col_widths)
     outfile.seek(0)
     for line in outfile.readlines():
-        result_rows.append(line.strip('\n'))
+        result_rows.append(tostr(line).strip('\n'))
 
     return result_rows
 

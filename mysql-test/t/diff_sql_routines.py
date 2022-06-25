@@ -32,46 +32,46 @@ _PROC_TABLE = "CREATE TABLE `diff_routine`.`t1` (b char(30))"
 _ROUTINE_TESTS = [
     # Procedure tests
     ("Procedure access",
-     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 char(20)) "
      "CONTAINS SQL INSERT INTO diff_routine.t1 VALUES ('50');",
-     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) NO "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 char(20)) NO "
      "SQL INSERT INTO diff_routine.t1 VALUES ('50');", 0, "p1", [_PROC_TABLE]),
     ("Procedure security",
-     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 char(20)) "
      "SQL SECURITY INVOKER INSERT INTO diff_routine.t1 VALUES ('50');",
-     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 CHAR(20)) "
+     "CREATE definer=root@localhost PROCEDURE diff_routine.p1(p1 char(20)) "
      "SQL SECURITY DEFINER INSERT INTO diff_routine.t1 VALUES ('50');", 0,
      "p1", [_PROC_TABLE]),
     ("Procedure comment",
-     "CREATE PROCEDURE diff_routine.p1(p1 CHAR(20)) COMMENT 'Test 123' INSERT "
+     "CREATE PROCEDURE diff_routine.p1(p1 char(20)) COMMENT 'Test 123' INSERT "
      "INTO diff_routine.t1 VALUES ('50');",
-     "CREATE PROCEDURE diff_routine.p1(p1 CHAR(20)) COMMENT 'Test 456' INSERT "
+     "CREATE PROCEDURE diff_routine.p1(p1 char(20)) COMMENT 'Test 456' INSERT "
      "INTO diff_routine.t1 VALUES ('50');", 0, "p1", [_PROC_TABLE]),
     ("Procedure body - generates DROP+CREATE",
-     "CREATE PROCEDURE diff_routine.p1(p1 CHAR(20)) INSERT INTO "
+     "CREATE PROCEDURE diff_routine.p1(p1 char(20)) INSERT INTO "
      "diff_routine.t1 VALUES ('50');",
-     "CREATE PROCEDURE diff_routine.p1(p1 CHAR(20)) INSERT INTO "
+     "CREATE PROCEDURE diff_routine.p1(p1 char(20)) INSERT INTO "
      "diff_routine.t1 VALUES ('100');", 0, "p1", [_PROC_TABLE]),
     # Function tests
     ("Function access",
-     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS int "
      "CONTAINS SQL DETERMINISTIC RETURN (SELECT 1);",
-     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT NO "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS int NO "
      "SQL DETERMINISTIC RETURN (SELECT 1);", 0, "f1", []),
     ("Function security",
-     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS int "
      "SQL SECURITY INVOKER DETERMINISTIC RETURN (SELECT 1);",
-     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS INT "
+     "CREATE definer=root@localhost FUNCTION diff_routine.f1() RETURNS int "
      "SQL SECURITY DEFINER DETERMINISTIC RETURN (SELECT 1);", 0, "f1", []),
     ("Function comment",
-     "CREATE FUNCTION diff_routine.f1() RETURNS INT COMMENT 'Test 123' "
+     "CREATE FUNCTION diff_routine.f1() RETURNS int COMMENT 'Test 123' "
      "DETERMINISTIC RETURN (SELECT 1);",
-     "CREATE FUNCTION diff_routine.f1() RETURNS INT COMMENT 'Test 456' "
+     "CREATE FUNCTION diff_routine.f1() RETURNS int COMMENT 'Test 456' "
      "DETERMINISTIC RETURN (SELECT 1);", 0, "f1", []),
     ("Function body - generates DROP+CREATE",
-     "CREATE FUNCTION diff_routine.f1() RETURNS INT DETERMINISTIC "
+     "CREATE FUNCTION diff_routine.f1() RETURNS int DETERMINISTIC "
      "RETURN (SELECT 1);",
-     "CREATE FUNCTION diff_routine.f1() RETURNS INT DETERMINISTIC "
+     "CREATE FUNCTION diff_routine.f1() RETURNS int DETERMINISTIC "
      "RETURN (SELECT 2);", 0, "f1", []),
 ]
 
