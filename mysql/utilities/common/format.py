@@ -71,7 +71,7 @@ class UnicodeWriter(object):
         """
         self.writer.writerow(str(val) for val in row)
         data = self.queue.getvalue()
-        self.stream.write(tobytearray(data))
+        self.stream.write(tostr(data))
         self.queue.seek(0,0)
         self.queue.truncate(0)
 
@@ -81,7 +81,7 @@ class UnicodeWriter(object):
         rows[in]     list of row objects
         """
         for row in rows:
-            self.writerow(tobytearray(row))
+            self.writerow(tostr(row))
 
 
 def _format_col_separator(f_out, columns, col_widths, quiet=False):
@@ -97,8 +97,8 @@ def _format_col_separator(f_out, columns, col_widths, quiet=False):
     stop = len(columns)
     for i in range(0, stop):
         width = int(col_widths[i] + 2)
-        f_out.write(tobytearray('{0}{1:{1}<{2}}'.format("+", "-", width)))
-    f_out.write(tobytearray("+\n"))
+        f_out.write(tostr('{0}{1:{1}<{2}}'.format("+", "-", width)))
+    f_out.write(tostr("+\n"))
 
 
 def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
@@ -120,18 +120,18 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
         else:
             r = row[i]
         if not quiet:
-            f_out.write(tobytearray("| "))
+            f_out.write("| ")
         val = r if isinstance(r, str) \
             else str(r)
         if isinstance(val, str):
-            val = u"{0:<{1}}".format(val, col_widths[i] + 1)
-            f_out.write(tobytearray(val))
+            val = "{0:<{1}}".format(val, col_widths[i] + 1)
+            f_out.write(val)
         else:
-            f_out.write(tobytearray("{0:<{1}} ".format("%s" % str(val,'utf-8'), col_widths[i])))
+            f_out.write("{0:<{1}} ".format("%s" % val, col_widths[i]))
 
     if not quiet:
-        f_out.write(tobytearray("|"))
-    f_out.write(tobytearray("\n"))
+        f_out.write("|")
+    f_out.write("\n")
 
 
 def get_col_widths(columns, rows):
@@ -325,7 +325,7 @@ def format_vertical_list(f_out, columns, rows, options=None):
     row_num = 0
     for row in rows:
         row_num += 1
-        f_out.write(tobytearray('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
+        f_out.write(tostr('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
                                                                        row_num,
                                                                        ' ', 8)))
         if none_to_null:
@@ -336,16 +336,16 @@ def format_vertical_list(f_out, columns, rows, options=None):
                 if isinstance(columns[i], str) else columns[i]
             val = row[i] \
                 if isinstance(row[i], str) else row[i]
-            out = u"{0:>{1}}: {2}\n".format(col, max_colwidth, val)
-            f_out.write(tobytearray(out))
+            out = "{0:>{1}}: {2}\n".format(col, max_colwidth, val)
+            f_out.write(out)
 
     if row_num > 0:
         row_str = 'rows' if row_num > 1 else 'row'
-        f_out.write(tobytearray("{0} {1}.\n".format(row_num, row_str)))
+        f_out.write("{0} {1}.\n".format(row_num, row_str))
 
 
 def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False,
-               to_sql=False, col_widths=None):
+               to_sql=False, col_widths=None, print_opt={}):
     """Print a list< based on format.
 
     Prints a list of rows in the format chosen. Default is GRID.
@@ -359,22 +359,22 @@ def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False,
     to_sql[out]       If True, converts columns to SQL format before
                       printing them to the output.
     col_widths[in]    col widths to use instead of actual col
+    print_opt[in]     quiet, print_footer, none_to_null, none_to_zls
+
     """
 
     if not col_widths:
         col_widths = []
     if sort:
         rows.sort()
-    list_options = {
-        'print_header': not no_headers,
-        'to_sql': to_sql,
-        'col_widths': col_widths,
-    }
-    
+    list_options = print_opt
+    list_options['print_header'] = not no_headers
+    list_options['to_sql'] = to_sql
+    list_options['col_widths'] = col_widths
 
             
     if fmt == "vertical":
-        format_vertical_list(f_out, columns, rows)
+        format_vertical_list(f_out, columns, rows, list_options)
     elif fmt == "tab":
         list_options['separator'] = '\t'
         format_tabular_list(f_out, columns, rows, list_options)
@@ -428,25 +428,39 @@ def print_dictionary_list(column_names, keys, dictionary_list,
                                          column_names[1], max_value))
         print(_TWO_COLUMN_DISPLAY.format('-' * (max_name), max_name,
                                          '-' * max_value, max_value))
+    namelist=set()
+    namedir={}
     for item in dictionary_list:
         name = item[keys[0]]
-        if len(name) > max_name:
-            name = "{0}...".format(name[:(max_name - 3)])
-        value = item[keys[1]]
-        if isinstance(value, (bool, int)) or value is None:
-            description = [str(value)]
-        elif not value:
-            description = ['']
-        else:
-            description = textwrap.wrap(value, max_value)
+        if name not in namelist:
+            namelist.add(name)
+            namedir[name] = []
+#        print("adding entry for ",name," keys: ",keys," item: ",item)
+        vlist = [ item[keys[1]] ]
+        if len(keys) > 2:
+            vlist.append(item[keys[2]])
+        namedir[name].append(vlist)
 
-        if use_alias and len(keys) > 2 and len(item[keys[2]]) > 0:
-            name += ' | ' + item[keys[2]]
-        print(_TWO_COLUMN_DISPLAY.format(name, max_name,
+    for name in sorted(namelist):
+        for item in namedir[name]:
+            sname = name
+            if len(name) > max_name:
+                sname = "{0}...".format(name[:(max_name - 3)])
+            value = item[0]
+            if isinstance(value, (bool, int)) or value is None:
+                description = [str(value)]
+            elif not value:
+                description = ['']
+            else:
+                description = textwrap.wrap(value, max_value)
+
+            if use_alias and len(keys) > 2 and len(item[1]) > 0:
+                sname += ' | ' + item[1]
+            print(_TWO_COLUMN_DISPLAY.format(sname, max_name,
                                          description[0], max_value))
-        for i in range(1, len(description)):
-            print(_TWO_COLUMN_DISPLAY.format('', max_name, description[i],
-                                             max_value))
+            for i in range(1, len(description)):
+                print(_TWO_COLUMN_DISPLAY.format('', max_name, description[i],
+                                                 max_value))
 
 
 def convert_dictionary_list(dict_list):

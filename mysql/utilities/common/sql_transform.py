@@ -157,6 +157,8 @@ def is_quoted_with_backticks(identifier, sql_mode=''):
 
     Returns True if the identifier has backtick quotes, and False otherwise.
     """
+    if identifier == "":
+        return False
     if 'ANSI_QUOTES' in sql_mode:
         return (identifier[0] == "`" and identifier[-1] == "`") or \
             (identifier[0] == '"' and identifier[-1] == '"')

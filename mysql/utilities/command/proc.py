@@ -212,6 +212,11 @@ class ProcessGrep(object):
         charset = kwrds.get('charset', None)
         ssl_opts = kwrds.get('ssl_opts', {})
 
+        print_opts = {
+            'none_to_zls'  : (fmt.lower() == 'csv'),
+            'none_to_null' : (fmt.lower() == 'sql'),
+        }
+
         headers = ("Connection", "Id", "User", "Host", "Db",
                    "Command", "Time", "State", "Info")
         entries = []
@@ -253,11 +258,13 @@ class ProcessGrep(object):
                     entries.append(tuple([_spec(info)] + list(row)))
             if print_rows:
                 print("# The following KILL commands were executed:")
-                print_list(output, fmt, cols, print_rows)
+                print_list(output, fmt, cols, print_rows,
+                           print_opt = print_opts)
 
         # If output is None, nothing is printed
         if len(entries) > 0 and output:
             entries.sort(key=lambda fifth: fifth[5])
-            print_list(output, fmt, headers, entries)
+            print_list(output, fmt, headers, entries,
+                       print_opt = print_opts)
         elif PRINT_PROCESS in self.__actions:
             raise EmptyResultError("No matches found")

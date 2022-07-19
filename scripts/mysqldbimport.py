@@ -84,6 +84,13 @@ if __name__ == '__main__':
                       "grid, tab, csv, raw_csv or vertical format", "sql",
                       True, extra_formats=["raw_csv"])
 
+    # Input file encoding (need for blobs)
+    parser.add_option("--encoding", action="store",
+                      dest="input_encoding", default="utf-8",
+                      help="the input file encoding, utf-8 (default), "
+                      "but should use latin-1 for binary data")
+                      
+
     # Import mode
     parser.add_option("-i", "--import", action="store", dest="import_type",
                       default="definitions", help="control the import of "
@@ -245,6 +252,7 @@ if __name__ == '__main__':
         "skip_gtid": opt.skip_gtid,
         "table": opt.table,
         "charset": opt.charset,
+        "encoding": opt.input_encoding,
         "multiprocess": num_cpu if opt.multiprocess == 0 else opt.multiprocess,
         "autocommit": opt.autocommit,
         "max_bulk_insert": max_bulk_size,

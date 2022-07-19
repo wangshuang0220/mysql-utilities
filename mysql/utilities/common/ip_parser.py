@@ -319,7 +319,6 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
             raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
         return grp.groups()
 
-
     # SSL options, must not be overwritten with those from options.
     ssl_ca = None
     ssl_cert = None
@@ -444,7 +443,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
             # Check if the login configuration file (.mylogin.cnf) exists
             if login_path and not my_login_config_exists():
                 if not config_path_data:
-                    util_err_msg = (".mylogin.cnf was not found at is default "
+                    util_err_msg = (".mylogin.cnf was not found at its default "
                                     "location: {0}. Please configure your "
                                     "login-path data before using it (use the "
                                     "mysql_config_editor tool)."
@@ -501,11 +500,11 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                     config_path_data.update(login_path_data)
                     login_path_data = config_path_data
 
-            user = login_path_data.get('user', getpass.getuser())
+            user = login_path_data.get('user', None)
             passwd = login_path_data.get('password', None)
-            host = login_path_data.get('host', 'localhost')
+            host = login_path_data.get('host', None)
             if not port:
-                port = login_path_data.get('port', 3306)
+                port = login_path_data.get('port', None)
             if not socket:
                 socket = login_path_data.get('socket', None)
 
@@ -517,8 +516,11 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
             else:
                 required_options = ('user', 'host', 'port')
 
-            missing_options = [opt for opt in required_options
-                               if [opt] is None]
+            missing_options = []
+            for opt in required_options:
+                if locals().get(opt,None) is None:
+                    missing_options.append(opt)
+                    
             # If we are on unix and port is missing, user might have specified
             # a socket instead
             if os.name == "posix" and "port" in missing_options:
@@ -531,11 +533,11 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                     missing_options[i] = "port or socket"
 
             if missing_options:
-                message = ",".join(missing_options)
+                message = ", ".join(missing_options)
                 if len(missing_options) > 1:
                     comma_idx = message.rfind(",")
                     message = "{0} and {1}".format(message[:comma_idx],
-                                                   message[comma_idx + 1:])
+                                                   message[comma_idx + 2:])
                 pluralize = "s" if len(missing_options) > 1 else ""
                 raise UtilError("Missing connection value{0} for "
                                 "{1} option{0}".format(pluralize, message))

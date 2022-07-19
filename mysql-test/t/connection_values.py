@@ -74,7 +74,7 @@ class test(mutlib.System_test):
         self.server1.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost'")
         self.create_login_path_data('test_server1', 'root_me',
                                     'localhost', None,
-                                    "'{0}'".format(server1_socket[0][1]))
+                                    '{0}'.format(server1_socket[0][1]))
         server2_socket = self.server2.show_server_variable('socket')
         try:
             self.server2.exec_query("DROP USER 'root_me'@'localhost'")
@@ -85,7 +85,7 @@ class test(mutlib.System_test):
         self.server2.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost'")
         self.create_login_path_data('test_server2', 'root_me',
                                     'localhost', None,
-                                    "'{0}'".format(server2_socket[0][1]))
+                                    '{0}'.format(server2_socket[0][1]))
 
         _TEST_CASES.append(("Valid connection string.",
                             self.build_connection_string(self.server1),
@@ -130,6 +130,7 @@ class test(mutlib.System_test):
         server1_vals['port'] = None
         server2_vals = get_connection_dictionary("test_server2")
         server2_vals['port'] = None
+        
         res = check_hostname_alias(server1_vals, server2_vals)
         # Add test case so that results match.
         _TEST_CASES.append((comment, "test_server1", False))

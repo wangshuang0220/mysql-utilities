@@ -33,7 +33,8 @@ from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.replication import negotiate_rpl_connection
 from mysql.utilities.common.server import connect_servers, Server
 from mysql.utilities.common.tools import tostr, tobytearray
-from mysql.utilities.common.sql_transform import quote_with_backticks
+from mysql.utilities.common.sql_transform import (quote_with_backticks,
+                                                  is_quoted_with_backticks)
 from mysql.utilities.common.table import Table
 from mysql.utilities.exception import UtilError, UtilDBError
 
@@ -204,17 +205,32 @@ def _export_metadata(source, db_list, output_file, options):
             output_file.write("USE {0};\n".format(db.q_db_name))
             for dbobj in db.get_next_object():
                 if dbobj[0] == "GRANT" and not skip_grants:
+                    if dbobj[1][0].lower() in ["'mysql.infoschema'@'localhost'",
+                                               "'mysql.session'@'localhost'",
+                                               "'mysql.sys'@'localhost'"]:
+                        continue
+                    rdb = dbobj[1][2]
+                    rtbl = dbobj[1][3]
+                    if not rdb and not rtbl:
+                        continue
+                    if rdb != '*':
+                        rdb = db.q_db_name
+
                     if not quiet:
                         output_file.write("# Grant:\n")
-                    if dbobj[1][3]:
+                    if rdb and rtbl:                            
+                        q_tbl = quote_with_backticks(rtbl,sql_mode) \
+                            if (rtbl != '*' and
+                                not is_quoted_with_backticks(rtbl,sql_mode)) else rtbl
+                                                        
                         create_str = "CREATE USER IF NOT EXISTS {3};\nGRANT {0} ON {1}.{2} TO {3};\n".format(
-                            dbobj[1][1], db.q_db_name,
-                            quote_with_backticks(dbobj[1][3], sql_mode),
+                            dbobj[1][1], rdb,
+                            q_tbl,
                             dbobj[1][0]
                         )
-                    else:
+                    elif dbobj[1][2]:
                         create_str = "CREATE USER IF NOT EXISTS {2};\nGRANT {0} ON {1}.* TO {2};\n".format(
-                            dbobj[1][1], db.q_db_name, dbobj[1][0]
+                            dbobj[1][1], rdb, dbobj[1][0]
                         )
                     output_file.write(create_str)
                 else:
@@ -264,7 +280,20 @@ def _export_metadata(source, db_list, output_file, options):
                     rows = db.get_db_objects(obj_type, column_type, True)
                 else:
                     rows = db.get_db_objects(obj_type, column_type, True, True)
-                if len(rows[1]) < 1:
+                if obj_type == "GRANT":
+                    newrows = []
+                    if len(rows[1]) < 1:
+                        continue
+                    for j in range(0,len(rows[1])):
+                        if rows[1][j][0].lower() in ["'mysql.infoschema'@'localhost'",
+                                                  "'mysql.session'@'localhost'",
+                                                  "'mysql.sys'@'localhost'"]:
+                            continue
+                        if not rows[1][j][2] and not rows[1][j][3]:
+                            continue
+                        newrows.append(rows[1][j])
+                    rows = [rows[0],newrows]
+                if len(rows) < 2 or len(rows[1]) < 1:
                     output_file.write(" (none found)\n")
                 else:
                     output_file.write("\n")

@@ -2,79 +2,79 @@ Test Case 1: Show Help
 
 Command                 Description                                          
 ----------------------  -----------------------------------------------------
-help utilities          Display list of all utilities supported.             
-help <utility>          Display help for a specific utility.                 
-show errors             Display errors captured during the execution of the  
-                        utilities.                                           
-clear errors            clear captured errors.                               
-show last error         Display the last error captured during the execution 
-                        of the utilities                                     
-help | help commands    Show this list.                                      
-exit | quit             Exit the console.                                    
-set <variable>=<value>  Store a variable for recall in commands.             
-show options            Display list of options specified by the user on     
-                        launch.                                              
-show variables          Display list of variables.                           
+<DOWN>                  Press DOWN to retrieve the previous command.         
 <ENTER>                 Press ENTER to execute command.                      
 <ESCAPE>                Press ESCAPE to clear the command entry.             
-<DOWN>                  Press DOWN to retrieve the previous command.         
-<UP>                    Press UP to retrieve the next command in history.    
 <TAB>                   Press TAB for type completion of utility, option, or 
                         variable names.                                      
 <TAB><TAB>              Press TAB twice for list of matching type completion 
                         (context sensitive).                                 
+<UP>                    Press UP to retrieve the next command in history.    
+clear errors            clear captured errors.                               
+exit | quit             Exit the console.                                    
+help | help commands    Show this list.                                      
+help <utility>          Display help for a specific utility.                 
+help utilities          Display list of all utilities supported.             
+set <variable>=<value>  Store a variable for recall in commands.             
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
 
 Test Case 2: Show Help Commands
 
 Command                 Description                                          
 ----------------------  -----------------------------------------------------
-help utilities          Display list of all utilities supported.             
-help <utility>          Display help for a specific utility.                 
-show errors             Display errors captured during the execution of the  
-                        utilities.                                           
-clear errors            clear captured errors.                               
-show last error         Display the last error captured during the execution 
-                        of the utilities                                     
-help | help commands    Show this list.                                      
-exit | quit             Exit the console.                                    
-set <variable>=<value>  Store a variable for recall in commands.             
-show options            Display list of options specified by the user on     
-                        launch.                                              
-show variables          Display list of variables.                           
+<DOWN>                  Press DOWN to retrieve the previous command.         
 <ENTER>                 Press ENTER to execute command.                      
 <ESCAPE>                Press ESCAPE to clear the command entry.             
-<DOWN>                  Press DOWN to retrieve the previous command.         
-<UP>                    Press UP to retrieve the next command in history.    
 <TAB>                   Press TAB for type completion of utility, option, or 
                         variable names.                                      
 <TAB><TAB>              Press TAB twice for list of matching type completion 
                         (context sensitive).                                 
+<UP>                    Press UP to retrieve the next command in history.    
+clear errors            clear captured errors.                               
+exit | quit             Exit the console.                                    
+help | help commands    Show this list.                                      
+help <utility>          Display help for a specific utility.                 
+help utilities          Display list of all utilities supported.             
+set <variable>=<value>  Store a variable for recall in commands.             
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
 
 Test Case 3: Show Help Commands
 
 Command                 Description                                          
 ----------------------  -----------------------------------------------------
-help utilities          Display list of all utilities supported.             
-help <utility>          Display help for a specific utility.                 
-show errors             Display errors captured during the execution of the  
-                        utilities.                                           
-clear errors            clear captured errors.                               
-show last error         Display the last error captured during the execution 
-                        of the utilities                                     
-help | help commands    Show this list.                                      
-exit | quit             Exit the console.                                    
-set <variable>=<value>  Store a variable for recall in commands.             
-show options            Display list of options specified by the user on     
-                        launch.                                              
-show variables          Display list of variables.                           
+<DOWN>                  Press DOWN to retrieve the previous command.         
 <ENTER>                 Press ENTER to execute command.                      
 <ESCAPE>                Press ESCAPE to clear the command entry.             
-<DOWN>                  Press DOWN to retrieve the previous command.         
-<UP>                    Press UP to retrieve the next command in history.    
 <TAB>                   Press TAB for type completion of utility, option, or 
                         variable names.                                      
 <TAB><TAB>              Press TAB twice for list of matching type completion 
                         (context sensitive).                                 
+<UP>                    Press UP to retrieve the next command in history.    
+clear errors            clear captured errors.                               
+exit | quit             Exit the console.                                    
+help | help commands    Show this list.                                      
+help <utility>          Display help for a specific utility.                 
+help utilities          Display list of all utilities supported.             
+set <variable>=<value>  Store a variable for recall in commands.             
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
 
 Test Case 4: Show Utilities
 
@@ -114,14 +114,14 @@ Test Case 5: Show Options
 
 Option     Value                                                             
 ---------  ------------------------------------------------------------------
-prompt     mysqluc>                                                          
-hide_util  False                                                             
 add_util                                                                     
-utildir    XXXXXXXXXXXXXX
 commands   show options                                                      
-verbosity  0                                                                 
-quiet      False                                                             
 custom     True                                                              
+hide_util  False                                                             
+prompt     mysqluc>                                                          
+quiet      False                                                             
+utildir    XXXXXXXXXXXXXX
+verbosity  0                                                                 
 width      77                                                                
 
 Test Case 6: Do Exit
@@ -155,27 +155,27 @@ Test Case 10: Show Help + Help Utilities
 
 Command                 Description                                          
 ----------------------  -----------------------------------------------------
-help utilities          Display list of all utilities supported.             
-help <utility>          Display help for a specific utility.                 
-show errors             Display errors captured during the execution of the  
-                        utilities.                                           
-clear errors            clear captured errors.                               
-show last error         Display the last error captured during the execution 
-                        of the utilities                                     
-help | help commands    Show this list.                                      
-exit | quit             Exit the console.                                    
-set <variable>=<value>  Store a variable for recall in commands.             
-show options            Display list of options specified by the user on     
-                        launch.                                              
-show variables          Display list of variables.                           
+<DOWN>                  Press DOWN to retrieve the previous command.         
 <ENTER>                 Press ENTER to execute command.                      
 <ESCAPE>                Press ESCAPE to clear the command entry.             
-<DOWN>                  Press DOWN to retrieve the previous command.         
-<UP>                    Press UP to retrieve the next command in history.    
 <TAB>                   Press TAB for type completion of utility, option, or 
                         variable names.                                      
 <TAB><TAB>              Press TAB twice for list of matching type completion 
                         (context sensitive).                                 
+<UP>                    Press UP to retrieve the next command in history.    
+clear errors            clear captured errors.                               
+exit | quit             Exit the console.                                    
+help | help commands    Show this list.                                      
+help <utility>          Display help for a specific utility.                 
+help utilities          Display list of all utilities supported.             
+set <variable>=<value>  Store a variable for recall in commands.             
+show errors             Display errors captured during the execution of the  
+                        utilities.                                           
+show last error         Display the last error captured during the execution 
+                        of the utilities                                     
+show options            Display list of options specified by the user on     
+                        launch.                                              
+show variables          Display list of variables.                           
 
 
 Utility            Description                                               
@@ -246,14 +246,14 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
 Option     Value                                                             
 ---------  ------------------------------------------------------------------
-prompt     mysqluc>                                                          
-hide_util  False                                                             
 add_util                                                                     
-utildir    XXXXXXXXXXXXXX
 commands   help utilities ; show options                                     
-verbosity  0                                                                 
-quiet      False                                                             
 custom     True                                                              
+hide_util  False                                                             
+prompt     mysqluc>                                                          
+quiet      False                                                             
+utildir    XXXXXXXXXXXXXX
+verbosity  0                                                                 
 width      77                                                                
 
 Test Case 12: Show Utilities + Options + NULL
@@ -293,14 +293,14 @@ mysqluserclone     clone a MySQL user account to one or more new users
 
 Option     Value                                                             
 ---------  ------------------------------------------------------------------
-prompt     mysqluc>                                                          
-hide_util  False                                                             
 add_util                                                                     
-utildir    XXXXXXXXXXXXXX
 commands   help utilities;show options;                                      
-verbosity  0                                                                 
-quiet      False                                                             
 custom     True                                                              
+hide_util  False                                                             
+prompt     mysqluc>                                                          
+quiet      False                                                             
+utildir    XXXXXXXXXXXXXX
+verbosity  0                                                                 
 width      77                                                                
 
 
@@ -313,8 +313,8 @@ Test Case 14: Set and Show Variables
 
 Variable  Value                                                              
 --------  -------------------------------------------------------------------
-killer    123                                                                
 ABC       'test123'                                                          
+killer    123                                                                
 
 Test Case 15: Attempt to run extraneous command.
 

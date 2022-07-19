@@ -8,17 +8,19 @@ FROM
 WHERE
     USER LIKE 'root'"
 root[...],XXXXX,root,localhost,,Sleep,XXXXX,,
+root[...],XXXXX,root,localhost,,Sleep,XXXXX,,
 
 Test case 2 - find processes for current user format=TAB
 WARNING: Using a password on the command line interface can be insecure.
 Connection	Id	User	Host	Db	Command	Time	State	Info
-root[...]
+root[...]	XXXXX	root	localhost	None	Query	XXXXX	executing	"SELECT
   Id, User, Host, Db, Command, Time, State, Info
 FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
     USER LIKE 'root'"
-root[...]
+root[...]	XXXXX	root	localhost	None	Sleep	XXXXX		None
+root[...]	XXXXX	root	localhost	None	Sleep	XXXXX		None
 
 Test case 3 - find processes for current user format=VERTICAL
 WARNING: Using a password on the command line interface can be insecure.
@@ -47,7 +49,17 @@ WHERE
        Time: XXXXX
       State: 
        Info: None
-2 rows.
+*************************       3. row *************************
+ Connection: XXXXX
+         Id: XXXXX
+       User: root
+       Host: localhost
+         Db: None
+    Command: Sleep
+       Time: XXXXX
+      State: 
+       Info: None
+3 rows.
 
 Test case 4 - find processes for current user format=GRID
 WARNING: Using a password on the command line interface can be insecure.
@@ -60,6 +72,7 @@ FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
     USER LIKE 'root'  |
+| root[...]  | XXXXX | root  | localhost  | None  | Sleep    | XXXXX |            | None                                                                                                                      |
 | root[...]  | XXXXX | root  | localhost  | None  | Sleep    | XXXXX |            | None                                                                                                                      |
 +---+
 

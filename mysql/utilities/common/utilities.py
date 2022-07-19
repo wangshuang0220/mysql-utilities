@@ -32,7 +32,8 @@ import subprocess
 
 from mysql.utilities import AVAILABLE_UTILITIES
 from mysql.utilities.common.format import print_dictionary_list
-from mysql.utilities.common.tools import check_python_version
+from mysql.utilities.common.tools import (check_python_version,
+                                          tostr, tobytearray)
 from mysql.utilities.exception import UtilError
 
 
@@ -343,7 +344,9 @@ class Utilities(object):
                       "command: {0} --help".format(util_name))
             return None
 
-        res = self.program_usage.match(stdout_temp.replace("\r", ""))
+        stdout_temp = tostr(stdout_temp)
+        stdout_temp.replace("\r","")
+        res = self.program_usage.match(stdout_temp)
         if not res:
             print(WARNING_FAIL_TO_READ_OPTIONS.format(util_name))
             print("An error occurred while trying to parse the options "

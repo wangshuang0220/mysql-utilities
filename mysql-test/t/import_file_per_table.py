@@ -108,6 +108,7 @@ class test(import_basic.test):
                                                   "util_test.t{0}".format(i))
                     self.results.append("# Data from util_test.t{0}:\n".format(
                         i))
+                    orderedrows = []
                     for row in res:
                         str_ = ""
                         for col in row:
@@ -116,7 +117,10 @@ class test(import_basic.test):
                                 str_ = "{0}{1} ".format(str_, col)
                             else:
                                 str_ = "{0}NULL ".format(str_)
-                        self.results.append(str_ + "\n")
+                        orderedrows.append(str_ + "\n")
+
+                    for row in sorted(orderedrows):
+                        self.results.append(row)
 
                 except UtilError:
                     raise MUTLibError("Cannot get rows from "

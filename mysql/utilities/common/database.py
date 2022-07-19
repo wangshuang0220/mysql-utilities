@@ -1751,7 +1751,7 @@ class Database(object):
                 EXTERNAL_LANGUAGE AS LANGUAGE, 
                 SQL_DATA_ACCESS, IS_DETERMINISTIC, SECURITY_TYPE,
                 (SELECT GROUP_CONCAT(
-                IF(PARAMETER_MODE='IN','',CONCAT(PARAMETER_MODE,' '),
+                IF(PARAMETER_MODE='IN','',CONCAT(PARAMETER_MODE,' ')),
                 PARAMETER_NAME,' ',DTD_IDENTIFIER)  
                   FROM information_schema.parameters p
                   WHERE p.SPECIFIC_NAME = ROUTINE_NAME 
@@ -1955,7 +1955,7 @@ class Database(object):
                     FROM INFORMATION_SCHEMA.COLUMN_PRIVILEGES
                     WHERE table_schema = '{db}'
             ) UNION (
-                    SELECT GRANTEE, PRIVILEGE_TYPE, NULL, NULL,
+                    SELECT GRANTEE, PRIVILEGE_TYPE, '*', '*',
                     NULL, NULL, IS_GRANTABLE
                     FROM INFORMATION_SCHEMA.USER_PRIVILEGES
             ) UNION (

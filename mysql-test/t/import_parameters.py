@@ -57,6 +57,7 @@ class test(import_basic.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Now, check db and save the results.
+        self.server2.flush_logs()
         self.results.append("AFTER:\n")
         res = self.server2.exec_query("SHOW DATABASES LIKE 'util_test'")
         if res == () or res == []:
@@ -263,16 +264,31 @@ class test(import_basic.test):
 
         # Mask multiprocessing warning.
         self.remove_result("# WARNING: Number of processes ")
-
+        
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqldbimport version",
             "MySQL Utilities mysqldbimport version X.Y.Z\n")
 
+        # remove GRANT ... TO 'root'@'localhost'   lines
+        linenums = []
+        linenum = 0
+        for line in self.results:
+            index = line.find("GRANT ")
+            if index == 0:
+                index = line.find("TO 'root'@'localhost'")
+                if index > 0:
+                    linenums.append(linenum)
+            linenum += 1
+        # remove in reverse order
+        for linenum in reversed(linenums):
+            self.results.pop(linenum) 
+
         return res
 
     def get_result(self):
-        return self.compare(__name__, self.results)
+        return self.compare_pp(__name__, self.results,
+                               self.server1, self.server2)
 
     def record(self):
         return self.save_result_file(__name__, self.results)

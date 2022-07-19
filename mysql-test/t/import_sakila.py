@@ -94,7 +94,7 @@ class test(mutlib.System_test):
         import_file = os.path.normpath(
             _IMPORT_FILES_PATH.format(_IMPORT_FILES[1]))
         # --import=both because the data file also include some definitions.
-        cmd = ("{0} {1} --import=both"
+        cmd = ("{0} {1} --import=both --encoding=latin-1 "
                "".format(cmd_base, import_file))
         res = self.run_test_case(0, cmd, comment)
         if not res:

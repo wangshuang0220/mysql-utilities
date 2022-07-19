@@ -1,0 +1,49 @@
+# set up conditions with mysql system account
+$ mysql -uroot
+mysql> source setupfile.sql
+mysql> quit
+
+
+# illustrate the difference between create procedure and create function
+# with account that has SET_USER_ID and SYSTEM_USER privileges (so can
+# set the DEFINER to the root account), but not the 'deprecated' SUPER.
+
+$ mysql -ujoe -pjoe
+mysql> source create_procedure.sql
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> source create_function.sql
+ERROR 1419 (HY000): You do not have the SUPER privilege and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable)
+
+
+
+
+
+-- setupfile.sql -----------------------------------
+-- root@localhost is a system user 
+
+CREATE DATABASE `testdb`;
+CREATE USER `joe`@`localhost` IDENTIFIED BY 'joe';
+GRANT SET_USER_ID,SYSTEM_USER ON *.* TO `joe`@`localhost`;
+GRANT ALL PRIVILEGES ON `testdb`.* TO `joe`@`localhost`;
+SET GLOBAL log_bin_trust_function_creators = 0;
+SHOW VARIABLES like 'log_bin%';
+-- -------------------------------------------------
+
+-- --------------create_procedure.sql------------------
+-- create procedure
+USE `testdb`;
+CREATE TABLE `testdb`.`t1` (a int);
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p int)
+       INSERT INTO `testdb`.`t1` VALUES (50);
+-- ----------------------------------------------------       
+
+-- ---------------create_function.sql------------------
+-- create function
+USE `testdb`;
+CREATE DEFINER=`root`@`localhost` FUNCTION `f1`()
+       RETURNS int
+       DETERMINISTIC RETURN (SELECT 1);
+-- ----------------------------------------------------
+
+

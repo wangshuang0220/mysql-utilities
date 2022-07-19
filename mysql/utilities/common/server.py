@@ -778,7 +778,8 @@ class Server(object):
             if conn_values.get("port",3306) is None:
                 self.port = 3306
             else:
-                self.port = int(conn_values.get("port",3306))
+                self.port = conn_values.get("port",3306)
+                self.port = int(self.port)
             self.charset = options.get("charset",
                                        conn_values.get("charset", None))
             # Optional values

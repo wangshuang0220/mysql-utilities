@@ -1,0 +1,9 @@
+mysql_config_editor print --login-path=(path)
+--user
+--host
+--port
+--socket
+
+from ~/.mylogin.cnf 
+
+mysql_config_editor print -all

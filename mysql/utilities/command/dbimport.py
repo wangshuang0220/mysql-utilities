@@ -885,7 +885,9 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
 
             # Quote required identifiers with backticks
             obj_db = quote_with_backticks(db, sql_mode) \
-                if not is_quoted_with_backticks(db, sql_mode) else db
+                if (db != '*' and
+                    not is_quoted_with_backticks(db, sql_mode)) else db
+
             obj_tbl = quote_with_backticks(tbl, sql_mode) \
                 if (tbl != '*' and
                     not is_quoted_with_backticks(tbl, sql_mode)) else tbl
@@ -1336,7 +1338,8 @@ def import_file(dest_val, file_name, options):
     options[in]        a dictionary containing the options for the import:
                        (skip_tables, skip_views, skip_triggers, skip_procs,
                        skip_funcs, skip_events, skip_grants, skip_create,
-                       skip_data, no_header, display, format, and debug)
+                       skip_data, no_header, display, format, encoding,
+                       and debug)
 
     Returns bool True = success, False = error
     """
@@ -1394,6 +1397,7 @@ def import_file(dest_val, file_name, options):
     no_headers = options.get("no_headers", False)
     quiet = options.get("quiet", False)
     import_type = options.get("import_type", "definitions")
+    encoding = options.get("encoding","UTF-8")
     single = options.get("single", True)
     dryrun = options.get("dryrun", False)
     do_drop = options.get("do_drop", False)
@@ -1429,7 +1433,7 @@ def import_file(dest_val, file_name, options):
     get_db = True
     check_privileges = True
     db_name = None
-    file_h = open(file_name)
+    file_h = open(file_name, encoding=encoding)
     columns = []
     read_columns = False
     has_data = False
