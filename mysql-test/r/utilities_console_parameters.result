@@ -34,19 +34,18 @@ mysqldiff - compare object definitions among objects where the difference is how
 Options:
 Option                     Description                                     
 -------------------------  ------------------------------------------------
---version                  show program's version number and exit          
+--changes-for=CHANGES_FOR  specify the server to show transformations to   
+                           match the other server. For example, to see the 
+                           transformation for transforming server1 to match
+                           server2, use --changes-for=server1. Valid values
+                           are 'server1' or 'server2'. The default is      
+                           'server1'.                                      
+--character-set=CHARSET    sets the client character set. The default is   
+                           retrieved from the server variable              
+                           'character_set_client'.                         
+--force                    do not abort when a diff test fails             
 --help                     display a help message and exit                 
 --license                  display program's license and exit              
---ssl-ca=SSL_CA            path to a file that contains a list of trusted  
-                           SSL CAs.                                        
---ssl-cert=SSL_CERT        name of the SSL certificate file to use for     
-                           establishing a secure connection.               
---ssl-key=SSL_KEY          name of the SSL key file to use for establishing
-                           a secure connection.                            
---ssl=SSL                  specifies if the server connection requires use 
-                           of SSL. If an encrypted connection cannot be    
-                           established, the connection attempt fails. By   
-                           default 0 (SSL not required).                   
 --server1=SERVER1          connection information for first server in the  
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
@@ -57,26 +56,6 @@ Option                     Description
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
                            or <login-path>[:<port>][:<socket>] or <config- 
                            path>[<[group]>].                               
---character-set=CHARSET    sets the client character set. The default is   
-                           retrieved from the server variable              
-                           'character_set_client'.                         
---width=WIDTH              display width                                   
---force                    do not abort when a diff test fails             
--c, --compact              compact output from a diff.                     
---skip-table-options       skip check of all table options (e.g.,          
-                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
--v, --verbose              control how much information is displayed. e.g.,
-                           -v = verbose, -vv = more verbose, -vvv = debug  
--q, --quiet                turn off all messages for quiet execution.      
--d, --difftype=DIFFTYPE    display differences in context format in one of 
-                           the following formats:                          
-                           [unified|context|differ|sql] (default: unified).
---changes-for=CHANGES_FOR  specify the server to show transformations to   
-                           match the other server. For example, to see the 
-                           transformation for transforming server1 to match
-                           server2, use --changes-for=server1. Valid values
-                           are 'server1' or 'server2'. The default is      
-                           'server1'.                                      
 --show-reverse             produce a transformation report containing the  
                            SQL statements to transform the object          
                            definitions specified in reverse. For example if
@@ -84,6 +63,27 @@ Option                     Description
                            the transformation for server2. Note: the       
                            reverse changes are annotated and marked as     
                            comments.                                       
+--skip-table-options       skip check of all table options (e.g.,          
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
+--ssl-ca=SSL_CA            path to a file that contains a list of trusted  
+                           SSL CAs.                                        
+--ssl-cert=SSL_CERT        name of the SSL certificate file to use for     
+                           establishing a secure connection.               
+--ssl-key=SSL_KEY          name of the SSL key file to use for establishing
+                           a secure connection.                            
+--ssl=SSL                  specifies if the server connection requires use 
+                           of SSL. If an encrypted connection cannot be    
+                           established, the connection attempt fails. By   
+                           default 0 (SSL not required).                   
+--version                  show program's version number and exit          
+--width=WIDTH              display width                                   
+-c, --compact              compact output from a diff.                     
+-d, --difftype=DIFFTYPE    display differences in context format in one of 
+                           the following formats:                          
+                           [unified|context|differ|sql] (default: unified).
+-q, --quiet                turn off all messages for quiet execution.      
+-v, --verbose              control how much information is displayed. e.g.,
+                           -v = verbose, -vv = more verbose, -vvv = debug  
 
 Test Case 3: Verbosity
 
@@ -96,19 +96,18 @@ mysqldiff - compare object definitions among objects where the difference is how
 Options:
 Option                     Description                                     
 -------------------------  ------------------------------------------------
---version                  show program's version number and exit          
+--changes-for=CHANGES_FOR  specify the server to show transformations to   
+                           match the other server. For example, to see the 
+                           transformation for transforming server1 to match
+                           server2, use --changes-for=server1. Valid values
+                           are 'server1' or 'server2'. The default is      
+                           'server1'.                                      
+--character-set=CHARSET    sets the client character set. The default is   
+                           retrieved from the server variable              
+                           'character_set_client'.                         
+--force                    do not abort when a diff test fails             
 --help                     display a help message and exit                 
 --license                  display program's license and exit              
---ssl-ca=SSL_CA            path to a file that contains a list of trusted  
-                           SSL CAs.                                        
---ssl-cert=SSL_CERT        name of the SSL certificate file to use for     
-                           establishing a secure connection.               
---ssl-key=SSL_KEY          name of the SSL key file to use for establishing
-                           a secure connection.                            
---ssl=SSL                  specifies if the server connection requires use 
-                           of SSL. If an encrypted connection cannot be    
-                           established, the connection attempt fails. By   
-                           default 0 (SSL not required).                   
 --server1=SERVER1          connection information for first server in the  
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
@@ -119,26 +118,6 @@ Option                     Description
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
                            or <login-path>[:<port>][:<socket>] or <config- 
                            path>[<[group]>].                               
---character-set=CHARSET    sets the client character set. The default is   
-                           retrieved from the server variable              
-                           'character_set_client'.                         
---width=WIDTH              display width                                   
---force                    do not abort when a diff test fails             
--c, --compact              compact output from a diff.                     
---skip-table-options       skip check of all table options (e.g.,          
-                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
--v, --verbose              control how much information is displayed. e.g.,
-                           -v = verbose, -vv = more verbose, -vvv = debug  
--q, --quiet                turn off all messages for quiet execution.      
--d, --difftype=DIFFTYPE    display differences in context format in one of 
-                           the following formats:                          
-                           [unified|context|differ|sql] (default: unified).
---changes-for=CHANGES_FOR  specify the server to show transformations to   
-                           match the other server. For example, to see the 
-                           transformation for transforming server1 to match
-                           server2, use --changes-for=server1. Valid values
-                           are 'server1' or 'server2'. The default is      
-                           'server1'.                                      
 --show-reverse             produce a transformation report containing the  
                            SQL statements to transform the object          
                            definitions specified in reverse. For example if
@@ -146,6 +125,27 @@ Option                     Description
                            the transformation for server2. Note: the       
                            reverse changes are annotated and marked as     
                            comments.                                       
+--skip-table-options       skip check of all table options (e.g.,          
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).         
+--ssl-ca=SSL_CA            path to a file that contains a list of trusted  
+                           SSL CAs.                                        
+--ssl-cert=SSL_CERT        name of the SSL certificate file to use for     
+                           establishing a secure connection.               
+--ssl-key=SSL_KEY          name of the SSL key file to use for establishing
+                           a secure connection.                            
+--ssl=SSL                  specifies if the server connection requires use 
+                           of SSL. If an encrypted connection cannot be    
+                           established, the connection attempt fails. By   
+                           default 0 (SSL not required).                   
+--version                  show program's version number and exit          
+--width=WIDTH              display width                                   
+-c, --compact              compact output from a diff.                     
+-d, --difftype=DIFFTYPE    display differences in context format in one of 
+                           the following formats:                          
+                           [unified|context|differ|sql] (default: unified).
+-q, --quiet                turn off all messages for quiet execution.      
+-v, --verbose              control how much information is displayed. e.g.,
+                           -v = verbose, -vv = more verbose, -vvv = debug  
 
 Test Case 4: Quiet
 Quiet mode, saving output to XXXXXXXXXXXXXX
@@ -158,12 +158,54 @@ mysqldiff - compare object definitions among objects where the difference is how
 Options:
 Option                     Description                 
 -------------------------  ----------------------------
---version                  show program's version      
-                           number and exit             
+--changes-for=CHANGES_FOR  specify the server to show  
+                           transformations to match the
+                           other server. For example,  
+                           to see the transformation   
+                           for transforming server1 to 
+                           match server2, use          
+                           --changes-for=server1. Valid
+                           values are 'server1' or     
+                           'server2'. The default is   
+                           'server1'.                  
+--character-set=CHARSET    sets the client character   
+                           set. The default is         
+                           retrieved from the server   
+                           variable                    
+                           'character_set_client'.     
+--force                    do not abort when a diff    
+                           test fails                  
 --help                     display a help message and  
                            exit                        
 --license                  display program's license   
                            and exit                    
+--server1=SERVER1          connection information for  
+                           first server in the form: <u
+                           ser>[:<password>]@<host>[:<p
+                           ort>][:<socket>] or <login- 
+                           path>[:<port>][:<socket>] or
+                           <config- path>[<[group]>].  
+--server2=SERVER2          connection information for  
+                           second server in the form: <
+                           user>[:<password>]@<host>[:<
+                           port>][:<socket>] or <login-
+                           path>[:<port>][:<socket>] or
+                           <config- path>[<[group]>].  
+--show-reverse             produce a transformation    
+                           report containing the SQL   
+                           statements to transform the 
+                           object definitions specified
+                           in reverse. For example if  
+                           --changes-for is set to     
+                           server1, also generate the  
+                           transformation for server2. 
+                           Note: the reverse changes   
+                           are annotated and marked as 
+                           comments.                   
+--skip-table-options       skip check of all table     
+                           options (e.g.,              
+                           AUTO_INCREMENT, ENGINE,     
+                           CHARSET, etc.).             
 --ssl-ca=SSL_CA            path to a file that contains
                            a list of trusted SSL CAs.  
 --ssl-cert=SSL_CERT        name of the SSL certificate 
@@ -179,63 +221,21 @@ Option                     Description
                            established, the connection 
                            attempt fails. By default 0 
                            (SSL not required).         
---server1=SERVER1          connection information for  
-                           first server in the form: <u
-                           ser>[:<password>]@<host>[:<p
-                           ort>][:<socket>] or <login- 
-                           path>[:<port>][:<socket>] or
-                           <config- path>[<[group]>].  
---server2=SERVER2          connection information for  
-                           second server in the form: <
-                           user>[:<password>]@<host>[:<
-                           port>][:<socket>] or <login-
-                           path>[:<port>][:<socket>] or
-                           <config- path>[<[group]>].  
---character-set=CHARSET    sets the client character   
-                           set. The default is         
-                           retrieved from the server   
-                           variable                    
-                           'character_set_client'.     
+--version                  show program's version      
+                           number and exit             
 --width=WIDTH              display width               
---force                    do not abort when a diff    
-                           test fails                  
 -c, --compact              compact output from a diff. 
---skip-table-options       skip check of all table     
-                           options (e.g.,              
-                           AUTO_INCREMENT, ENGINE,     
-                           CHARSET, etc.).             
--v, --verbose              control how much information
-                           is displayed. e.g., -v =    
-                           verbose, -vv = more verbose,
-                           -vvv = debug                
--q, --quiet                turn off all messages for   
-                           quiet execution.            
 -d, --difftype=DIFFTYPE    display differences in      
                            context format in one of the
                            following formats:          
                            [unified|context|differ|sql]
                            (default: unified).         
---changes-for=CHANGES_FOR  specify the server to show  
-                           transformations to match the
-                           other server. For example,  
-                           to see the transformation   
-                           for transforming server1 to 
-                           match server2, use          
-                           --changes-for=server1. Valid
-                           values are 'server1' or     
-                           'server2'. The default is   
-                           'server1'.                  
---show-reverse             produce a transformation    
-                           report containing the SQL   
-                           statements to transform the 
-                           object definitions specified
-                           in reverse. For example if  
-                           --changes-for is set to     
-                           server1, also generate the  
-                           transformation for server2. 
-                           Note: the reverse changes   
-                           are annotated and marked as 
-                           comments.                   
+-q, --quiet                turn off all messages for   
+                           quiet execution.            
+-v, --verbose              control how much information
+                           is displayed. e.g., -v =    
+                           verbose, -vv = more verbose,
+                           -vvv = debug                
 
 Test Case 6: Normal - width 66
 
@@ -246,9 +246,39 @@ mysqldiff - compare object definitions among objects where the difference is how
 Options:
 Option                     Description                            
 -------------------------  ---------------------------------------
---version                  show program's version number and exit 
+--changes-for=CHANGES_FOR  specify the server to show             
+                           transformations to match the other     
+                           server. For example, to see the        
+                           transformation for transforming server1
+                           to match server2, use --changes-       
+                           for=server1. Valid values are 'server1'
+                           or 'server2'. The default is 'server1'.
+--character-set=CHARSET    sets the client character set. The     
+                           default is retrieved from the server   
+                           variable 'character_set_client'.       
+--force                    do not abort when a diff test fails    
 --help                     display a help message and exit        
 --license                  display program's license and exit     
+--server1=SERVER1          connection information for first server
+                           in the form: <user>[:<password>]@<host>
+                           [:<port>][:<socket>] or <login-        
+                           path>[:<port>][:<socket>] or <config-  
+                           path>[<[group]>].                      
+--server2=SERVER2          connection information for second      
+                           server in the form: <user>[:<password>]
+                           @<host>[:<port>][:<socket>] or <login- 
+                           path>[:<port>][:<socket>] or <config-  
+                           path>[<[group]>].                      
+--show-reverse             produce a transformation report        
+                           containing the SQL statements to       
+                           transform the object definitions       
+                           specified in reverse. For example if   
+                           --changes-for is set to server1, also  
+                           generate the transformation for        
+                           server2. Note: the reverse changes are 
+                           annotated and marked as comments.      
+--skip-table-options       skip check of all table options (e.g., 
+                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).
 --ssl-ca=SSL_CA            path to a file that contains a list of 
                            trusted SSL CAs.                       
 --ssl-cert=SSL_CERT        name of the SSL certificate file to use
@@ -260,48 +290,18 @@ Option                     Description
                            connection cannot be established, the  
                            connection attempt fails. By default 0 
                            (SSL not required).                    
---server1=SERVER1          connection information for first server
-                           in the form: <user>[:<password>]@<host>
-                           [:<port>][:<socket>] or <login-        
-                           path>[:<port>][:<socket>] or <config-  
-                           path>[<[group]>].                      
---server2=SERVER2          connection information for second      
-                           server in the form: <user>[:<password>]
-                           @<host>[:<port>][:<socket>] or <login- 
-                           path>[:<port>][:<socket>] or <config-  
-                           path>[<[group]>].                      
---character-set=CHARSET    sets the client character set. The     
-                           default is retrieved from the server   
-                           variable 'character_set_client'.       
+--version                  show program's version number and exit 
 --width=WIDTH              display width                          
---force                    do not abort when a diff test fails    
 -c, --compact              compact output from a diff.            
---skip-table-options       skip check of all table options (e.g., 
-                           AUTO_INCREMENT, ENGINE, CHARSET, etc.).
--v, --verbose              control how much information is        
-                           displayed. e.g., -v = verbose, -vv =   
-                           more verbose, -vvv = debug             
--q, --quiet                turn off all messages for quiet        
-                           execution.                             
 -d, --difftype=DIFFTYPE    display differences in context format  
                            in one of the following formats:       
                            [unified|context|differ|sql] (default: 
                            unified).                              
---changes-for=CHANGES_FOR  specify the server to show             
-                           transformations to match the other     
-                           server. For example, to see the        
-                           transformation for transforming server1
-                           to match server2, use --changes-       
-                           for=server1. Valid values are 'server1'
-                           or 'server2'. The default is 'server1'.
---show-reverse             produce a transformation report        
-                           containing the SQL statements to       
-                           transform the object definitions       
-                           specified in reverse. For example if   
-                           --changes-for is set to server1, also  
-                           generate the transformation for        
-                           server2. Note: the reverse changes are 
-                           annotated and marked as comments.      
+-q, --quiet                turn off all messages for quiet        
+                           execution.                             
+-v, --verbose              control how much information is        
+                           displayed. e.g., -v = verbose, -vv =   
+                           more verbose, -vvv = debug             
 
 Test Case 7: Replacement
 

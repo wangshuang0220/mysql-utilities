@@ -28,6 +28,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.console import Console
 from mysql.utilities.common.format import print_dictionary_list
 from mysql.utilities.common.utilities import Utilities, get_util_path
+from mysql.utilities.common.tools import tostr
 
 
 # The following are additional base commands for the console. These comamnds
@@ -303,6 +304,7 @@ class UtilitiesConsole(Console):
                 # check the output for errors
                 _, stderr_temp = proc.communicate()
                 return_code = proc.returncode
+                stderr_temp = tostr(stderr_temp)
                 err_msg = ("\nThe console has detected that the utility '{0}' "
                            "ended with an error code.\nYou can get more "
                            "information about the error by running the console"
