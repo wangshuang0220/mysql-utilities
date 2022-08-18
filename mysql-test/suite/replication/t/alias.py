@@ -93,26 +93,32 @@ class test(mutlib.System_test):
             self.server2 = res[0]
             self.servers.add_new_server(self.server2, True)
 
-        self.server1.exec_query("GRANT ALL ON *.* TO 'root'@'{0}' IDENTIFIED "
-                                "BY 'root'".format(self.server1.host))
+        self.server1.exec_query("CREATE USER 'root'@'{0}' "
+                                "".format(self.server1.host))
+        self.server1.exec_query("GRANT ALL ON *.* TO 'root'@'{0}'  "
+                                "".format(self.server1.host))
 
         host_ip = socket.gethostbyname_ex(socket.gethostname())
         _MASTER_ALIASES.append(host_ip[2][0])
         _MASTER_ALIASES.append(host_ip[0])
 
         for ip in host_ip[2]:
+            self.server2.exec_query("CREATE USER 'root'@'{0}' "
+                                    "".format(ip))
             self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'{0}' "
-                                    "IDENTIFIED BY 'root'".format(ip))
+                                    "".format(ip))
             self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                                    "'rpl'@'{0}' IDENTIFIED BY "
-                                    "'rpl'".format(ip))
+                                    "'rpl'@'{0}'  "
+                                    "".format(ip))
 
         for alias in _MASTER_ALIASES:
+            self.server2.exec_query("CREATE USER 'root'@'{0}' "
+                                "".format(alias))
             self.server2.exec_query("GRANT ALL ON *.* TO 'root'@'{0}' "
-                                    "IDENTIFIED BY 'root'".format(alias))
+                                    "".format(alias))
             self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                                    "'rpl'@'{0}' IDENTIFIED BY "
-                                    "'rpl'".format(alias))
+                                    "'rpl'@'{0}' "
+                                    "".format(alias))
 
         return True
 

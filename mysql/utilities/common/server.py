@@ -53,7 +53,9 @@ _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
                "feature support. Errors:")
     
 
-class MySQLUtilsCursorRaw(mysql.connector.cursor.MySQLCursorRaw):
+class MySQLUtilsCursorRaw(
+#        mysql.connector.cursor.MySQLCursorRaw,
+        mysql.connector.cursor_cext.CMySQLCursorRaw):
     """
     Cursor for Connector/Python v2.0, returning bytearray
     """
@@ -72,7 +74,8 @@ class MySQLUtilsCursorRaw(mysql.connector.cursor.MySQLCursorRaw):
 
 
 class MySQLUtilsCursorBufferedRaw(
-        mysql.connector.cursor.MySQLCursorBufferedRaw):
+#        mysql.connector.cursor.MySQLCursorBufferedRaw,
+        mysql.connector.cursor_cext.CMySQLCursorBufferedRaw):
     """
     Cursor for Connector/Python v2.0, returning  bytearray
     """
@@ -242,6 +245,7 @@ def get_local_servers(all_proc=False, start=3306, end=3333,
         for line in tmp_file.readlines():
             mysqld_safe = False
             mysqld = False
+            mariadb = False
             datadir = False
             grep = False
             datadir_arg = ""
@@ -254,10 +258,13 @@ def get_local_servers(all_proc=False, start=3306, end=3333,
                     mysqld = True
                 if "mysqld_safe" in arg:
                     mysqld_safe = True
+                if "mariadb" in arg:
+                    mariadb = True
                 if "grep" in arg:
                     grep = True
             # Check to see if this is a mysqld server and not mysqld_safe proc
-            if ((mysqld and datadir) or (mysqld and not grep)) and \
+            if ((mysqld and datadir) or (mysqld and not grep) \
+               or (mariadb and datadir) or (mariadb and not grep)) and \
                not mysqld_safe:
                 # If provided, check datadir prefix
                 if all_proc:
@@ -433,7 +440,7 @@ def connect_servers(src_val, dest_val, options=None):
     src_name = options.get("src_name", "Source")
     dest_name = options.get("dest_name", "Destination")
     version = options.get("version", None)
-    charset = options.get("charset", None) #CEL utf-8? 
+    charset = options.get("charset", None)  
     verbose = options.get('verbose', False)
 
     ssl_dict = {}
@@ -1105,10 +1112,10 @@ class Server(object):
             self.db_conn = self.get_connection()
             if log_version:
                 log_server_version(self)
-            # If no charset provided, get it from the "character_set_client"
+            # If no charset provided, get it from the "character_set_server"
             # server variable.
             if not self.charset:
-                res = self.show_server_variable('character_set_client')
+                res = self.show_server_variable('character_set_server')
                 self.db_conn.set_charset_collation(charset=res[0][1])
                 self.charset = res[0][1]
             if self.ssl:
@@ -1349,7 +1356,7 @@ class Server(object):
         # If we are fetching all, we need to use a buffered
         if fetch:
             if raw:
-                if mysql.connector.__version_info__ < (2, 0):
+                if mysql.connector.__version_info__ > (2, 0):
                     cur = self.db_conn.cursor(buffered=True, raw=True)
                 else:
                     cur = self.db_conn.cursor(
@@ -1357,7 +1364,7 @@ class Server(object):
             else:
                 cur = self.db_conn.cursor(buffered=True)
         else:
-            if mysql.connector.__version_info__ < (2, 0):
+            if mysql.connector.__version_info__ > (2, 0):
                 cur = self.db_conn.cursor(raw=True)
             else:
                 cur = self.db_conn.cursor(cursor_class=MySQLUtilsCursorRaw)
@@ -2345,7 +2352,7 @@ class QueryKillerThread(threading.Thread):
             # kill the query.
             if not self._stop_event.is_set():
                 try:
-                    if mysql.connector.__version_info__ < (2, 0):
+                    if mysql.connector.__version_info__ > (2, 0):
                         cur = self._connection.cursor(raw=True)
                     else:
                         cur = self._connection.cursor(

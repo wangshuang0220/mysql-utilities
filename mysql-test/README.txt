@@ -6,6 +6,9 @@ Need  python preprocess
 (pip install preprocess or rpm -i python3-preprocess )
 for pre-processing std_data files used in testing.
 
+chmod a+rx /var/log/mariadb    (serverinfo, check log size)
+
+
 emacs
 M-x whitespace-mode
 to show tabs

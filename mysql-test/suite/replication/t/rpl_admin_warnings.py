@@ -52,8 +52,7 @@ _MYSQL_OPTS_GTID_OFF = ' '.join(['"--log-bin=mysql-bin',
                                  '--sync-master-info=1',
                                  '--master-info-repository=table"'])
 
-_GRANT_QUERY = ("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'localhost' "
-                "IDENTIFIED BY 'rpl'")
+_GRANT_QUERY = ("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'localhost' ")
 _SET_SQL_LOG_BIN = "SET SQL_LOG_BIN = {0}"
 
 

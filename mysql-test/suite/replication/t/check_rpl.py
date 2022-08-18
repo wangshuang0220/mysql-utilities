@@ -91,8 +91,7 @@ class test(replicate.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.server2.exec_query("DROP USER rpl@localhost")
-        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO rpl@'%' "
-                                "IDENTIFIED BY 'rpl'")
+        self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO rpl@'%' ")
         self.server2.exec_query("FLUSH PRIVILEGES")
 
         test_num += 1
@@ -104,8 +103,7 @@ class test(replicate.test):
 
         self.server2.exec_query("DROP USER rpl@'%'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* "
-                                "TO rpl@'local%' "
-                                "IDENTIFIED BY 'rpl'")
+                                "TO rpl@'local%' ")
         self.server2.exec_query("FLUSH PRIVILEGES")
 
         test_num += 1
@@ -117,8 +115,7 @@ class test(replicate.test):
 
         self.server2.exec_query("DROP USER rpl@'local%'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* "
-                                "TO rpl@localhost "
-                                "IDENTIFIED BY 'rpl'")
+                                "TO rpl@localhost ")
         self.server2.exec_query("FLUSH PRIVILEGES")
 
         self.do_replacements()

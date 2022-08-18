@@ -323,6 +323,8 @@ class Utilities(object):
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
             stdout_temp, stderr_temp = proc.communicate()
+            stdout_temp = tostr(stdout_temp)
+            stderr_temp = tostr(stderr_temp)
             returncode = proc.returncode
         except OSError:
             # always OS error if not found.

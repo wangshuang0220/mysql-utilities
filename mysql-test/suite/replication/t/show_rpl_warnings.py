@@ -50,7 +50,7 @@ class test(rpl_admin.test):
         self.s4_port = self.server5.port
 
         self.server5.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                                "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+                                "'rpl'@'localhost'")
 
         self.master_str = " --master={0}".format(
             self.build_connection_string(self.server1))

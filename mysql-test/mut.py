@@ -565,7 +565,7 @@ if __name__ == "__main__":
             server_options = {
                 'conn_info': conn_val,
                 'role': "server{0}".format(i),
-                'charset': 'utf8',   # CEL: for mariadb
+#                'charset': 'latin1',   # CEL: for mariadb
             }
             conn = Server(server_options)
             try:

@@ -133,7 +133,7 @@ class test(rpl_sync.test):
             server.exec_query("CREATE USER 'rpl'@'{0}' IDENTIFIED BY 'rpl'"
                               "".format(server.host))
             server.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'{0}' "
-                              "IDENTIFIED BY 'rpl'".format(server.host))
+                              "".format(server.host))
             server.exec_query("SET SQL_LOG_BIN= 1")
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)

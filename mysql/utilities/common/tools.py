@@ -319,7 +319,23 @@ def parse_mysqld_version(vers_str):
     except:
         return None
 
+def parse_mysqld_type(vers_str):
+    """ Parse the server type from version string.
 
+    vers_str[in]     --version output string
+
+    Returns string = (MySQL|Maria|Percona)
+    default is MySQL if no different type found
+    """
+    type = "MySQL" 
+    pattern = r"^\S+\s+Ver\s+[\d\.]+-([^\-]+)"
+    match = re.search(pattern, vers_str)
+    if not match:
+        return type
+    type = match.group(1)
+    return type
+
+    
 def get_mysqld_version(mysqld_path):
     """Return the version number for a mysqld executable.
 
@@ -349,6 +365,37 @@ def get_mysqld_version(mysqld_path):
     # strip path for long, unusual paths that contain version number
     fixed_str = "{0} {1}".format("mysqld", line.strip(mysqld_path))
     return parse_mysqld_version(fixed_str)
+
+
+def get_mysqld_type(mysqld_path):
+    """Return the type of a mysqld executable. (MySQL, MariaDB, etc)
+
+    mysqld_path[in]    location of the mysqld executable
+
+    returns string: MySQL|Maria|Percona
+    """
+    out = open("version_check", 'w')
+    proc = subprocess.Popen("%s --version" % mysqld_path,
+                            stdout=out, stderr=out, shell=True)
+    proc.wait()
+    out.close()
+    out = open("version_check", 'r')
+    line = None
+    for line in out.readlines():
+        if "Ver" in line:
+            break
+    out.close()
+
+    try:
+        os.unlink('version_check')
+    except:
+        pass
+
+    if line is None:
+        return None
+    # strip path for long, unusual paths that contain version number
+    fixed_str = "{0} {1}".format("mysqld", line.strip(mysqld_path))
+    return parse_mysqld_type(fixed_str)
 
 
 def show_file_statistics(file_name, wild=False, out_format="GRID"):

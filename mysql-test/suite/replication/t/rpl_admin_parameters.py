@@ -105,7 +105,7 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
-                                "'rpl'@'localhost' IDENTIFIED BY 'rpl'")
+                                "'rpl'@'localhost'")
 
         test_num += 1
         comment = "Test case {0} - switchover with verbosity".format(test_num)

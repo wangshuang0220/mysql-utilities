@@ -90,7 +90,7 @@ class test(mutlib.System_test):
         for slave in [self.server2, self.server3, self.server4]:
             slave.exec_query("SET SQL_LOG_BIN= 0")
             slave.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'{0}' "
-                             "IDENTIFIED BY 'rpl'".format(self.server1.host))
+                             "".format(self.server1.host))
             slave.exec_query("SET SQL_LOG_BIN= 1")
 
         # Form replication topology - 1 master, 3 slaves

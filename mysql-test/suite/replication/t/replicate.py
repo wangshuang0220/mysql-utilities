@@ -186,12 +186,12 @@ class test(mutlib.System_test):
             self.server1.exec_query("DROP USER IF EXISTS 'rpl'@'%'")
             self.server1.exec_query("CREATE USER 'rpl'@'%'")
             self.server1.exec_query("GRANT ALL ON *.* TO  'rpl'@'%' "
-                                    "IDENTIFIED BY 'rpl' WITH GRANT OPTION")
+                                    "WITH GRANT OPTION")
             self.server2.exec_query("DROP USER IF EXISTS 'rpl'@'localhost'")
             self.server2.exec_query("DROP USER IF EXISTS 'rpl'@'%'")
             self.server2.exec_query("CREATE USER 'rpl'@'%'")
             self.server2.exec_query("GRANT ALL ON *.* TO  'rpl'@'%' "
-                                    "IDENTIFIED BY 'rpl' WITH GRANT OPTION")
+                                    "WITH GRANT OPTION")
         except UtilError:
             raise MUTLibError("{0}: Failed to stop slave.".format(comment))
 
