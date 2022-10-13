@@ -5,7 +5,7 @@
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities
 Version:       %{version}
-Release:       18%{?dist}
+Release:       19%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
 URL:           https://github.com/celane/mysql-utilities
@@ -15,7 +15,6 @@ BuildRequires: python3-devel > 3.0
 ### mysql-connector-python3 should be in /usr/lib64
 ## and sometimes bad builds put it in the wrong place, this checks
 Requires:      mysql-connector-python3 >= 3.0.0
-Requires:      %{python3_sitearch}/mysql/connector/__init__.py
 BuildRequires: git
 #
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
