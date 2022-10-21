@@ -1,14 +1,16 @@
+#global python_version 3.10
 %define version 1.6.5
 %define __python /usr/bin/python3
+%define NVdir %{name}-%{version} 
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities%{python_version_nodots}
 Version:       %{version}
-Release:       20%{?dist}
+Release:       20.git%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
 URL:           https://github.com/celane/mysql-utilities
-Source0:       mysql-utilities-%{version}.tar.gz
+#Source0:       mysql-utilities-#{version}.zip
 BuildArch:     noarch
 AutoReq:       no
 Requires:      python%{python_version}
@@ -32,14 +34,21 @@ are used for maintaining and administering MySQL servers, including:
 
 %prep
 
-%setup -n mysql-utilities-%{version}
+#### build from git ###
+rm -rf %{NVdir}
+git clone %{url}.git %{NVdir}
+###
+
+# #setup -q
 
 %build
+cd %{NVdir}
 %{__python} setup.py build
 
 %install
 rm -rf %{buildroot}
 
+cd %{NVdir}
 %{__python} setup.py install --skip-build \
        --root %{buildroot}  \
      --install-lib %{python3_sitearch}
@@ -64,7 +73,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc CHANGES.txt  LICENSE.txt  README.txt
+%doc %{NVdir}/CHANGES.txt  %{NVdir}/LICENSE.txt  %{NVdir}/README.txt
 %{_bindir}/mysqlbinlogpurge
 %{_bindir}/mysqlbinlogrotate
 %{_bindir}/mysqlslavetrx
@@ -98,9 +107,6 @@ rm -rf %{buildroot}
 %{_mandir}/man1/mysql*.1*
 
 %changelog
-* Thu Oct 20 2022 Charles Lane <lane@dchooz.org> - 1.6.5-20
-- update rpm packaging
-
 * Wed Jan 20 2016 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.6.3-1
 - Update dist values for sles
 - Added mysql_utilities-*.egg-info file for sles12
