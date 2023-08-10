@@ -54,8 +54,9 @@ _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
     
 
 class MySQLUtilsCursorRaw(
-#        mysql.connector.cursor.MySQLCursorRaw,
-        mysql.connector.cursor_cext.CMySQLCursorRaw):
+        mysql.connector.cursor.MySQLCursorRaw,
+#        mysql.connector.cursor_cext.CMySQLCursorRaw
+):
     """
     Cursor for Connector/Python v2.0, returning bytearray
     """
@@ -74,8 +75,9 @@ class MySQLUtilsCursorRaw(
 
 
 class MySQLUtilsCursorBufferedRaw(
-#        mysql.connector.cursor.MySQLCursorBufferedRaw,
-        mysql.connector.cursor_cext.CMySQLCursorBufferedRaw):
+        mysql.connector.cursor.MySQLCursorBufferedRaw,
+#        mysql.connector.cursor_cext.CMySQLCursorBufferedRaw
+):
     """
     Cursor for Connector/Python v2.0, returning  bytearray
     """
