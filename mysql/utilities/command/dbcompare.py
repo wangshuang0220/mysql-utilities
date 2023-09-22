@@ -32,6 +32,7 @@ from mysql.utilities.common.dbcompare import (diff_objects, get_common_objects,
                                               build_diff_list,
                                               DEFAULT_SPAN_KEY_SIZE)
 from mysql.utilities.common.server import connect_servers
+import csv
 
 _PRINT_WIDTH = 75
 _ROW_FORMAT = "# {0:{1}} {2:{3}} {4:{5}} {6:{7}} {8:{9}}"
@@ -40,7 +41,7 @@ _RPT_FORMAT = "{0:{1}} {2:{3}}"
 _ERROR_DB_DIFF = "The object definitions do not match."
 _ERROR_DB_MISSING = "The database {0} does not exist."
 _ERROR_OBJECT_LIST = "The list of objects differs among database {0} and {1}."
-_ERROR_ROW_COUNT = "Row counts are not the same among {0} and {1}.\n#"
+_ERROR_ROW_COUNT = "Row counts are not the same among {0}[{1}] and {2}[{3}].\n#"
 _ERROR_DB_MISSING_ON_SERVER = "The database {0} on {1} does not exist on {2}."
 
 _DEFAULT_OPTIONS = {
@@ -223,7 +224,7 @@ def _check_objects(server1, server2, db1, db2,
         for obj in sorted(objects, key=objects.get):
             print(" {0:>12} : {1}".format(obj, objects[obj]))
 
-    return (in_both, differs)
+    return (in_both, differs, in_db1, in_db2)
 
 
 def _compare_objects(server1, server2, obj1, obj2, reporter, options,
@@ -281,9 +282,10 @@ def _check_row_counts(server1, server2, obj1, obj2, reporter, options):
     if not options['no_row_count']:
         rows1 = server1.exec_query("SELECT COUNT(*) FROM " + obj1)
         rows2 = server2.exec_query("SELECT COUNT(*) FROM " + obj2)
+
         if rows1 != rows2:
             reporter.report_state('FAIL')
-            msg = _ERROR_ROW_COUNT.format(obj1, obj2)
+            msg = _ERROR_ROW_COUNT.format(obj1, rows1[0][0], obj2, rows2[0][0])
             if not options['run_all_tests'] and \
                     not options.get('quiet', False):
                 raise UtilError(msg)
@@ -323,7 +325,6 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
             diff_server1, diff_server2 = check_consistency(
                 server1, server2, obj1, obj2, options, diag_msgs=debug_msgs,
                 reporter=reporter)
-
             # if no differences, return
             if (diff_server1 is None and diff_server2 is None) or \
                     (not reverse and direction == 'server1' and
@@ -345,6 +346,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                                             'server2', 'server1', new_opts)
             if diff_list:
                 errors = diff_list
+
         except UtilError as e:
             if e.errmsg.endswith("not have an usable Index or primary key."):
                 reporter.report_state('SKIP')
@@ -443,9 +445,9 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     # Check for database existence and CREATE differences
     _check_databases(server1, server2, db1_conn.q_db_name, db2_conn.q_db_name,
                      options)
-
+    print("\n #------------options:{0}".format(options))
     # Get common objects and report discrepancies
-    (in_both, differs) = _check_objects(server1, server2, db1, db2,
+    (in_both, differs, in_db1, in_db2) = _check_objects(server1, server2, db1, db2,
                                         db1_conn, db2_conn, options)
     success = not differs
 
@@ -456,6 +458,8 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     server1_sql_mode = server1.select_variable("SQL_MODE")
     server2_sql_mode = server2.select_variable("SQL_MODE")
 
+    # differ_table list，包含所有表对比的结果。
+    table_result_list = []
     # Remaining operations can occur in a loop one for each object.
     for item in in_both:
         error_list = []
@@ -486,16 +490,25 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         else:
             reporter.report_state("-")
 
+        table_name = item[1][0]
+        table_result = False
+        is_in_db1 = True
+        is_in_db2 = True
         # Check data consistency for tables
         if obj_type == 'TABLE':
             errors, debug_msgs = _check_data_consistency(server1, server2,
                                                          q_obj1, q_obj2,
                                                          reporter, options)
+            
             if len(errors) != 0:
                 error_list.extend(errors)
+            else:
+                table_result = True
+
         else:
             reporter.report_state("-")
-
+        per_table_result = [db1, table_name,table_result,is_in_db1,is_in_db2]
+        table_result_list.append(per_table_result)
         if options['verbosity'] > 0:
             if not quiet:
                 print()
@@ -512,6 +525,39 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         if error_list:
             success = False
 
+    # in db1 not in db2
+    for item in in_db1:
+        table_name = item[1][0]
+        table_result = False
+        is_in_db1 = True
+        is_in_db2 = True
+        # Set the object type
+        obj_type = item[0]
+        # Check row counts
+        if obj_type == 'TABLE':
+            is_in_db2 = False
+            per_table_result = [db1, table_name,table_result,is_in_db1,is_in_db2]
+            table_result_list.append(per_table_result)
+
+    # in db2 not in db1
+    for item in in_db2:
+        table_name = item[1][0]
+        table_result = False
+        is_in_db1 = True
+        is_in_db2 = True
+        # Set the object type
+        obj_type = item[0]
+        # Check row counts
+        if obj_type == 'TABLE':
+            is_in_db1 = False
+            per_table_result = [db1, table_name,table_result,is_in_db1,is_in_db2]
+            table_result_list.append(per_table_result)   
+
+    with open('table_result.csv', 'w', newline='') as csvfile:
+        head = ['database', 'table', 'consistency', 'in_source', 'in_target']
+        writer = csv.writer(csvfile)
+        writer.writerow(head)
+        writer.writerows(sorted(table_result_list))
     return success
 
 
@@ -598,6 +644,7 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
     for db in common_dbs:
         try:
             res = database_compare(server1_val, server2_val, db, db, options)
+            print("\n#-----------database_compare_res:{}", res)
             if not res:
                 success = False
             if not quiet:

@@ -71,7 +71,7 @@ class UnicodeWriter(object):
         """
         self.writer.writerow(str(val) for val in row)
         data = self.queue.getvalue()
-        self.stream.write(tostr(data))
+        self.stream.write(tostr(data).encode())
         self.queue.seek(0,0)
         self.queue.truncate(0)
 
@@ -97,8 +97,8 @@ def _format_col_separator(f_out, columns, col_widths, quiet=False):
     stop = len(columns)
     for i in range(0, stop):
         width = int(col_widths[i] + 2)
-        f_out.write(tostr('{0}{1:{1}<{2}}'.format("+", "-", width)))
-    f_out.write(tostr("+\n"))
+        f_out.write(tostr('{0}{1:{1}<{2}}'.format("+", "-", width)).encode())
+    f_out.write(tostr("+\n").encode())
 
 
 def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
@@ -114,24 +114,28 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
     if len(columns) == 1 and row != columns:
         if not isinstance(row,list):
             row = list(row)
+
+    # col_widths_len = len(col_widths)
+
     for i, _ in enumerate(columns):
         if i >= len(row):
             r = 'NULL'
         else:
             r = row[i]
         if not quiet:
-            f_out.write("| ")
+            f_out.write("| ".encode())
         val = r if isinstance(r, str) \
             else str(r)
         if isinstance(val, str):
+           # if i < col_widths_len :
             val = "{0:<{1}}".format(val, col_widths[i] + 1)
-            f_out.write(val)
+            f_out.write(val.encode())
         else:
             f_out.write("{0:<{1}} ".format("%s" % val, col_widths[i]))
 
     if not quiet:
-        f_out.write("|")
-    f_out.write("\n")
+        f_out.write("|".encode())
+    f_out.write("\n".encode())
 
 
 def get_col_widths(columns, rows):
@@ -327,7 +331,7 @@ def format_vertical_list(f_out, columns, rows, options=None):
         row_num += 1
         f_out.write(tostr('{0:{0}<{1}}{2:{3}>{4}}. row {0:{0}<{1}}\n'.format("*", 25,
                                                                        row_num,
-                                                                       ' ', 8)))
+                                                                       ' ', 8)).encode())
         if none_to_null:
             # Convert None values to 'NULL'
             row = ['NULL' if not val else val for val in row]
@@ -337,11 +341,11 @@ def format_vertical_list(f_out, columns, rows, options=None):
             val = row[i] \
                 if isinstance(row[i], str) else row[i]
             out = "{0:>{1}}: {2}\n".format(col, max_colwidth, val)
-            f_out.write(out)
+            f_out.write(out.encode())
 
     if row_num > 0:
         row_str = 'rows' if row_num > 1 else 'row'
-        f_out.write("{0} {1}.\n".format(row_num, row_str))
+        f_out.write("{0} {1}.\n".format(row_num, row_str).encode())
 
 
 def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False,
